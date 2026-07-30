@@ -11,7 +11,7 @@ Gove 的个人游戏作品集网站 — 纯静态 HTML/CSS/JS，部署于 GitHub
 ## Site Structure
 
 ```
-index.html                          # 首页：作品集入口，5 张游戏卡片网格
+index.html                          # 首页：导航 + Hero(统计) + Bento 2+3 作品网格 + 关于 + Footer
 games/
   lightingforyou/index.html         # 游戏详情页 ×5
   archipelago-luminary/index.html
@@ -51,10 +51,9 @@ games/
 
 ## Known Issues
 
-### Breakpoint Inconsistency
+### Breakpoint Consistency
 
-- 首页 `index.html` 主断点用 `820px`，游戏详情页统一用 `860px`
-- 如果同步共享修改，这两个值需保持一致，否则首页和详情页在小屏布局上表现不同
+- 首页 `index.html` 与游戏详情页主断点均已统一为 `860px`；首页移动端在 `560px` 进一步收为单列
 
 ## Editing Guidelines
 

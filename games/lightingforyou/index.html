@@ -3,281 +3,655 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LightingForYou | Gove Game Portfolio</title>
-  <meta name="description" content="LightingForYou：TapTap 聚光灯 2024 21天游戏创作挑战作品，一个关于缺了一点光的叙事冒险游戏。" />
-  <link rel="stylesheet" href="../../shared/style.css">
+  <title>LightingForYou | Gove</title>
+  <meta name="description" content="LightingForYou：黑暗中一粒光，14 个关卡与 14 个隐藏故事的短篇哲理冒险。" />
   <style>
     :root {
-      --bg: #070708;
-      --surface: rgba(18, 18, 20, 0.76);
-      --surface-strong: rgba(29, 28, 32, 0.86);
-      --text: #fff8e7;
-      --muted: #c7bdab;
-      --subtle: #8e8374;
-      --line: rgba(255, 248, 231, 0.13);
-      --light: #ffe08a;
-      --light-strong: #ffbd4a;
-      --blue: #93c5fd;
-      --radius: 24px;
-      --shadow: 0 30px 90px rgba(0, 0, 0, 0.44);
+      --black: #050506;
+      --black-soft: #0a0a0c;
+      --light: #ffd76b;
+      --light-soft: #ffe9a8;
+      --text: #e8e2d4;
+      --muted: #8a8472;
+      --faint: #46423a;
+      --line: rgba(255, 215, 107, 0.12);
     }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
-      background:
-        radial-gradient(circle at 50% 18%, rgba(255, 224, 138, 0.28), transparent 11rem),
-        radial-gradient(circle at 14% 20%, rgba(147, 197, 253, 0.14), transparent 28rem),
-        radial-gradient(circle at 82% 72%, rgba(255, 189, 74, 0.1), transparent 24rem),
-        linear-gradient(180deg, #050505 0%, #111015 48%, #070708 100%);
+      margin: 0;
+      min-height: 100vh;
+      background: var(--black);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      line-height: 1.9;
+      overflow-x: hidden;
     }
 
+    /* 顶部微光 + 底部微光 */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: 0;
       pointer-events: none;
       background:
-        linear-gradient(rgba(255, 248, 231, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 248, 231, 0.035) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: radial-gradient(circle at 50% 20%, black, transparent 72%);
+        radial-gradient(circle at 50% 0%, rgba(255, 215, 107, 0.07), transparent 42vh),
+        radial-gradient(circle at 50% 100%, rgba(255, 215, 107, 0.04), transparent 42vh);
     }
 
-    .site-header {
-      background: rgba(7, 7, 8, 0.76);
+    /* 鼠标光晕 —— 微弱视野机制 */
+    .cursor-glow {
+      position: fixed;
+      width: 560px;
+      height: 560px;
+      left: 0;
+      top: 0;
+      margin: -280px 0 0 -280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 215, 107, 0.13), rgba(255, 215, 107, 0.04) 38%, transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+      transform: translate(-1000px, -1000px);
+      mix-blend-mode: screen;
+      transition: opacity 0.5s ease;
     }
 
-    .brand-mark {
-      border: 1px solid rgba(255, 224, 138, 0.42);
-      border-radius: 999px;
-      color: var(--light);
-      background: rgba(255, 224, 138, 0.08);
-      box-shadow: 0 0 34px rgba(255, 189, 74, 0.22);
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(820px, calc(100% - 48px));
+      margin: 0 auto;
     }
 
-    .hero-layout {
-      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    /* ---------- 顶部 ---------- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0;
+      background: linear-gradient(180deg, rgba(5, 5, 6, 0.92), rgba(5, 5, 6, 0));
     }
+    .topbar a {
+      color: var(--muted);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      transition: color 0.3s ease;
+    }
+    .topbar a:hover { color: var(--light); }
+    .topbar .back::before { content: "← "; }
 
-    h1 {
-      max-width: 760px;
+    /* ---------- Hero ---------- */
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 0;
+    }
+    .light-orb {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--light);
+      box-shadow:
+        0 0 24px rgba(255, 215, 107, 0.9),
+        0 0 64px rgba(255, 215, 107, 0.5),
+        0 0 140px rgba(255, 215, 107, 0.25);
+      animation: breathe 4s ease-in-out infinite;
+      margin-bottom: 46px;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+    .hero h1 {
+      margin: 0;
       font-size: clamp(46px, 9vw, 92px);
-      line-height: 0.9;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: var(--text);
     }
-
-    .eyebrow {
-      color: var(--light);
-    }
-
-    .title-accent {
-      background: linear-gradient(135deg, #fff6c9, var(--light-strong) 56%, #ffffff);
+    .hero h1 em {
+      font-style: normal;
+      color: transparent;
+      background: linear-gradient(180deg, var(--light-soft), var(--light));
       -webkit-background-clip: text;
       background-clip: text;
-      text-shadow: 0 0 46px rgba(255, 189, 74, 0.12);
+    }
+    .hero .sub {
+      margin: 28px 0 0;
+      max-width: 520px;
+      color: var(--muted);
+      font-size: clamp(16px, 2.4vw, 19px);
+      font-style: italic;
+    }
+    .hero .meta {
+      margin-top: 40px;
+      display: inline-flex;
+      gap: 14px;
+      align-items: center;
+      color: var(--faint);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .hero .meta span { color: var(--light); }
+
+    /* ---------- 滚动浮现 ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .button:hover,
-    .button:focus-visible {
-      border-color: rgba(255, 224, 138, 0.5);
+    /* ---------- 引言 ---------- */
+    .intro {
+      padding: 90px 0;
+      text-align: center;
     }
-
-    .button.primary {
-      color: #211605;
-      background: linear-gradient(135deg, #fff1a8, var(--light-strong));
+    .intro p {
+      margin: 0 auto;
+      max-width: 560px;
+      font-size: clamp(20px, 3vw, 28px);
+      line-height: 1.7;
+      color: var(--text);
+      font-style: italic;
     }
-
-    .quote span {
+    .intro p::first-letter {
       color: var(--light);
     }
 
-    .list li {
-      border-left: 2px solid rgba(255, 224, 138, 0.38);
+    /* ---------- 14 关卡光点路径 ---------- */
+    .levels {
+      padding: 70px 0;
     }
-
-    .light-card {
+    .levels-head {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .levels-head h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+    .levels-head p {
+      margin: 0;
+      color: var(--faint);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+    }
+    .level-path {
       position: relative;
-      overflow: hidden;
-      min-height: 390px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background:
-        radial-gradient(circle at 50% 42%, rgba(255, 224, 138, 0.5), transparent 8rem),
-        linear-gradient(180deg, rgba(29, 28, 32, 0.9), rgba(12, 12, 14, 0.82));
-      box-shadow: var(--shadow);
+      list-style: none;
+      margin: 0 auto;
+      padding: 0;
+      max-width: 620px;
     }
-
-    .light-card::before,
-    .light-card::after {
+    .level-path::before {
       content: "";
       position: absolute;
       left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, var(--line) 12%, var(--line) 88%, transparent);
       transform: translateX(-50%);
-      border-radius: 999px;
-      pointer-events: none;
     }
-
-    .light-card::before {
-      top: 54px;
-      width: 132px;
-      height: 132px;
-      background: var(--light);
-      box-shadow:
-        0 0 42px rgba(255, 224, 138, 0.86),
-        0 0 120px rgba(255, 189, 74, 0.42),
-        0 0 220px rgba(255, 248, 231, 0.22);
+    .level {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 84px;
+      padding: 0 0 0 50%;
     }
-
-    .light-card::after {
-      top: 212px;
-      width: 2px;
-      height: 118px;
-      background: linear-gradient(180deg, rgba(255, 224, 138, 0.8), transparent);
+    .level:nth-child(even) {
+      padding: 0 50% 0 0;
+      justify-content: flex-end;
+      text-align: right;
     }
-
-    .light-card-content {
+    .level .dot {
       position: absolute;
-      inset: auto 22px 22px;
-      padding: 18px;
-      border: 1px solid rgba(255, 248, 231, 0.12);
-      border-radius: 18px;
-      background: rgba(7, 7, 8, 0.54);
-      backdrop-filter: blur(12px);
+      left: 50%;
+      top: 50%;
+      width: 9px;
+      height: 9px;
+      margin: -4.5px 0 0 -4.5px;
+      border-radius: 50%;
+      background: var(--black);
+      border: 1px solid var(--faint);
+      transition: all 0.6s ease;
+    }
+    .level.lit .dot {
+      background: var(--light);
+      border-color: var(--light);
+      box-shadow: 0 0 16px rgba(255, 215, 107, 0.8), 0 0 40px rgba(255, 215, 107, 0.35);
+    }
+    .level .frag {
+      max-width: 240px;
+      padding: 0 28px;
+      color: var(--faint);
+      font-style: italic;
+      font-size: 15px;
+      transition: color 0.6s ease;
+    }
+    .level:nth-child(even) .frag { padding: 0 28px 0 0; }
+    .level.lit .frag { color: var(--text); }
+
+    /* ---------- 大引用 ---------- */
+    .bigquote {
+      padding: 120px 0;
+      text-align: center;
+    }
+    .bigquote blockquote {
+      margin: 0 auto;
+      max-width: 640px;
+      font-size: clamp(26px, 4.6vw, 44px);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      font-weight: 400;
+    }
+    .bigquote blockquote em {
+      font-style: normal;
+      color: var(--light);
+    }
+    .bigquote .cite {
+      margin-top: 32px;
+      color: var(--faint);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
     }
 
-    .light-card-content p {
+    /* ---------- 体验三主题 ---------- */
+    .experience {
+      padding: 70px 0;
+    }
+    .exp-head {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .exp-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 400;
+      color: var(--text);
+    }
+    .exp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .exp-card {
+      padding: 30px 24px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 215, 107, 0.02);
+      transition: border-color 0.4s ease, background 0.4s ease;
+    }
+    .exp-card:hover {
+      border-color: rgba(255, 215, 107, 0.4);
+      background: rgba(255, 215, 107, 0.05);
+    }
+    .exp-card h3 {
+      margin: 0 0 12px;
+      font-size: 19px;
+      font-weight: 400;
+      color: var(--light);
+    }
+    .exp-card p {
       margin: 0;
       color: var(--muted);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
     }
 
-    @media (max-width: 860px) {
-      .light-card {
-        min-height: 320px;
+    /* ---------- 光量（5 级视野系统，源自 game_control.gd） ---------- */
+    .volume {
+      padding: 70px 0;
+      text-align: center;
+    }
+    .volume-head {
+      margin-bottom: 44px;
+    }
+    .volume-head h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 400;
+      color: var(--text);
+    }
+    .volume-head p {
+      margin: 0;
+      color: var(--faint);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+    .volume-bars {
+      display: flex;
+      justify-content: center;
+      gap: 26px;
+      flex-wrap: wrap;
+    }
+    .vol {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .vol-orb {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+    }
+    .vol-orb.v1 { background: radial-gradient(circle, #3b82f6, transparent 72%); box-shadow: 0 0 28px rgba(59, 130, 246, 0.6); }
+    .vol-orb.v2 { background: radial-gradient(circle, #6ee7b7, transparent 72%); box-shadow: 0 0 28px rgba(110, 231, 183, 0.6); }
+    .vol-orb.v3 { background: radial-gradient(circle, #ffffff, transparent 72%); box-shadow: 0 0 28px rgba(255, 255, 255, 0.6); }
+    .vol-orb.v4 { background: radial-gradient(circle, #ffd76b, transparent 72%); box-shadow: 0 0 28px rgba(255, 215, 107, 0.6); }
+    .vol-orb.v5 { background: radial-gradient(circle, #ef4444, transparent 72%); box-shadow: 0 0 28px rgba(239, 68, 68, 0.6); }
+    .vol-name {
+      color: var(--text);
+      font-size: 15px;
+      letter-spacing: 0.14em;
+    }
+
+    /* ---------- 截图（昏暗 → 点亮） ---------- */
+    .media {
+      padding: 70px 0;
+    }
+    .media-head {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+    .media-head h2 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 400;
+      color: var(--text);
+    }
+    .media-head p {
+      margin: 0;
+      color: var(--faint);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .shot {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      cursor: pointer;
+    }
+    .shot img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      filter: brightness(0.32) saturate(0.7);
+      transition: filter 0.6s ease, transform 0.6s ease;
+    }
+    .shot:hover img,
+    .shot:focus-visible img {
+      filter: brightness(1) saturate(1);
+      transform: scale(1.03);
+    }
+    .shot::after {
+      content: "靠近，才能看清";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    .shot:hover::after,
+    .shot:focus-visible::after { opacity: 0; }
+
+    /* ---------- 底部 ---------- */
+    .bottom {
+      padding: 90px 0 70px;
+      text-align: center;
+    }
+    .bottom .links {
+      display: inline-flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .bottom .links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+    }
+    .bottom .links a:hover {
+      border-color: var(--light);
+      color: var(--light);
+      background: rgba(255, 215, 107, 0.05);
+    }
+    .bottom .sign {
+      margin-top: 50px;
+      color: var(--faint);
+      font-style: italic;
+      font-size: 14px;
+    }
+
+    /* ---------- 响应式 ---------- */
+    @media (max-width: 720px) {
+      .exp-grid { grid-template-columns: 1fr; }
+      .media-grid { grid-template-columns: 1fr; }
+      .level, .level:nth-child(even) {
+        padding: 0 0 0 50%;
+        justify-content: flex-start;
+        text-align: left;
       }
+      .level:nth-child(even) .frag { padding: 0 0 0 28px; }
+      .level .frag { padding: 0 0 0 28px; }
+      .cursor-glow { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+      }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="../../index.html" aria-label="返回作品集首页">
-        <span class="brand-mark">L</span>
-        <span>LightingForYou</span>
-      </a>
-      <nav class="nav-links" aria-label="页面导航">
-        <a href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">TapTap 页面</a>
-        <a href="../../index.html">返回作品集</a>
-      </nav>
+  <div class="cursor-glow" id="glow" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="topbar">
+      <a class="back" href="../../index.html">返回作品集</a>
+      <a href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">TapTap 页面</a>
     </div>
-  </header>
 
-  <main>
     <section class="hero">
-      <div class="container hero-layout">
-        <div>
-          <p class="eyebrow">TapTap 聚光灯 2024 · 21天游戏创作挑战</p>
-          <h1><span class="title-accent">Lighting<br />ForYou</span></h1>
-          <p class="hero-copy">
-            Light, 光。每个人的生活都缺了一点光。一个在 21 天内完成的叙事冒险游戏，包含 14 个关卡与 14 个隐藏故事。
-          </p>
+      <div class="light-orb" aria-hidden="true"></div>
+      <h1>Lighting<em>ForYou</em></h1>
+      <p class="sub">Light，光。每个人的生活都缺了一点光。</p>
+      <p class="meta">TapTap 聚光灯 2024 · <span>21 天游戏创作挑战</span></p>
+    </section>
 
-        </div>
+    <section class="intro reveal">
+      <p>尽管所有人都确实活着，但是，说真的，你不觉得你也缺了一点光吗？遗憾的是，我们已经找不到那点光了。</p>
+    </section>
 
-        <aside class="light-card" aria-label="LightingForYou 视觉概念图">
-          <div class="light-card-content">
-            <p>“你不会从中找到那一点光。不过还好，并不是一无所有。”</p>
-          </div>
-        </aside>
+    <section class="levels">
+      <div class="levels-head reveal">
+        <h2>14 个关卡，14 段隐藏故事</h2>
+        <p>迷宫中 · 光之心 · 暗中人 · 光柱体 · 游荡灵 · 机关门 · 传送穴</p>
+      </div>
+      <ul class="level-path">
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>奇点</b> · 灵光一闪，诸般皆有</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>所有物</b> · 静下来，微光如呼吸</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>蛋糕</b> · 好想吃，好想吃，好想吃</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>独角兽</b> · 我刚好有一只，借你玩玩</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>讨厌</b> · 他们讨厌我，我也讨厌他们</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>社会学</b> · 我想静静，但母亲电脑不让</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>奇迹</b> · 小时候的奇迹轻而易举</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>海</b> · 你知道我说的不止是海</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>我死后</b> · 尽管仍然年轻，但这也说不准</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>三段论</b> · 山不过来，我便过去</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>门</b> · 通道或者隔阂，这是一个问题</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>预告片</b> · 在过去，预言家看到了未来</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>世界线</b> · 龙不吃青草与肉，蛇只吃自己的手</span></li>
+        <li class="level reveal"><span class="dot"></span><span class="frag"><b>矩阵</b> · 另一位观察者阻止了你的访问</span></li>
+      </ul>
+    </section>
+
+    <section class="bigquote reveal">
+      <blockquote>你不会从中找到那<em>一点光</em>。<br />不过还好，<em>并不是一无所有</em>。</blockquote>
+      <p class="cite">— LightingForYou</p>
+    </section>
+
+    <section class="volume reveal">
+      <div class="volume-head">
+        <h2>光量</h2>
+        <p>视野即生命——光的体积决定你能看见多少</p>
+      </div>
+      <div class="volume-bars">
+        <div class="vol"><span class="vol-orb v1"></span><span class="vol-name">冗余</span></div>
+        <div class="vol"><span class="vol-orb v2"></span><span class="vol-name">闲置</span></div>
+        <div class="vol"><span class="vol-orb v3"></span><span class="vol-name">额定</span></div>
+        <div class="vol"><span class="vol-orb v4"></span><span class="vol-name">负荷</span></div>
+        <div class="vol"><span class="vol-orb v5"></span><span class="vol-name">超载</span></div>
       </div>
     </section>
 
-
-
-
-
-    <section class="theme-section" aria-labelledby="theme-title">
-      <div class="container">
-        <div class="section-header">
-          <h2 id="theme-title">Experience</h2>
-          <p class="section-note">不是把“光”当成奖励，而是把看不清、走错、卡住和重新理解自己做成体验。</p>
-        </div>
-        <div class="theme-grid">
-          <article class="theme-card">
-            <h3>微弱视野</h3>
-            <p>玩家像一粒光在黑暗中移动，能看到的范围本身就是生命、方向和不安。</p>
-          </article>
-          <article class="theme-card">
-            <h3>隐藏故事</h3>
-            <p>14 个隐藏故事让关卡不只是通关目标，也像一组被拾起的记忆碎片。</p>
-          </article>
-          <article class="theme-card">
-            <h3>情绪关卡</h3>
-            <p>迷宫、敌人和文本都服务于“少了一点光”的主题，而不是单纯追求爽快。</p>
-          </article>
-        </div>
+    <section class="experience">
+      <div class="exp-head reveal">
+        <h2>体验</h2>
+      </div>
+      <div class="exp-grid">
+        <article class="exp-card reveal">
+          <h3>微弱视野</h3>
+          <p>玩家像一粒光在黑暗中移动，能看到的范围本身就是生命、方向和不安。</p>
+        </article>
+        <article class="exp-card reveal">
+          <h3>隐藏故事</h3>
+          <p>14 个隐藏故事让关卡不只是通关目标，也像一组被拾起的记忆碎片。</p>
+        </article>
+        <article class="exp-card reveal">
+          <h3>情绪关卡</h3>
+          <p>迷宫、敌人和文本都服务于"少了一点光"的主题，而不是单纯追求爽快。</p>
+        </article>
       </div>
     </section>
 
-    <section id="media" aria-labelledby="media-title">
-      <div class="container">
-        <div class="section-header">
-          <h2 id="media-title">Media</h2>
-          <p class="section-note">TapTap 页面实机截图。点击图片可以放大查看。</p>
-        </div>
-        <div class="media-grid">
-          <button class="media-shot" type="button" aria-label="放大截图 1">
-            <img src="screenshot-01.jpg" alt="lightingforyou 游戏截图 1" loading="lazy">
-          </button>
-          <button class="media-shot" type="button" aria-label="放大截图 2">
-            <img src="screenshot-02.jpg" alt="lightingforyou 游戏截图 2" loading="lazy">
-          </button>
-          <button class="media-shot" type="button" aria-label="放大截图 3">
-            <img src="screenshot-03.jpg" alt="lightingforyou 游戏截图 3" loading="lazy">
-          </button>
-          <button class="media-shot" type="button" aria-label="放大截图 4">
-            <img src="screenshot-04.jpg" alt="lightingforyou 游戏截图 4" loading="lazy">
-          </button>
-          <button class="media-shot" type="button" aria-label="放大截图 5">
-            <img src="screenshot-05.jpg" alt="lightingforyou 游戏截图 5" loading="lazy">
-          </button>
-          <button class="media-shot" type="button" aria-label="放大截图 6">
-            <img src="screenshot-06.jpg" alt="lightingforyou 游戏截图 6" loading="lazy">
-          </button>
-        </div>
+    <section class="media">
+      <div class="media-head reveal">
+        <h2>实机截图</h2>
+        <p>靠近，才能看清</p>
+      </div>
+      <div class="media-grid">
+        <button class="shot" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="LightingForYou 截图 1" loading="lazy"></button>
+        <button class="shot" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="LightingForYou 截图 2" loading="lazy"></button>
+        <button class="shot" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="LightingForYou 截图 3" loading="lazy"></button>
+        <button class="shot" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="LightingForYou 截图 4" loading="lazy"></button>
+        <button class="shot" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="LightingForYou 截图 5" loading="lazy"></button>
+        <button class="shot" type="button" aria-label="放大截图 6"><img src="screenshot-06.jpg" alt="LightingForYou 截图 6" loading="lazy"></button>
       </div>
     </section>
 
-    <section id="about" aria-labelledby="about-title">
-      <div class="container">
-        <div class="section-header">
-          <h2 id="about-title">About the Game</h2>
-          <p class="section-note">参考对应商店页面介绍整理，去掉平台噪音信息，保留玩法、主题与展示价值。</p>
-        </div>
-        <div class="detail-grid">
-          <div class="content-card detail-card">
-            <h3>游戏介绍</h3>
-            <p>LightingForYou 是 TapTap 聚光灯 2024「21 天游戏创作挑战」作品。它从一句“每个人的生活都缺了一点光”出发，把迷宫、微弱视野、隐藏文本和关卡推进组合成一次偏情绪化的短篇冒险。游戏不把“找到光”当作确定答案，而是让玩家在 14 个关卡和 14 个隐藏故事中，逐渐接近自己为什么会少了那一点光。</p>
-            <p>页面原文里反复强调“你不会从中找到那一点光，不过并不是一无所有”。所以作品集页面保留了暗色、光源和留白，把它呈现为一个关于追逐、卡住、放过自己与继续前进的短篇体验。</p>
-          </div>
-          <div class="content-card detail-card">
-            <h3>作品亮点</h3>
-            <ul class="list">
-              <li>14 个关卡与 14 个隐藏故事，形成短篇但完整的体验结构。</li>
-              <li>以“光”为视觉与叙事核心，玩法目标和情绪表达绑定在一起。</li>
-              <li>关卡内的星星、文本与隐藏内容，让玩家在通关之外继续探索。</li>
-              <li>TapTap 页面评价中多次提到“画风简洁、音乐好听、像在探索人生的宇宙”。</li>
-            </ul>
-          </div>
-        </div>
+    <section class="bottom">
+      <div class="links">
+        <a href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">在 TapTap 查看 →</a>
+        <a href="../../index.html">返回作品集 →</a>
       </div>
+      <p class="sign">LightingForYou — Gove</p>
     </section>
+  </div>
 
+  <script>
+    (function () {
+      // 鼠标光晕跟随 —— 微弱视野
+      const glow = document.getElementById('glow');
+      let tx = -1000, ty = -1000, cx = -1000, cy = -1000;
+      window.addEventListener('mousemove', (e) => { tx = e.clientX; ty = e.clientY; });
+      function loop() {
+        cx += (tx - cx) * 0.12;
+        cy += (ty - cy) * 0.12;
+        glow.style.transform = `translate(${cx}px, ${cy}px)`;
+        requestAnimationFrame(loop);
+      }
+      loop();
 
-  </main>
+      // 滚动浮现 + 关卡光点点亮
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add('in');
+            if (en.target.classList.contains('level')) en.target.classList.add('lit');
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.35 });
+      document.querySelectorAll('.reveal, .level').forEach((el) => io.observe(el));
 
-  <div class="lightbox" role="button" tabindex="0" aria-label="关闭截图预览"><img alt=""></div>
-
-
-
-  <script src="../../shared/script.js" defer></script>
+      // 截图简易放大
+      const shots = document.querySelectorAll('.shot');
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.9);cursor:zoom-out;';
+      const big = document.createElement('img');
+      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:14px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
+      overlay.appendChild(big);
+      document.body.appendChild(overlay);
+      shots.forEach((s) => {
+        s.addEventListener('click', () => {
+          big.src = s.querySelector('img').src;
+          overlay.style.display = 'flex';
+        });
+      });
+      overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.style.display = 'none'; });
+    })();
+  </script>
 </body>
 </html>
