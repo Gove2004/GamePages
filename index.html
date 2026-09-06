@@ -16,14 +16,12 @@
       --line: rgba(255, 255, 255, .08);
       --line-2: rgba(255, 255, 255, .16);
       --maxw: 1280px;
-      --header-h: 68px;
+      --header-h: 64px;
 
       --mono: ui-monospace, "Cascadia Code", "SF Mono", "JetBrains Mono", Consolas, monospace;
       --serif: Georgia, "Times New Roman", "Songti SC", serif;
-
       --ease: cubic-bezier(.2, .7, .3, 1);
 
-      /* 各作品标志色 */
       --c-light: #ffd76b;
       --c-luminary: #e7ecf2;
       --c-unreal: #9b8cff;
@@ -38,894 +36,1052 @@
       min-height: 100vh;
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      line-height: 1.55;
+      line-height: 1.6;
       background: var(--bg);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ===== 背景：光晕 + 视差网格 + 颗粒 ===== */
-    .bg-fx { position: fixed; inset: 0; z-index: -3; pointer-events: none; }
-    .bg-fx::before {
-      content: ""; position: absolute; inset: 0;
-      background:
-        radial-gradient(900px 580px at 72% -10%, rgba(46, 230, 255, .11), transparent 62%),
-        radial-gradient(780px 560px at 6% 110%, rgba(155, 140, 255, .11), transparent 62%),
-        var(--bg);
-    }
-    .bg-grid {
-      position: absolute; inset: -8%;
-      opacity: .45;
-      background-image:
-        linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
-      background-size: 64px 64px;
-      background-position: calc(var(--mx, 0) * 14px) calc(var(--my, 0) * 14px);
-      mask-image: radial-gradient(circle at 50% 26%, black, transparent 82%);
-      -webkit-mask-image: radial-gradient(circle at 50% 26%, black, transparent 82%);
-      transition: background-position 600ms var(--ease);
-    }
-    .bg-grain {
-      position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: .05;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-    /* 鼠标光晕（仅指针设备） */
-    .cursor-glow {
-      position: fixed; top: 0; left: 0; width: 460px; height: 460px;
-      z-index: -1; pointer-events: none; opacity: 0; transition: opacity 500ms ease;
-      background: radial-gradient(circle, color-mix(in srgb, var(--accent, #2ee6ff) 12%, transparent), transparent 66%);
-    }
-    .cursor-glow.on { opacity: 1; }
-
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
-    .container { width: min(var(--maxw), calc(100% - 48px)); margin: 0 auto; }
 
     /* ===== 顶部导航 ===== */
-    .site-header {
-      position: sticky; top: 0; z-index: 60;
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 4vw, 48px);
+      background: rgba(6, 7, 12, .72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--line);
-      background: rgba(6, 7, 12, .5);
-      backdrop-filter: blur(18px) saturate(140%);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      transition: background 300ms ease, border-color 300ms ease;
     }
-    .site-header::after {
-      content: ""; position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%;
-      transform: scaleX(var(--sp, 0)); transform-origin: left;
-      background: linear-gradient(90deg, var(--c-slime), var(--c-unreal), var(--c-light));
-      transition: transform 120ms linear;
+    .nav-brand {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: .04em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .site-header.scrolled { background: rgba(6, 7, 12, .82); border-bottom-color: var(--line-2); }
-    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: var(--header-h); transition: min-height 300ms var(--ease); }
-    .site-header.scrolled .nav { min-height: 56px; }
+    .nav-brand .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--c-light);
+      box-shadow: 0 0 12px var(--c-light);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(.8); }
+    }
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: color .25s, background .25s;
+      white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .nav-toggle {
+      display: none;
+      background: none; border: 1px solid var(--line-2);
+      color: var(--text);
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
 
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 900; letter-spacing: -.02em; font-size: 19px; }
-    .brand-mark {
-      display: grid; width: 36px; height: 36px; place-items: center; flex: none;
-      border-radius: 11px; border: 1px solid rgba(46, 230, 255, .4);
-      color: #2ee6ff; background: rgba(46, 230, 255, .08);
-      font-size: 16px; font-weight: 900;
-      animation: markPulse 4s ease-in-out infinite;
+    /* ===== Hero ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: calc(var(--header-h) + 40px) 24px 80px;
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes markPulse {
-      0%, 100% { box-shadow: 0 0 20px rgba(46, 230, 255, .16); }
-      50% { box-shadow: 0 0 36px rgba(46, 230, 255, .40); }
-    }
-    .nav-links { display: flex; align-items: center; gap: 26px; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .03em; }
-    .nav-links a { position: relative; padding: 6px 0; transition: color 180ms ease; }
-    .nav-links a::after {
-      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-      background: currentColor; transform: scaleX(0); transform-origin: left;
-      transition: transform 260ms var(--ease);
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::after { transform: scaleX(1); }
-    .nav-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--subtle); text-transform: uppercase; }
-
-    /* ===== HERO 轮播 ===== */
-    .hero { position: relative; }
-    .carousel {
-      position: relative; overflow: hidden; --accent: var(--c-slime);
-      height: clamp(480px, calc(100vh - var(--header-h)), 900px);
-    }
-    @supports (height: 100svh) {
-      .carousel { height: clamp(480px, calc(100svh - var(--header-h)), 900px); }
-    }
-    .slides { position: absolute; inset: 0; }
-    .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .8s ease, visibility .8s ease; }
-    .slide.active { opacity: 1; visibility: visible; }
-    .slide-bg {
-      position: absolute; inset: 0; background-size: cover; background-position: center;
-      transform: scale(1.08); transition: transform 7s linear;
-    }
-    .slide.active .slide-bg { transform: scale(1); }
-    .slide-overlay {
+    .hero-bg {
       position: absolute; inset: 0;
+      z-index: 0;
       background:
-        linear-gradient(90deg, rgba(6, 7, 12, .95) 0%, rgba(6, 7, 12, .6) 42%, rgba(6, 7, 12, .10) 100%),
-        linear-gradient(0deg, rgba(6, 7, 12, .96) 0%, rgba(6, 7, 12, .25) 58%);
+        radial-gradient(800px 500px at 50% 20%, rgba(255, 215, 107, .08), transparent 60%),
+        radial-gradient(600px 400px at 80% 80%, rgba(155, 140, 255, .07), transparent 60%),
+        radial-gradient(600px 400px at 20% 70%, rgba(46, 230, 255, .06), transparent 60%);
     }
-    .slide-glow {
-      position: absolute; left: 4%; bottom: 12%; width: min(560px, 70vw); aspect-ratio: 1; border-radius: 50%;
-      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 62%);
-      filter: blur(34px); opacity: 0; transition: opacity .9s ease; pointer-events: none;
+    .hero-grid {
+      position: absolute; inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at 50% 40%, black, transparent 75%);
     }
-    .slide.active .slide-glow { opacity: 1; animation: glowBreath 7s ease-in-out infinite; }
-    @keyframes glowBreath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-
-    .slide-content {
-      position: absolute; left: 0; right: 0; bottom: clamp(56px, 9vh, 104px);
-      display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
-      max-width: 760px;
+    .hero-content { position: relative; z-index: 1; max-width: 780px; }
+    .hero-kicker {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--subtle);
+      margin: 0 0 28px;
     }
-    /* 逐行 stagger 入场 */
-    .slide-content > * { opacity: 0; transform: translateY(24px); }
-    .slide.active .slide-content > * { animation: rise .78s var(--ease) forwards; }
-    .slide.active .slide-content > *:nth-child(1) { animation-delay: .10s; }
-    .slide.active .slide-content > *:nth-child(2) { animation-delay: .18s; }
-    .slide.active .slide-content > *:nth-child(3) { animation-delay: .26s; }
-    .slide.active .slide-content > *:nth-child(4) { animation-delay: .36s; }
-    .slide.active .slide-content > *:nth-child(5) { animation-delay: .44s; }
-    .slide.active .slide-content > *:nth-child(6) { animation-delay: .52s; }
-    @keyframes rise { to { opacity: 1; translate: 0 0; } }
-
-    .slide-eyebrow {
-      display: inline-flex; align-items: center; gap: 12px; margin: 0;
-      font-family: var(--mono); font-size: 12px; font-weight: 600;
-      letter-spacing: .22em; text-transform: uppercase; color: var(--muted);
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(48px, 10vw, 110px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #fff 30%, var(--c-light) 60%, var(--c-unreal) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .slide-eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent); flex: none; }
-    .slide-index { font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .34em; color: var(--accent); text-transform: uppercase; }
-    .slide-title {
-      margin: 0; font-weight: 900; letter-spacing: -.045em; line-height: .92;
-      font-size: clamp(54px, 9vw, 116px); text-shadow: 0 22px 64px rgba(0, 0, 0, .55);
+    .hero-sub {
+      margin: 28px auto 0;
+      font-size: clamp(16px, 2.4vw, 22px);
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
     }
-    .slide-title .accent {
-      color: transparent;
-      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 78%, #fff), var(--accent));
-      -webkit-background-clip: text; background-clip: text;
+    .hero-sub em {
+      font-style: normal;
+      color: var(--c-light);
     }
-    .slide-tagline { margin: 0; font-family: var(--serif); font-size: clamp(17px, 2vw, 23px); font-style: italic; color: var(--text); }
-    .slide-tags { display: flex; flex-wrap: wrap; gap: 10px; }
-    .slide-tags span {
-      padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line-2);
-      color: var(--muted); background: rgba(255, 255, 255, .04);
-      font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    .hero-meta {
+      margin-top: 40px;
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-    .btn {
-      display: inline-flex; align-items: center; gap: 10px; min-height: 50px; padding: 0 26px;
-      border-radius: 999px; font-size: 14.5px; font-weight: 800; letter-spacing: .02em;
-      border: 1px solid var(--line-2); color: var(--text);
-      transition: transform 200ms ease, border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+    .hero-meta .item {
+      text-align: center;
     }
-    .btn.primary {
-      border-color: transparent; color: #06070c;
-      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #ffffff));
-      box-shadow: 0 14px 38px color-mix(in srgb, var(--accent) 45%, transparent);
+    .hero-meta .num {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
     }
-    .btn.primary:hover { transform: translateY(-3px); box-shadow: 0 22px 54px color-mix(in srgb, var(--accent) 62%, transparent); }
-    .btn.primary:active { transform: translateY(-1px) scale(.985); }
-
-    /* 右侧竖排索引轨（桌面） */
-    .rail {
-      position: absolute; right: clamp(16px, 3vw, 44px); top: 50%; transform: translateY(-50%);
-      z-index: 8; display: flex; flex-direction: column; gap: 4px;
+    .hero-meta .label {
+      font-size: 12px;
+      color: var(--subtle);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-top: 2px;
     }
-    .rail button {
-      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-      width: 74px; padding: 7px 0; border: 0; background: none; cursor: pointer;
-      font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .18em;
-      color: var(--subtle); transition: color 260ms ease;
+    .hero-scroll {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--subtle);
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
     }
-    .rail button::after {
-      content: ""; width: 18px; height: 1px; background: currentColor; opacity: .45;
-      transition: width 320ms var(--ease), opacity 260ms ease;
+    .hero-scroll .line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--subtle), transparent);
+      animation: scrollLine 2s ease-in-out infinite;
     }
-    .rail button:hover { color: var(--text); }
-    .rail button:hover::after { width: 30px; opacity: 1; }
-    .rail button.on { color: var(--accent); }
-    .rail button.on::after { width: 40px; opacity: 1; }
-
-    /* 圆点（移动） */
-    .dots {
-      position: absolute; left: 0; right: 0; bottom: 26px; z-index: 8;
-      display: none; justify-content: center; gap: 8px;
-    }
-    .dots button {
-      position: relative; width: 22px; height: 22px; border: 0; padding: 0; cursor: pointer; background: none;
-    }
-    .dots button::after {
-      content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-      width: 7px; height: 7px; border-radius: 999px; background: rgba(255, 255, 255, .28);
-      transition: width 280ms var(--ease), background 280ms ease, border-radius 280ms var(--ease);
-    }
-    .dots button.on::after { width: 24px; background: var(--accent); border-radius: 999px; }
-
-    .carousel .nav-btn {
-      position: absolute; top: 50%; transform: translateY(-50%); z-index: 8;
-      width: 54px; height: 54px; display: grid; place-items: center; cursor: pointer;
-      border-radius: 50%; border: 1px solid var(--line-2); background: rgba(6, 7, 12, .5);
-      color: var(--text); font-size: 26px; line-height: 1; backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
-    }
-    .carousel .nav-btn:hover { background: rgba(6, 7, 12, .85); border-color: var(--accent); color: var(--accent); transform: translateY(-50%) scale(1.06); }
-    .carousel .nav-btn.prev { left: clamp(12px, 2vw, 32px); }
-    .carousel .nav-btn.next { right: clamp(12px, 2vw, 32px); }
-
-    .scroll-hint {
-      position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 8; margin: 0;
-      font-family: var(--mono); font-size: 11px; letter-spacing: .3em; text-transform: uppercase;
-      color: var(--subtle); animation: bob 2.6s ease-in-out infinite;
-    }
-    @keyframes bob { 0%, 100% { transform: translate(-50%, 0); opacity: .45; } 50% { transform: translate(-50%, 6px); opacity: 1; } }
-
-    /* 自动播放进度条 */
-    .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .07); z-index: 9; }
-    .progress i {
-      display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: left;
-      background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), var(--accent));
-      box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent);
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
     }
 
-    /* ===== 索引滚动带 ===== */
-    .ticker {
-      border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, .012); overflow: hidden; padding: 14px 0;
-      mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
-      -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+    /* ===== 五扇门通用 ===== */
+    .gates { position: relative; }
+    .gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 80px clamp(20px, 5vw, 80px);
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
     }
-    .ticker-track { display: flex; width: max-content; animation: ticker 38s linear infinite; }
-    .ticker:hover .ticker-track { animation-play-state: paused; }
-    .ticker-group { display: flex; align-items: center; flex: none; }
-    .ticker-group b {
-      font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .2em;
-      color: var(--subtle); text-transform: uppercase; margin: 0 18px;
+    .gate-inner {
+      width: 100%;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(32px, 6vw, 80px);
+      align-items: center;
     }
-    .ticker-group b i { font-style: normal; color: var(--accent); margin-right: 8px; }
-    @keyframes ticker { to { transform: translateX(-50%); } }
-
-    /* ===== 作品列表 ===== */
-    .works { padding: clamp(64px, 10vh, 120px) 0 clamp(40px, 6vh, 72px); }
-    .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 40px; flex-wrap: wrap; }
-    .section-head .kicker {
-      display: inline-flex; align-items: center; gap: 12px; margin: 0 0 14px;
-      font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .24em;
-      text-transform: uppercase; color: var(--subtle);
+    .gate-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 360px;
+      position: relative;
     }
-    .section-head .kicker::before { content: ""; width: 26px; height: 1px; background: var(--subtle); }
-    .section-head h2 { margin: 0; font-size: clamp(34px, 5vw, 62px); font-weight: 900; letter-spacing: -.045em; line-height: 1; }
-    .section-head h2 span { color: var(--subtle); font-weight: 800; }
-    .section-head .note { max-width: 430px; margin: 0; color: var(--muted); font-size: 15px; font-family: var(--serif); font-style: italic; line-height: 1.7; }
-
-    .works-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-    .work { position: relative; border-bottom: 1px solid var(--line); }
-    .work::before {
-      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; z-index: 2;
-      background: var(--accent); transform: scaleY(0); transform-origin: top;
-      transition: transform 380ms var(--ease);
+    .gate-info { position: relative; z-index: 1; }
+    .gate-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      margin: 0 0 16px;
     }
-    .work:hover::before, .work:focus-within::before { transform: scaleY(1); }
-    .work > a {
-      display: grid; align-items: center; gap: 26px; padding: 26px 20px;
-      grid-template-columns: 92px 200px 1fr auto 44px;
-      grid-template-areas: "num thumb main meta go";
-      transition: padding 320ms var(--ease), background 320ms var(--ease);
+    .gate h2 {
+      margin: 0 0 14px;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.01em;
     }
-    .work:hover > a, .work:focus-within > a { padding-left: 36px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 11%, transparent), transparent 74%); }
-
-    .work-num {
-      grid-area: num; font-family: var(--mono); font-weight: 800; letter-spacing: -.04em;
-      font-size: clamp(26px, 3vw, 38px); line-height: 1;
-      color: transparent; -webkit-text-stroke: 1px var(--subtle);
-      transition: color 320ms ease, -webkit-text-stroke-color 320ms ease, transform 320ms var(--ease);
+    .gate-tagline {
+      margin: 0 0 20px;
+      font-size: clamp(15px, 2vw, 19px);
+      line-height: 1.7;
+      max-width: 480px;
     }
-    .work:hover .work-num { color: var(--accent); -webkit-text-stroke-color: var(--accent); transform: translateX(3px); }
-
-    .work-thumb {
-      grid-area: thumb; width: 200px; aspect-ratio: 16 / 9; border-radius: 12px;
-      background-size: cover; background-position: center;
-      border: 1px solid var(--line); position: relative; overflow: hidden;
-      transition: transform 420ms var(--ease), box-shadow 420ms var(--ease), border-color 320ms ease;
+    .gate-desc {
+      margin: 0 0 28px;
+      font-size: 14px;
+      line-height: 1.8;
+      max-width: 460px;
     }
-    .work-thumb::after {
-      content: "查看"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      font-family: var(--mono); font-size: 11.5px; letter-spacing: .18em; color: #fff;
-      background: color-mix(in srgb, var(--accent) 32%, rgba(6, 7, 12, .6));
-      opacity: 0; transition: opacity 320ms ease;
+    .gate-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
     }
-    .work:hover .work-thumb { transform: scale(1.045); border-color: color-mix(in srgb, var(--accent) 45%, transparent); box-shadow: 0 20px 48px rgba(0, 0, 0, .6); }
-    .work:hover .work-thumb::after { opacity: 1; }
-
-    .work-main { grid-area: main; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
-    .work-title { font-size: clamp(21px, 2.6vw, 30px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
-    .work-tagline { margin: 0; font-family: var(--serif); font-size: 14.5px; font-style: italic; color: var(--accent); }
-    .work-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-    .work-tags span {
-      padding: 4px 11px; border-radius: 999px; border: 1px solid var(--line-2);
-      color: var(--muted); font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    .gate-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid;
     }
-    .work-meta { grid-area: meta; font-family: var(--mono); color: var(--subtle); font-size: 12px; font-weight: 600; letter-spacing: .08em; white-space: nowrap; text-transform: uppercase; }
-    .work-go { grid-area: go; justify-self: end; font-family: var(--mono); font-size: 22px; color: var(--subtle); transition: transform 260ms var(--ease), color 260ms ease; }
-    .work:hover .work-go { transform: translateX(6px); color: var(--accent); }
-
-    /* 跟随鼠标的大图预览（仅指针设备） */
-    .peek { position: fixed; top: 0; left: 0; z-index: 50; pointer-events: none; will-change: transform; }
-    .peek-inner {
-      width: 330px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line-2);
-      background: var(--surface); box-shadow: 0 32px 78px rgba(0, 0, 0, .68);
-      opacity: 0; transform: scale(.94) translateY(6px);
-      transition: opacity .28s ease, transform .34s var(--ease);
+    .gate-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 30px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      border: 1px solid;
+      transition: transform .3s var(--ease), box-shadow .3s;
     }
-    .peek.on .peek-inner { opacity: 1; transform: none; }
-    .peek-img { height: 186px; background-size: cover; background-position: center; }
-    .peek-bar {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 10px 14px; border-top: 1px solid var(--line);
-      font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
-    }
-    .peek-bar em { font-style: normal; color: var(--accent); }
-
-    /* ===== 页脚 ===== */
-    .site-footer { position: relative; border-top: 1px solid var(--line); overflow: hidden; padding-top: clamp(48px, 7vh, 84px); }
-    .footer-wordmark {
-      display: block; text-align: center; user-select: none;
-      font-size: clamp(86px, 19vw, 230px); font-weight: 900; letter-spacing: -.055em; line-height: .82;
-      color: transparent;
-      background: linear-gradient(180deg, rgba(255, 255, 255, .17), rgba(255, 255, 255, .03) 62%, transparent);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 96%);
-      mask-image: linear-gradient(180deg, #000 20%, transparent 96%);
-      margin: 0 0 -6px;
-    }
-    .footer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; flex-wrap: wrap; padding-bottom: 34px; }
-    .footer-brand { display: flex; align-items: center; gap: 12px; }
-    .footer-brand .brand-mark { animation: none; }
-    .footer-tag { margin: 8px 0 0; color: var(--subtle); font-size: 13px; font-family: var(--serif); font-style: italic; max-width: 320px; }
-    .footer-links { display: flex; gap: 26px; flex-wrap: wrap; color: var(--muted); font-size: 13.5px; font-weight: 600; }
-    .footer-links a { transition: color 180ms ease; }
-    .footer-links a:hover { color: var(--text); }
-    .footer-base {
-      border-top: 1px solid var(--line); padding: 22px 0 max(28px, env(safe-area-inset-bottom));
-      display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
-      color: var(--subtle); font-size: 12.5px; font-family: var(--mono); letter-spacing: .06em;
-    }
+    .gate-cta:hover { transform: translateY(-2px); }
+    .gate-cta .arrow { transition: transform .3s; }
+    .gate-cta:hover .arrow { transform: translateX(4px); }
 
     /* 滚动浮现 */
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .85s ease, transform .85s var(--ease); }
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity .9s var(--ease), transform .9s var(--ease);
+    }
     .reveal.in { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
 
-    /* ===== 平板 ===== */
-    @media (max-width: 1080px) {
-      .work > a { grid-template-columns: 72px 168px 1fr 40px; grid-template-areas: "num thumb main go"; gap: 20px; }
-      .work-meta { display: none; }
-      .work-thumb { width: 168px; }
+    /* ===== Gate 1: LightingForYou ===== */
+    .gate-light {
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(255, 215, 107, .07), transparent 55%),
+        #050506;
+    }
+    .gate-light .gate-num { color: var(--c-light); }
+    .gate-light h2 { color: #f0e8d0; }
+    .gate-light .gate-tagline { color: #c8c0a8; }
+    .gate-light .gate-desc { color: #8a8472; }
+    .gate-light .gate-tag { color: var(--c-light); border-color: rgba(255,215,107,.3); background: rgba(255,215,107,.06); }
+    .gate-light .gate-cta {
+      color: var(--c-light);
+      border-color: rgba(255,215,107,.4);
+      background: rgba(255,215,107,.08);
+      box-shadow: 0 0 30px rgba(255,215,107,.1);
+    }
+    .gate-light .gate-cta:hover { box-shadow: 0 0 50px rgba(255,215,107,.2); }
+
+    /* 光晕视觉 */
+    .light-orb {
+      position: relative;
+      width: clamp(220px, 30vw, 340px);
+      height: clamp(220px, 30vw, 340px);
+    }
+    .light-orb .core {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 60px; height: 60px;
+      margin: -30px 0 0 -30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff, var(--c-light) 40%, transparent 70%);
+      box-shadow: 0 0 60px 20px rgba(255,215,107,.4);
+      animation: lightPulse 3s ease-in-out infinite;
+    }
+    @keyframes lightPulse {
+      0%, 100% { box-shadow: 0 0 60px 20px rgba(255,215,107,.4); }
+      50% { box-shadow: 0 0 90px 35px rgba(255,215,107,.55); }
+    }
+    .light-orb .ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      border-radius: 50%;
+      border: 1px solid rgba(255,215,107,.15);
+      transform: translate(-50%, -50%);
+    }
+    .light-orb .ring:nth-child(2) { width: 140px; height: 140px; animation: ringExpand 4s ease-out infinite; }
+    .light-orb .ring:nth-child(3) { width: 220px; height: 220px; animation: ringExpand 4s ease-out infinite 1.3s; }
+    .light-orb .ring:nth-child(4) { width: 300px; height: 300px; animation: ringExpand 4s ease-out infinite 2.6s; }
+    @keyframes ringExpand {
+      0% { opacity: .6; transform: translate(-50%,-50%) scale(.7); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(1.1); }
+    }
+    .light-dots {
+      position: absolute;
+      inset: -20px;
+    }
+    .light-dots span {
+      position: absolute;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--c-light);
+      opacity: .6;
+      animation: dotFloat 6s ease-in-out infinite;
+    }
+    @keyframes dotFloat {
+      0%, 100% { transform: translateY(0); opacity: .3; }
+      50% { transform: translateY(-12px); opacity: .8; }
     }
 
-    /* ===== 手机 / 触摸端 ===== */
-    @media (max-width: 760px) {
-      :root { --header-h: 56px; }
-      .container { width: min(100% - 40px, var(--maxw)); }
-      .nav-links { gap: 18px; font-size: 12.5px; }
-      .nav-tag { display: none; }
-      .brand { font-size: 17px; gap: 10px; }
-      .brand-mark { width: 32px; height: 32px; font-size: 14px; border-radius: 9px; }
+    /* ===== Gate 2: UnReal Objects ===== */
+    .gate-unreal {
+      background:
+        radial-gradient(ellipse at 70% 40%, rgba(155, 140, 255, .08), transparent 55%),
+        #0a0a12;
+    }
+    .gate-unreal .gate-num { color: var(--c-unreal); }
+    .gate-unreal h2 { color: #d4d0e8; font-family: var(--mono); letter-spacing: .02em; }
+    .gate-unreal .gate-tagline { color: #9b98b0; }
+    .gate-unreal .gate-desc { color: #6b6c80; }
+    .gate-unreal .gate-tag { color: var(--c-unreal); border-color: rgba(155,140,255,.3); background: rgba(155,140,255,.06); }
+    .gate-unreal .gate-cta {
+      color: var(--c-unreal);
+      border-color: rgba(155,140,255,.4);
+      background: rgba(155,140,255,.08);
+    }
+    .gate-unreal .gate-cta:hover { box-shadow: 0 0 40px rgba(155,140,255,.2); }
 
-      /* 轮播：底部压暗 + 内容上提，给圆点让位 */
-      .carousel { height: clamp(460px, calc(100vh - var(--header-h)), 780px); }
-      @supports (height: 100svh) { .carousel { height: clamp(460px, calc(100svh - var(--header-h)), 780px); } }
-      .slide-overlay {
-        background:
-          linear-gradient(0deg, rgba(6, 7, 12, .97) 0%, rgba(6, 7, 12, .84) 26%, rgba(6, 7, 12, .35) 62%, rgba(6, 7, 12, .30) 100%),
-          linear-gradient(90deg, rgba(6, 7, 12, .45), transparent 70%);
-      }
-      .slide-glow { left: 50%; bottom: auto; top: 12%; transform: translateX(-50%); width: 88vw; opacity: 0; }
-      .slide.active .slide-glow { opacity: .8; }
-      .slide-content { bottom: 84px; gap: 12px; max-width: 100%; }
-      .slide-title { font-size: clamp(32px, 10.5vw, 52px); letter-spacing: -.035em; line-height: .96; }
-      .slide-eyebrow { font-size: 10.5px; letter-spacing: .18em; gap: 9px; }
-      .slide-eyebrow::before { width: 18px; }
-      .slide-index { font-size: 11.5px; letter-spacing: .28em; }
-      .slide-tagline { font-size: 15px; line-height: 1.5; }
-      .slide-tags { gap: 8px; }
-      .slide-tags span { padding: 5px 11px; font-size: 10.5px; }
-      .btn { min-height: 46px; padding: 0 22px; font-size: 14px; }
-
-      .rail { display: none; }
-      .dots { display: flex; }
-      .carousel .nav-btn { display: none; }
-      .scroll-hint { display: none; }
-
-      /* 作品列表 → 卡片式 */
-      .works { padding: 52px 0 28px; }
-      .section-head { gap: 18px; margin-bottom: 30px; }
-      .section-head .note { font-size: 14px; max-width: 100%; }
-      .work > a {
-        grid-template-columns: 1fr 40px;
-        grid-template-areas: "thumb thumb" "main go" "meta meta";
-        gap: 14px 10px; padding: 22px 0 26px;
-      }
-      .work:hover > a, .work:focus-within > a { padding-left: 20px; }
-      .work::before { transform: scaleY(1); opacity: .55; }        /* 触摸端常驻彩条 */
-      .work:active::before { opacity: 1; }
-      .work-thumb { grid-area: thumb; width: 100%; border-radius: 12px; }
-      .work-num {
-        grid-area: thumb; justify-self: start; align-self: start; z-index: 3; margin: 12px;
-        font-size: 13px; letter-spacing: .12em; padding: 4px 9px; border-radius: 7px;
-        color: var(--accent); -webkit-text-stroke: 0;
-        background: rgba(6, 7, 12, .72); border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
-        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-      }
-      .work-main { grid-area: main; gap: 8px; }
-      .work-title { font-size: 21px; }
-      .work-tagline { font-size: 13.5px; }
-      .work-meta { grid-area: meta; white-space: normal; font-size: 11px; color: var(--accent); opacity: .85; }
-      .work-go { grid-area: go; align-self: start; font-size: 19px; color: var(--accent); opacity: .8; }
-
-      .footer-top { gap: 20px; padding-bottom: 26px; }
-      .footer-links { gap: 18px; }
-      .footer-base { font-size: 11px; letter-spacing: .04em; }
-      .peek { display: none; }
+    .unreal-visual {
+      position: relative;
+      width: clamp(220px, 28vw, 320px);
+      height: clamp(220px, 28vw, 320px);
+    }
+    .unreal-triangle {
+      width: 100%; height: 100%;
+      animation: spinSlow 20s linear infinite;
+    }
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .unreal-crt {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px);
+      mix-blend-mode: multiply;
+      border-radius: 8px;
     }
 
-    @media (max-width: 380px) {
-      .container { width: min(100% - 32px, var(--maxw)); }
-      .slide-title { font-size: clamp(29px, 10vw, 44px); }
-      .work-tags span { font-size: 10px; padding: 3px 9px; }
+    /* ===== Gate 3: Archipelago Luminary ===== */
+    .gate-luminary {
+      background:
+        linear-gradient(180deg, #06080a 0%, #0a0e14 100%);
+    }
+    .gate-luminary .gate-num { color: var(--c-luminary); }
+    .gate-luminary h2 { color: #e7ecf2; font-family: var(--mono); letter-spacing: .02em; }
+    .gate-luminary .gate-tagline { color: #9aa3ad; }
+    .gate-luminary .gate-desc { color: #6a7280; }
+    .gate-luminary .gate-tag { color: #f0c674; border-color: rgba(240,198,116,.3); background: rgba(240,198,116,.06); }
+    .gate-luminary .gate-cta {
+      color: #f0c674;
+      border-color: rgba(240,198,116,.4);
+      background: rgba(240,198,116,.08);
+    }
+    .gate-luminary .gate-cta:hover { box-shadow: 0 0 40px rgba(240,198,116,.15); }
+
+    .battlefield {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4 / 3;
+      border: 1px solid rgba(231,236,242,.12);
+      border-radius: 4px;
+      background:
+        linear-gradient(rgba(231,236,242,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(231,236,242,.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      overflow: hidden;
+    }
+    .battlefield .lane {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: rgba(231,236,242,.08);
+    }
+    .battlefield .lane:nth-child(1) { top: 25%; }
+    .battlefield .lane:nth-child(2) { top: 50%; }
+    .battlefield .lane:nth-child(3) { top: 75%; }
+    .turret {
+      position: absolute;
+      width: 24px; height: 24px;
+      border: 2px solid #e7ecf2;
+      border-radius: 4px;
+      background: rgba(231,236,242,.1);
+    }
+    .turret::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 8px; height: 2px;
+      background: #e7ecf2;
+      transform-origin: left center;
+      animation: turretAim 3s ease-in-out infinite;
+    }
+    @keyframes turretAim {
+      0%, 100% { transform: translateY(-50%) rotate(0deg); }
+      50% { transform: translateY(-50%) rotate(45deg); }
+    }
+    .enemy {
+      position: absolute;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px rgba(239,68,68,.5);
+      animation: enemyMove 5s linear infinite;
+    }
+    @keyframes enemyMove {
+      from { left: 100%; }
+      to { left: -20px; }
+    }
+    .gold-spark {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #f0c674;
+      box-shadow: 0 0 8px #f0c674;
+      animation: spark 2s ease-in-out infinite;
+    }
+    @keyframes spark {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
     }
 
-    @media (hover: none) {
-      .work::before { transform: scaleY(1); opacity: .55; }
-      .cursor-glow { display: none; }
+    /* ===== Gate 4: Bug Universe God ===== */
+    .gate-bug {
+      background:
+        radial-gradient(ellipse at 25% 60%, rgba(239, 68, 68, .08), transparent 50%),
+        radial-gradient(ellipse at 75% 30%, rgba(251, 146, 60, .06), transparent 50%),
+        #140a0c;
+    }
+    .gate-bug .gate-num { color: var(--c-bug); }
+    .gate-bug h2 {
+      color: #f5e9ea;
+      font-family: "Bradley Hand", "Comic Sans MS", "Marker Felt", "Segoe Print", cursive, "Microsoft YaHei", sans-serif;
+      transform: rotate(-2deg);
+      display: inline-block;
+    }
+    .gate-bug .gate-tagline { color: #c8a0a4; }
+    .gate-bug .gate-desc { color: #9a7074; }
+    .gate-bug .gate-tag { color: #fb923c; border-color: rgba(251,146,60,.3); background: rgba(251,146,60,.06); }
+    .gate-bug .gate-cta {
+      color: #fb923c;
+      border-color: rgba(251,146,60,.4);
+      background: rgba(251,146,60,.08);
+      font-family: inherit;
+    }
+    .gate-bug .gate-cta:hover { box-shadow: 0 0 40px rgba(251,146,60,.2); }
+
+    .bug-visual {
+      position: relative;
+      width: clamp(240px, 30vw, 340px);
+      height: clamp(240px, 30vw, 340px);
+    }
+    .bug-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px dashed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      font-family: "Bradley Hand", "Comic Sans MS", cursive, "Microsoft YaHei", sans-serif;
+    }
+    .bug-circle.c1 {
+      width: 100px; height: 100px;
+      top: 10%; left: 15%;
+      border-color: rgba(239,68,68,.5);
+      color: #ef4444;
+      background: rgba(239,68,68,.08);
+      transform: rotate(-8deg);
+      animation: bugFloat 5s ease-in-out infinite;
+    }
+    .bug-circle.c2 {
+      width: 110px; height: 110px;
+      top: 30%; right: 10%;
+      border-color: rgba(251,146,60,.5);
+      color: #fb923c;
+      background: rgba(251,146,60,.08);
+      transform: rotate(6deg);
+      animation: bugFloat 6s ease-in-out infinite 1s;
+    }
+    .bug-circle.c3 {
+      width: 90px; height: 90px;
+      bottom: 15%; left: 30%;
+      border-color: rgba(167,139,250,.5);
+      color: #a78bfa;
+      background: rgba(167,139,250,.08);
+      transform: rotate(-4deg);
+      animation: bugFloat 7s ease-in-out infinite 2s;
+    }
+    .bug-plus {
+      position: absolute;
+      font-size: 32px;
+      color: rgba(255,255,255,.2);
+      font-weight: 300;
+    }
+    @keyframes bugFloat {
+      0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+      50% { transform: translateY(-14px) rotate(calc(var(--r, 0deg) + 3deg)); }
+    }
+
+    /* ===== Gate 5: 第九张史莱姆牌 ===== */
+    .gate-slime {
+      background:
+        radial-gradient(ellipse at 60% 50%, rgba(34, 211, 238, .07), transparent 55%),
+        #06121a;
+    }
+    .gate-slime .gate-num { color: var(--c-slime); }
+    .gate-slime h2 { color: #e6fbfd; font-family: var(--serif); }
+    .gate-slime .gate-tagline { color: #8fb3c0; }
+    .gate-slime .gate-desc { color: #5a8090; }
+    .gate-slime .gate-tag { color: var(--c-slime); border-color: rgba(34,211,238,.3); background: rgba(34,211,238,.06); }
+    .gate-slime .gate-cta {
+      color: var(--c-slime);
+      border-color: rgba(34,211,238,.4);
+      background: rgba(34,211,238,.08);
+    }
+    .gate-slime .gate-cta:hover { box-shadow: 0 0 40px rgba(34,211,238,.2); }
+
+    .card-fan {
+      position: relative;
+      width: clamp(240px, 30vw, 340px);
+      height: clamp(300px, 38vw, 420px);
+    }
+    .game-card {
+      position: absolute;
+      width: 140px;
+      height: 200px;
+      border-radius: 10px;
+      border: 1px solid rgba(34,211,238,.3);
+      background: linear-gradient(160deg, #0d2836, #06121a);
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform .4s var(--ease), box-shadow .4s;
+      cursor: pointer;
+    }
+    .game-card:hover {
+      transform: translateY(-12px) scale(1.05) !important;
+      box-shadow: 0 16px 50px rgba(34,211,238,.25);
+      z-index: 10;
+    }
+    .game-card .card-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+    .game-card .card-name {
+      font-family: var(--serif);
+      font-size: 14px;
+      color: #e6fbfd;
+      text-align: center;
+    }
+    .game-card .card-cost {
+      position: absolute;
+      top: 8px; left: 8px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(34,211,238,.2);
+      border: 1px solid rgba(34,211,238,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--c-slime);
+    }
+    .card-fan .game-card:nth-child(1) {
+      bottom: 0; left: 50%;
+      transform: translateX(-50%) rotate(-18deg);
+      z-index: 1;
+    }
+    .card-fan .game-card:nth-child(2) {
+      bottom: 0; left: 50%;
+      transform: translateX(-50%) rotate(-9deg) translateX(-50px);
+      z-index: 2;
+    }
+    .card-fan .game-card:nth-child(3) {
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+    .card-fan .game-card:nth-child(4) {
+      bottom: 0; left: 50%;
+      transform: translateX(-50%) rotate(9deg) translateX(50px);
+      z-index: 2;
+    }
+    .card-fan .game-card:nth-child(5) {
+      bottom: 0; left: 50%;
+      transform: translateX(-50%) rotate(18deg);
+      z-index: 1;
+    }
+
+    /* ===== 关于区 ===== */
+    .about {
+      padding: 100px clamp(20px, 5vw, 80px);
+      background: var(--bg);
+      border-top: 1px solid var(--line);
+    }
+    .about-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .about-kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--subtle);
+      margin: 0 0 20px;
+    }
+    .about h2 {
+      margin: 0 0 24px;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+    }
+    .about p {
+      margin: 0 0 16px;
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+    .about-links {
+      margin-top: 36px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .about-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: 1px solid var(--line-2);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      transition: all .3s;
+    }
+    .about-links a:hover {
+      color: var(--text);
+      border-color: var(--c-light);
+      background: rgba(255,215,107,.06);
+    }
+
+    /* ===== 底部 ===== */
+    .footer {
+      padding: 40px clamp(20px, 5vw, 80px);
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: var(--subtle);
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--subtle);
+      transition: color .25s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 900px) {
+      .gate-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .gate-visual { order: -1; min-height: 280px; }
+      .gate-info { text-align: center; }
+      .gate-tagline, .gate-desc { margin-left: auto; margin-right: auto; }
+      .gate-tags { justify-content: center; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: var(--header-h);
+        left: 0; right: 0;
+        background: rgba(6,7,12,.96);
+        backdrop-filter: blur(14px);
+        padding: 16px;
+        border-bottom: 1px solid var(--line);
+        gap: 4px;
+      }
+      .nav-toggle { display: block; }
+    }
+
+    @media (max-width: 520px) {
+      .hero-meta { gap: 20px; }
+      .hero-meta .num { font-size: 24px; }
+      .gate { padding: 60px 20px; }
+      .card-fan { transform: scale(.85); }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; scroll-behavior: auto !important; }
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+      }
       .reveal { opacity: 1; transform: none; }
-      .slide-content > * { opacity: 1; transform: none; }
-      .slide-glow { opacity: .85 !important; }
-      .ticker-track { animation: none; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-fx" aria-hidden="true"><div class="bg-grid" id="bgGrid"></div></div>
-  <div class="bg-grain" aria-hidden="true"></div>
-  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <!-- 顶部导航 -->
+  <nav class="nav">
+    <a href="#top" class="nav-brand"><span class="dot"></span>GOVE</a>
+    <div class="nav-links" id="navLinks">
+      <a href="#gate-light">LightingForYou</a>
+      <a href="#gate-unreal">UnReal Objects</a>
+      <a href="#gate-luminary">Archipelago</a>
+      <a href="#gate-bug">Bug Universe God</a>
+      <a href="#gate-slime">史莱姆牌</a>
+      <a href="#about">关于</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+  </nav>
 
-  <header class="site-header" id="header">
-    <div class="container nav">
-      <a class="brand" href="#top" aria-label="返回顶部"><span class="brand-mark">G</span><span>Gove</span></a>
-      <nav class="nav-links" aria-label="主导航">
-        <span class="nav-tag">Portfolio · 2026</span>
-        <a href="#games">作品</a>
-        <a href="https://www.taptap.cn/developer/275988" target="_blank" rel="noreferrer">开发者主页</a>
-      </nav>
+  <!-- Hero -->
+  <header class="hero" id="top">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-kicker">Independent Game Portfolio · 2024 — 2026</p>
+      <h1>GOVE</h1>
+      <p class="hero-sub">从<em>一束光</em>，到<em>一整副牌</em>。<br>5 款独立游戏，5 种造物实验。</p>
+      <div class="hero-meta">
+        <div class="item"><div class="num">5</div><div class="label">款游戏</div></div>
+        <div class="item"><div class="num">3</div><div class="label">个平台</div></div>
+        <div class="item"><div class="num">2</div><div class="label">年创作</div></div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="line"></div>
     </div>
   </header>
 
-  <main id="top">
-    <!-- HERO 轮播 -->
-    <section class="hero" aria-label="作品轮播" aria-roledescription="carousel">
-      <div class="carousel" id="carousel">
-        <div class="slides">
-          <article class="slide active" style="--accent: var(--c-light);">
-            <div class="slide-bg" style="background-image:url('games/lightingforyou/cover.jpg')"></div>
-            <div class="slide-overlay"></div>
-            <div class="slide-glow"></div>
-            <div class="slide-content container">
-              <p class="slide-eyebrow">Narrative Adventure</p>
-              <span class="slide-index">01 / 05</span>
-              <h1 class="slide-title">Lighting<span class="accent">ForYou</span></h1>
-              <p class="slide-tagline">"每个人的生活都缺了一点光"</p>
-              <div class="slide-tags"><span>TapTap 2024</span><span>聚光灯 GameJam</span></div>
-              <a class="btn primary" href="games/lightingforyou/index.html">查看详情 →</a>
+  <!-- 五扇门 -->
+  <main class="gates">
+
+    <!-- Gate 1: LightingForYou -->
+    <section class="gate gate-light" id="gate-light">
+      <div class="gate-inner">
+        <div class="gate-visual reveal">
+          <div class="light-orb">
+            <div class="core"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="light-dots">
+              <span style="top:15%;left:20%;animation-delay:0s"></span>
+              <span style="top:30%;left:80%;animation-delay:1s"></span>
+              <span style="top:60%;left:10%;animation-delay:2s"></span>
+              <span style="top:75%;left:70%;animation-delay:.5s"></span>
+              <span style="top:45%;left:90%;animation-delay:1.5s"></span>
+              <span style="top:85%;left:35%;animation-delay:2.5s"></span>
             </div>
-          </article>
-
-          <article class="slide" style="--accent: var(--c-luminary);">
-            <div class="slide-bg" style="background-image:url('games/archipelago-luminary/cover.jpg')"></div>
-            <div class="slide-overlay"></div>
-            <div class="slide-glow"></div>
-            <div class="slide-content container">
-              <p class="slide-eyebrow">Minimalist Tower Defense</p>
-              <span class="slide-index">02 / 05</span>
-              <h1 class="slide-title">Archipelago <span class="accent">Luminary</span></h1>
-              <p class="slide-tagline">"黑白战场中，颜色是稀缺的宝物"</p>
-              <div class="slide-tags"><span>Steam 2025</span><span>策略</span></div>
-              <a class="btn primary" href="games/archipelago-luminary/index.html">查看详情 →</a>
-            </div>
-          </article>
-
-          <article class="slide" style="--accent: var(--c-unreal);">
-            <div class="slide-bg" style="background-image:url('games/unreal-objects/cover.jpg')"></div>
-            <div class="slide-overlay"></div>
-            <div class="slide-glow"></div>
-            <div class="slide-content container">
-              <p class="slide-eyebrow">Impossible-Object Puzzle</p>
-              <span class="slide-index">03 / 05</span>
-              <h1 class="slide-title">UnReal <span class="accent">Objects</span></h1>
-              <p class="slide-tagline">"二维成立，三维冲突"</p>
-              <div class="slide-tags"><span>itch.io</span><span>Godot</span></div>
-              <a class="btn primary" href="games/unreal-objects/index.html">查看详情 →</a>
-            </div>
-          </article>
-
-          <article class="slide" style="--accent: var(--c-bug);">
-            <div class="slide-bg" style="background-image:url('games/bug-universe-god/cover.jpg')"></div>
-            <div class="slide-overlay"></div>
-            <div class="slide-glow"></div>
-            <div class="slide-content container">
-              <p class="slide-eyebrow">Concept Synthesis</p>
-              <span class="slide-index">04 / 05</span>
-              <h1 class="slide-title">Bug Universe <span class="accent">God</span></h1>
-              <p class="slide-tagline">"操控概念本身，创造一个世界"</p>
-              <div class="slide-tags"><span>TapTap 2025</span><span>聚光灯 GameJam</span></div>
-              <a class="btn primary" href="games/bug-universe-god/index.html">查看详情 →</a>
-            </div>
-          </article>
-
-          <article class="slide" style="--accent: var(--c-slime);">
-            <div class="slide-bg" style="background-image:url('games/ninth-slime-card/cover.jpg')"></div>
-            <div class="slide-overlay"></div>
-            <div class="slide-glow"></div>
-            <div class="slide-content container">
-              <p class="slide-eyebrow">Roguelike Card</p>
-              <span class="slide-index">05 / 05</span>
-              <h1 class="slide-title">第九张<span class="accent">史莱姆牌</span></h1>
-              <p class="slide-tagline">"你能闯到第几层？"</p>
-              <div class="slide-tags"><span>TapTap 2026</span><span>策略</span></div>
-              <a class="btn primary" href="games/ninth-slime-card/index.html">查看详情 →</a>
-            </div>
-          </article>
-        </div>
-
-        <button class="nav-btn prev" id="prev" aria-label="上一个作品">‹</button>
-        <button class="nav-btn next" id="next" aria-label="下一个作品">›</button>
-        <div class="rail" id="rail" role="tablist" aria-label="作品切换"></div>
-        <div class="dots" id="dots" role="tablist" aria-label="作品切换"></div>
-        <div class="progress"><i id="progressFill"></i></div>
-        <p class="scroll-hint">向下滚动 ↓</p>
-      </div>
-    </section>
-
-    <!-- 索引滚动带 -->
-    <div class="ticker" aria-hidden="true">
-      <div class="ticker-track" id="tickerTrack"></div>
-    </div>
-
-    <!-- 作品列表 -->
-    <section class="works" id="games" aria-labelledby="works-title">
-      <div class="container">
-        <div class="section-head reveal">
-          <div>
-            <p class="kicker">// Selected Works</p>
-            <h2 id="works-title">作品 <span>/ Works</span></h2>
           </div>
-          <p class="note">5 款独立游戏，每种气质都不同。点开任意一款，像走进一个新网站。</p>
         </div>
-
-        <ol class="works-list" id="worksList">
-          <li class="work reveal" style="--accent: var(--c-light);"
-              data-cover="games/lightingforyou/cover.jpg" data-no="01">
-            <a href="games/lightingforyou/index.html">
-              <span class="work-num">01</span>
-              <span class="work-thumb" style="background-image:url('games/lightingforyou/cover.jpg')"></span>
-              <span class="work-main">
-                <span class="work-title">LightingForYou</span>
-                <span class="work-tagline">"每个人的生活都缺了一点光"</span>
-                <span class="work-tags"><span>叙事冒险</span><span>聚光灯 GameJam</span></span>
-              </span>
-              <span class="work-meta">TapTap · 2024</span>
-              <span class="work-go">→</span>
-            </a>
-          </li>
-
-          <li class="work reveal" style="--accent: var(--c-luminary);"
-              data-cover="games/archipelago-luminary/cover.jpg" data-no="02">
-            <a href="games/archipelago-luminary/index.html">
-              <span class="work-num">02</span>
-              <span class="work-thumb" style="background-image:url('games/archipelago-luminary/cover.jpg')"></span>
-              <span class="work-main">
-                <span class="work-title">Archipelago Luminary</span>
-                <span class="work-tagline">"黑白战场中，颜色是稀缺的宝物"</span>
-                <span class="work-tags"><span>极简塔防</span><span>策略</span></span>
-              </span>
-              <span class="work-meta">Steam · 2025</span>
-              <span class="work-go">→</span>
-            </a>
-          </li>
-
-          <li class="work reveal" style="--accent: var(--c-unreal);"
-              data-cover="games/unreal-objects/cover.jpg" data-no="03">
-            <a href="games/unreal-objects/index.html">
-              <span class="work-num">03</span>
-              <span class="work-thumb" style="background-image:url('games/unreal-objects/cover.jpg')"></span>
-              <span class="work-main">
-                <span class="work-title">UnReal Objects</span>
-                <span class="work-tagline">"二维成立，三维冲突"</span>
-                <span class="work-tags"><span>像素解谜</span><span>Godot</span></span>
-              </span>
-              <span class="work-meta">itch.io</span>
-              <span class="work-go">→</span>
-            </a>
-          </li>
-
-          <li class="work reveal" style="--accent: var(--c-bug);"
-              data-cover="games/bug-universe-god/cover.jpg" data-no="04">
-            <a href="games/bug-universe-god/index.html">
-              <span class="work-num">04</span>
-              <span class="work-thumb" style="background-image:url('games/bug-universe-god/cover.jpg')"></span>
-              <span class="work-main">
-                <span class="work-title">Bug Universe God</span>
-                <span class="work-tagline">"操控概念本身，创造一个世界"</span>
-                <span class="work-tags"><span>概念合成</span><span>聚光灯 GameJam</span></span>
-              </span>
-              <span class="work-meta">TapTap · 2025</span>
-              <span class="work-go">→</span>
-            </a>
-          </li>
-
-          <li class="work reveal" style="--accent: var(--c-slime);"
-              data-cover="games/ninth-slime-card/cover.jpg" data-no="05">
-            <a href="games/ninth-slime-card/index.html">
-              <span class="work-num">05</span>
-              <span class="work-thumb" style="background-image:url('games/ninth-slime-card/cover.jpg')"></span>
-              <span class="work-main">
-                <span class="work-title">第九张史莱姆牌</span>
-                <span class="work-tagline">"你能闯到第几层？"</span>
-                <span class="work-tags"><span>Roguelike 卡牌</span><span>策略</span></span>
-              </span>
-              <span class="work-meta">TapTap · 2026</span>
-              <span class="work-go">→</span>
-            </a>
-          </li>
-        </ol>
+        <div class="gate-info">
+          <p class="gate-num reveal reveal-delay-1">01 / 2024.12 · TapTap</p>
+          <h2 class="reveal reveal-delay-1">LightingForYou</h2>
+          <p class="gate-tagline reveal reveal-delay-2">黑暗中一粒光。14 个关卡，14 个隐藏故事。</p>
+          <p class="gate-desc reveal reveal-delay-2">每个人的生活都缺了一点光。即便通关全部 14 关、解锁 14 个隐藏故事，你也不会找到那一点光——但你可能会突然想起来，为什么会少了它。</p>
+          <div class="gate-tags reveal reveal-delay-3">
+            <span class="gate-tag">叙事冒险</span>
+            <span class="gate-tag">微弱视野</span>
+            <span class="gate-tag">哲理诗意</span>
+            <span class="gate-tag">评分 8.8</span>
+          </div>
+          <a href="games/lightingforyou/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+        </div>
       </div>
     </section>
+
+    <!-- Gate 2: UnReal Objects -->
+    <section class="gate gate-unreal" id="gate-unreal">
+      <div class="gate-inner">
+        <div class="gate-info">
+          <p class="gate-num reveal reveal-delay-1">02 / 2025.03 · itch.io</p>
+          <h2 class="reveal reveal-delay-1">UNREAL OBJECTS</h2>
+          <p class="gate-tagline reveal reveal-delay-2">不可能物体的像素解谜。二维成立，三维冲突。</p>
+          <p class="gate-desc reveal reveal-delay-2">彭罗斯三角形、不可能立方体、埃舍尔阶梯、恶魔音叉——四种只存在于二维的图形，通过欺骗大脑的透视机制，让你放下习惯性的空间直觉。</p>
+          <div class="gate-tags reveal reveal-delay-3">
+            <span class="gate-tag">像素解谜</span>
+            <span class="gate-tag">CRT 复古</span>
+            <span class="gate-tag">错觉实验</span>
+            <span class="gate-tag">Godot</span>
+          </div>
+          <a href="games/unreal-objects/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+        </div>
+        <div class="gate-visual reveal">
+          <div class="unreal-visual">
+            <svg class="unreal-triangle" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+              <g stroke="#9b8cff" stroke-width="14" stroke-linejoin="round">
+                <path d="M100 30 L160 150 L40 150 Z" />
+                <path d="M100 30 L124 76 L76 76 Z" fill="#9b8cff" />
+              </g>
+              <g stroke="#ff77a8" stroke-width="4">
+                <path d="M100 30 L160 150 L40 150 Z" />
+              </g>
+              <circle cx="100" cy="30" r="5" fill="#ffa300" />
+              <circle cx="160" cy="150" r="5" fill="#29adff" />
+              <circle cx="40" cy="150" r="5" fill="#ff77a8" />
+            </svg>
+            <div class="unreal-crt"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gate 3: Archipelago Luminary -->
+    <section class="gate gate-luminary" id="gate-luminary">
+      <div class="gate-inner">
+        <div class="gate-visual reveal">
+          <div class="battlefield">
+            <div class="lane"></div>
+            <div class="lane"></div>
+            <div class="lane"></div>
+            <div class="turret" style="top:20%;left:15%;"></div>
+            <div class="turret" style="top:45%;left:30%;"></div>
+            <div class="turret" style="top:70%;left:20%;"></div>
+            <div class="turret" style="top:35%;left:55%;"></div>
+            <div class="enemy" style="top:22%;animation-delay:0s;"></div>
+            <div class="enemy" style="top:47%;animation-delay:1.5s;"></div>
+            <div class="enemy" style="top:72%;animation-delay:3s;"></div>
+            <div class="gold-spark" style="top:30%;left:40%;animation-delay:.5s;"></div>
+            <div class="gold-spark" style="top:60%;left:65%;animation-delay:1.2s;"></div>
+            <div class="gold-spark" style="top:40%;left:75%;animation-delay:2s;"></div>
+          </div>
+        </div>
+        <div class="gate-info">
+          <p class="gate-num reveal reveal-delay-1">03 / 2025.05 · Steam · ¥11</p>
+          <h2 class="reveal reveal-delay-1">ARCHIPELAGO LUMINARY</h2>
+          <p class="gate-tagline reveal reveal-delay-2">极简 2D 塔防。黑白战场中，颜色是稀世珍宝。</p>
+          <p class="gate-desc reveal reveal-delay-2">一夜，一束光落入北海，无尽怪物从深处涌出。北方王国一步步撤退，直到最后庇护所——直到人类建造第一座炮塔。14 关反攻，14+ 炮塔，10+ 敌人，碎片叙事拼凑被遗忘的真相。</p>
+          <div class="gate-tags reveal reveal-delay-3">
+            <span class="gate-tag">塔防策略</span>
+            <span class="gate-tag">黑白美学</span>
+            <span class="gate-tag">碎片叙事</span>
+            <span class="gate-tag">14 成就</span>
+          </div>
+          <a href="games/archipelago-luminary/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gate 4: Bug Universe God -->
+    <section class="gate gate-bug" id="gate-bug">
+      <div class="gate-inner">
+        <div class="gate-info">
+          <p class="gate-num reveal reveal-delay-1">04 / 2025.10 · TapTap</p>
+          <h2 class="reveal reveal-delay-1">Bug Universe God</h2>
+          <p class="gate-tagline reveal reveal-delay-2">操控概念本身，从基本元素合成一个世界。</p>
+          <p class="gate-desc reveal reveal-delay-2">你相信世界是被创造出来的吗？作为潜在未来的造物者，你的工作并非挥舞刀剑，而是用"原型的雏形"从光与影开始，定义神学、哲学、文学、物理、天文……最终创造整个世界。</p>
+          <div class="gate-tags reveal reveal-delay-3">
+            <span class="gate-tag">概念合成</span>
+            <span class="gate-tag">不完美美学</span>
+            <span class="gate-tag">涂鸦实验</span>
+            <span class="gate-tag">评分 9.0</span>
+          </div>
+          <a href="games/bug-universe-god/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+        </div>
+        <div class="gate-visual reveal">
+          <div class="bug-visual">
+            <div class="bug-circle c1" style="--r:-8deg">光</div>
+            <div class="bug-circle c2" style="--r:6deg">影</div>
+            <div class="bug-circle c3" style="--r:-4deg">界</div>
+            <span class="bug-plus" style="top:25%;left:45%;">+</span>
+            <span class="bug-plus" style="top:55%;left:55%;">+</span>
+            <span class="bug-plus" style="top:40%;left:25%;font-size:24px;">→</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gate 5: 第九张史莱姆牌 -->
+    <section class="gate gate-slime" id="gate-slime">
+      <div class="gate-inner">
+        <div class="gate-visual reveal">
+          <div class="card-fan">
+            <div class="game-card">
+              <div class="card-cost">1</div>
+              <div class="card-icon">🗡️</div>
+              <div class="card-name">初始</div>
+            </div>
+            <div class="game-card">
+              <div class="card-cost">2</div>
+              <div class="card-icon">🩸</div>
+              <div class="card-name">血族</div>
+            </div>
+            <div class="game-card">
+              <div class="card-cost">3</div>
+              <div class="card-icon">🛡️</div>
+              <div class="card-name">坚固</div>
+            </div>
+            <div class="game-card">
+              <div class="card-cost">2</div>
+              <div class="card-icon">⚙️</div>
+              <div class="card-name">科技</div>
+            </div>
+            <div class="game-card">
+              <div class="card-cost">1</div>
+              <div class="card-icon">🌱</div>
+              <div class="card-name">种子</div>
+            </div>
+          </div>
+        </div>
+        <div class="gate-info">
+          <p class="gate-num reveal reveal-delay-1">05 / 2026.02 · TapTap</p>
+          <h2 class="reveal reveal-delay-1">第九张史莱姆牌</h2>
+          <p class="gate-tagline reveal reveal-delay-2">轻量 Roguelike 卡牌。8 大系列，战败归零，重新出发。</p>
+          <p class="gate-desc reveal reveal-delay-2">每局从 Lv.1 开始，用手中的卡牌击败层层递进的敌人。胜利后从丰富牌库扩充卡组，战败则一切归零。初始、七罪、血族、坚固、科技、种子、暗影、时序——8 大系列，构筑属于你的最强牌组。</p>
+          <div class="gate-tags reveal reveal-delay-3">
+            <span class="gate-tag">Roguelike</span>
+            <span class="gate-tag">卡牌构筑</span>
+            <span class="gate-tag">爬层冒险</span>
+            <span class="gate-tag">评分 8.5</span>
+          </div>
+          <a href="games/ninth-slime-card/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-top">
-        <div>
-          <div class="footer-brand">
-            <span class="brand-mark">G</span>
-            <span class="nav-tag">Gove · Indie Game Dev</span>
-          </div>
-          <p class="footer-tag">一个人写代码、做美术、调手感。每一款都是一次完整的尝试。</p>
-        </div>
-        <nav class="footer-links" aria-label="页脚导航">
-          <a href="#top">回到顶部</a>
-          <a href="#games">作品</a>
-          <a href="https://www.taptap.cn/developer/275988" target="_blank" rel="noreferrer">TapTap</a>
-        </nav>
+  <!-- 关于 -->
+  <section class="about" id="about">
+    <div class="about-inner">
+      <p class="about-kicker">About the Creator</p>
+      <h2>关于 Gove</h2>
+      <p>独立游戏开发者，横跨叙事、塔防、解谜、概念合成与卡牌。从 2024 年的 LightingForYou 开始，每一款游戏都是一次新的造物实验——不重复模板，不回避不完美。</p>
+      <p>页面本身即游戏体验的延伸：黑暗中的光晕、黑白战场、CRT 扫描线、涂鸦合成台、绒布卡牌桌——每款游戏的详情页都用贴合其本身的视觉语言。</p>
+      <div class="about-links">
+        <a href="https://www.taptap.cn/developer/275988" target="_blank" rel="noreferrer">TapTap 开发者主页</a>
+        <a href="https://gove.itch.io/" target="_blank" rel="noreferrer">itch.io</a>
+        <a href="https://github.com/Gove2004" target="_blank" rel="noreferrer">GitHub</a>
       </div>
     </div>
-    <p class="footer-wordmark" aria-hidden="true">GOVE</p>
-    <div class="container">
-      <div class="footer-base">
-        <span>© 2026 Gove · gamepages.evog.top</span>
-        <span>Built by hand</span>
-      </div>
+  </section>
+
+  <!-- 底部 -->
+  <footer class="footer">
+    <div class="footer-copy">© 2024—2026 Gove. All games reserved.</div>
+    <div class="footer-links">
+      <a href="#top">回到顶部</a>
+      <a href="https://gamepages.evog.top" target="_blank" rel="noreferrer">gamepages.evog.top</a>
     </div>
   </footer>
 
-  <div class="peek" id="peek" aria-hidden="true">
-    <div class="peek-inner">
-      <div class="peek-img" id="peekImg"></div>
-      <div class="peek-bar"><span id="peekName"></span><em id="peekNo"></em></div>
-    </div>
-  </div>
-
   <script>
-  (function () {
-    'use strict';
+    (function () {
+      // 滚动浮现
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add('in');
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-    var slides = Array.from(document.querySelectorAll('.slide'));
-    var carousel = document.getElementById('carousel');
-    var rail = document.getElementById('rail');
-    var dotsWrap = document.getElementById('dots');
-    var fill = document.getElementById('progressFill');
-    var accents = ['var(--c-light)', 'var(--c-luminary)', 'var(--c-unreal)', 'var(--c-bug)', 'var(--c-slime)'];
-    var names = ['LightingForYou', 'Archipelago Luminary', 'UnReal Objects', 'Bug Universe God', '第九张史莱姆牌'];
-    var INTERVAL = 5200;
-
-    var current = 0;
-    var elapsed = 0;
-    var paused = false;
-    var lastTs = 0;
-    var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-    /* ---- 构建索引（右侧轨 + 移动圆点） ---- */
-    slides.forEach(function (_, i) {
-      var label = '0' + (i + 1);
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('role', 'tab');
-      b.setAttribute('aria-label', '第 ' + (i + 1) + ' 个作品：' + names[i]);
-      b.textContent = label;
-      b.addEventListener('click', function () { go(i, true); });
-      rail.appendChild(b);
-
-      var d = document.createElement('button');
-      d.type = 'button';
-      d.setAttribute('role', 'tab');
-      d.setAttribute('aria-label', '第 ' + (i + 1) + ' 个作品：' + names[i]);
-      d.addEventListener('click', function () { go(i, true); });
-      dotsWrap.appendChild(d);
-    });
-    var railBtns = Array.from(rail.children);
-    var dots = Array.from(dotsWrap.children);
-
-    /* ---- 轮播主循环：进度条与自动播放共用同一时钟 ---- */
-    function go(i, manual) {
-      slides[current].classList.remove('active');
-      railBtns[current].classList.remove('on');
-      railBtns[current].setAttribute('aria-selected', 'false');
-      dots[current].classList.remove('on');
-
-      current = (i + slides.length) % slides.length;
-
-      slides[current].classList.add('active');
-      railBtns[current].classList.add('on');
-      railBtns[current].setAttribute('aria-selected', 'true');
-      dots[current].classList.add('on');
-      carousel.style.setProperty('--accent', accents[current]);
-
-      elapsed = 0;
-      fill.style.transform = 'scaleX(0)';
-      if (manual) paused = false;
-    }
-
-    function loop(ts) {
-      if (!lastTs) lastTs = ts;
-      var dt = ts - lastTs;
-      lastTs = ts;
-
-      if (!paused && !document.hidden) {
-        elapsed += dt;
-        if (elapsed >= INTERVAL) { go(current + 1); }
-        fill.style.transform = 'scaleX(' + Math.min(elapsed / INTERVAL, 1) + ')';
+      // 移动端导航
+      const toggle = document.getElementById('navToggle');
+      const links = document.getElementById('navLinks');
+      if (toggle && links) {
+        toggle.addEventListener('click', () => {
+          links.classList.toggle('open');
+        });
+        links.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => links.classList.remove('open'));
+        });
       }
-      updatePeek();
-      requestAnimationFrame(loop);
-    }
 
-    function next() { go(current + 1, true); }
-    function prev() { go(current - 1, true); }
-
-    document.getElementById('next').addEventListener('click', next);
-    document.getElementById('prev').addEventListener('click', prev);
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
-    });
-
-    if (fine) {
-      carousel.addEventListener('mouseenter', function () { paused = true; });
-      carousel.addEventListener('mouseleave', function () { paused = false; });
-    }
-
-    /* ---- 触摸滑动 ---- */
-    var sx = 0, sy = 0, swiping = false;
-    carousel.addEventListener('touchstart', function (e) {
-      sx = e.touches[0].clientX; sy = e.touches[0].clientY; swiping = true; paused = true;
-    }, { passive: true });
-    carousel.addEventListener('touchend', function (e) {
-      if (!swiping) return;
-      swiping = false; paused = false;
-      var dx = e.changedTouches[0].clientX - sx;
-      var dy = e.changedTouches[0].clientY - sy;
-      if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy)) go(current + (dx < 0 ? 1 : -1), true);
-    }, { passive: true });
-
-    go(0);
-    requestAnimationFrame(loop);
-
-    /* ---- 索引滚动带 ---- */
-    var track = document.getElementById('tickerTrack');
-    var items = names.map(function (n, i) {
-      return '<b><i>0' + (i + 1) + '</i>' + n + '</b>';
-    }).join('');
-    var group = '<div class="ticker-group">' + items + '</div>';
-    track.innerHTML = group + group;
-
-    /* ---- 跟随鼠标的大图预览（仅指针设备） ---- */
-    var peek = document.getElementById('peek');
-    var peekImg = document.getElementById('peekImg');
-    var peekName = document.getElementById('peekName');
-    var peekNo = document.getElementById('peekNo');
-    var px = 0, py = 0, tx = 0, ty = 0, peekOn = false;
-
-    function lerp(a, b, n) { return a + (b - a) * n; }
-
-    if (fine) {
-      document.getElementById('worksList').addEventListener('mousemove', function (e) {
-        var w = peek.offsetWidth || 330;
-        var h = peek.offsetHeight || 230;
-        tx = Math.min(e.clientX + 26, window.innerWidth - w - 18);
-        ty = Math.max(12, Math.min(e.clientY - h / 2, window.innerHeight - h - 18));
-      }, { passive: true });
-    }
-
-    function updatePeek() {
-      if (!peekOn) return;
-      px = lerp(px, tx, .18);
-      py = lerp(py, ty, .18);
-      peek.style.transform = 'translate3d(' + px.toFixed(2) + 'px,' + py.toFixed(2) + 'px,0)';
-    }
-
-    Array.from(document.querySelectorAll('.work')).forEach(function (row) {
-      row.addEventListener('mouseenter', function () {
-        if (!fine) return;
-        peekImg.style.backgroundImage = "url('" + row.dataset.cover + "')";
-        peekName.textContent = names[+row.dataset.no - 1];
-        peekNo.textContent = 'NO.' + row.dataset.no;
-        peek.style.setProperty('--accent', accents[+row.dataset.no - 1]);
-        var w = peek.offsetWidth || 330, h = peek.offsetHeight || 230;
-        tx = Math.min(tx, window.innerWidth - w - 18);
-        if (!peekOn) { px = tx; py = ty; }
-        peekOn = true;
-        peek.classList.add('on');
-      });
-      row.addEventListener('mouseleave', function () {
-        if (!fine) return;
-        peekOn = false;
-        peek.classList.remove('on');
-      });
-    });
-
-    /* ---- 背景视差 + 鼠标光晕 ---- */
-    var grid = document.getElementById('bgGrid');
-    var glow = document.getElementById('cursorGlow');
-    var gx = 0, gy = 0, gtx = 0, gty = 0, mx = 0, my = 0, mtx = 0, mty = 0, glowReady = false;
-
-    if (fine) {
-      window.addEventListener('mousemove', function (e) {
-        gtx = (e.clientX / window.innerWidth - .5) * 2;
-        gty = (e.clientY / window.innerHeight - .5) * 2;
-        mtx = e.clientX; mty = e.clientY;
-        if (!glowReady) { gx = mtx; gy = mty; glowReady = true; glow.classList.add('on'); }
-      }, { passive: true });
-    }
-
-    (function ambient() {
-      mx = lerp(mx, mtx, .12);
-      my = lerp(my, mty, .12);
-      glow.style.transform = 'translate3d(' + (mx - 230).toFixed(1) + 'px,' + (my - 230).toFixed(1) + 'px,0)';
-
-      gx = lerp(gx, gtx, .06);
-      gy = lerp(gy, gty, .06);
-      grid.style.setProperty('--mx', gx.toFixed(3));
-      grid.style.setProperty('--my', gy.toFixed(3));
-      requestAnimationFrame(ambient);
+      // 导航高亮当前区域
+      const sections = document.querySelectorAll('.gate, .hero, .about');
+      const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+      const navObserver = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            const id = en.target.id;
+            navAnchors.forEach((a) => {
+              a.style.color = a.getAttribute('href') === '#' + id ? 'var(--text)' : '';
+            });
+          }
+        });
+      }, { threshold: 0.4 });
+      sections.forEach((s) => { if (s.id) navObserver.observe(s); });
     })();
-
-    /* ---- 顶栏：滚动进度 + 收缩 ---- */
-    var header = document.getElementById('header');
-    var ticking = false;
-    function onScroll() {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      var p = max > 0 ? window.scrollY / max : 0;
-      header.style.setProperty('--sp', Math.min(p, 1).toFixed(4));
-      header.classList.toggle('scrolled', window.scrollY > 24);
-      ticking = false;
-    }
-    window.addEventListener('scroll', function () {
-      if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
-    }, { passive: true });
-    onScroll();
-
-    /* ---- 滚动浮现 ---- */
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-      });
-    }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
-    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
-  })();
   </script>
 </body>
 </html>

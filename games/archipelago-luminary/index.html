@@ -13,9 +13,12 @@
       --ink-dim: #9aa3ad;
       --faint: #4a525c;
       --gold: #f0c674;
+      --gold-dim: rgba(240, 198, 116, .3);
       --crimson: #ef4444;
+      --crimson-dim: rgba(239, 68, 68, .3);
       --line: rgba(231, 236, 242, 0.1);
-      --grid: rgba(231, 236, 242, 0.05);
+      --grid: rgba(231, 236, 242, 0.04);
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
     }
 
     * { box-sizing: border-box; }
@@ -42,7 +45,7 @@
         linear-gradient(var(--grid) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid) 1px, transparent 1px);
       background-size: 44px 44px;
-      mask-image: radial-gradient(circle at 50% 30%, black, transparent 80%);
+      mask-image: radial-gradient(circle at 50% 30%, black, transparent 85%);
     }
 
     a { color: inherit; text-decoration: none; }
@@ -55,9 +58,7 @@
       margin: 0 auto;
     }
 
-    .mono {
-      font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
-    }
+    .mono { font-family: var(--mono); }
 
     /* ---------- 顶部 ---------- */
     .topbar {
@@ -67,431 +68,480 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 0;
-      background: linear-gradient(180deg, rgba(6, 8, 10, 0.92), rgba(6, 8, 10, 0));
+      padding: 18px 0;
+      background: linear-gradient(180deg, rgba(6, 8, 10, 0.94), rgba(6, 8, 10, 0));
+      font-size: 12px;
+      letter-spacing: 0.08em;
     }
     .topbar a {
       color: var(--ink-dim);
-      font-size: 13px;
-      letter-spacing: 0.08em;
       transition: color 0.3s ease;
     }
-    .topbar a:hover { color: var(--ink); }
-    .topbar .back::before { content: "← "; }
-    .topbar .brand-tag {
+    .topbar a:hover { color: var(--gold); }
+    .topbar .back::before { content: "<- "; }
+    .topbar .tag {
       color: var(--faint);
-      font-size: 12px;
-      letter-spacing: 0.2em;
       text-transform: uppercase;
+      font-family: var(--mono);
     }
 
     /* ---------- Hero ---------- */
     .hero {
-      padding: 56px 0 40px;
+      padding: 70px 0 50px;
+      text-align: center;
     }
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 48px;
-      align-items: center;
-    }
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0 0 20px;
-      color: var(--ink-dim);
-      font-size: 12px;
-      letter-spacing: 0.22em;
+    .hero .kicker {
+      font-family: var(--mono);
+      color: var(--faint);
+      font-size: 11px;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
+      margin: 0 0 32px;
     }
-    .eyebrow::before {
-      content: "";
-      width: 22px;
-      height: 1px;
-      background: var(--ink-dim);
-    }
-    h1 {
-      margin: 0;
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: clamp(36px, 6vw, 64px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.02;
-      color: var(--ink);
-    }
-    h1 .accent {
-      color: var(--gold);
-    }
-    .hero p.lead {
-      margin: 24px 0 0;
-      max-width: 440px;
-      color: var(--ink-dim);
-      font-size: 17px;
-    }
-    .hero .quote-line {
-      margin: 28px 0 0;
-      padding-left: 16px;
-      border-left: 2px solid var(--gold);
-      color: var(--ink);
-      font-style: italic;
-      font-size: 15px;
-    }
-
-    .zh-title {
-      margin: 14px 0 0;
-      color: var(--ink-dim);
-      font-family: Georgia, "Times New Roman", "Songti SC", serif;
-      font-size: clamp(16px, 2.4vw, 20px);
-      letter-spacing: 0.08em;
-    }
-
-    /* ---------- 战场示意（带动画） ---------- */
-    .battlefield {
+    .battlefield-hero {
       position: relative;
       width: 100%;
-      height: 380px;
+      max-width: 560px;
+      aspect-ratio: 16 / 9;
+      margin: 0 auto 36px;
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 4px;
       background:
-        linear-gradient(var(--grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
-        linear-gradient(180deg, var(--bg-soft), var(--bg));
-      background-size: 30px 30px, 30px 30px, auto;
+        linear-gradient(rgba(231,236,242,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(231,236,242,.05) 1px, transparent 1px);
+      background-size: 28px 28px;
       overflow: hidden;
     }
-    .bf-label {
+    .battlefield-hero .lane {
       position: absolute;
-      top: 14px;
-      left: 14px;
-      color: var(--faint);
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-    }
-    .bf-label.r { left: auto; right: 14px; }
-
-    /* 路径 */
-    .path {
-      position: absolute;
-      left: 8%;
-      top: 50%;
-      width: 84%;
+      left: 0; right: 0;
       height: 1px;
-      background: repeating-linear-gradient(90deg, var(--faint) 0 6px, transparent 6px 12px);
-      opacity: 0.5;
+      background: rgba(231,236,242,.08);
     }
-
-    /* 炮塔 + 射程 */
+    .battlefield-hero .lane:nth-child(1) { top: 25%; }
+    .battlefield-hero .lane:nth-child(2) { top: 50%; }
+    .battlefield-hero .lane:nth-child(3) { top: 75%; }
     .turret {
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 22px; height: 22px;
       border: 2px solid var(--ink);
-      border-radius: 7px;
-      background: rgba(231, 236, 242, 0.12);
-    }
-    .turret::before {
-      content: "";
-      position: absolute;
-      inset: -26px;
-      border: 1px solid rgba(231, 236, 242, 0.25);
-      border-radius: 50%;
-      animation: range 3s ease-in-out infinite;
+      border-radius: 3px;
+      background: rgba(231,236,242,.08);
     }
     .turret::after {
       content: "";
       position: absolute;
-      top: 13px;
-      right: -16px;
-      width: 18px;
-      height: 4px;
-      border-radius: 999px;
+      top: 50%; left: 50%;
+      width: 10px; height: 2px;
       background: var(--ink);
+      transform-origin: left center;
+      animation: turretAim 3s ease-in-out infinite;
     }
-    @keyframes range {
-      0%, 100% { transform: scale(0.92); opacity: 0.25; }
-      50% { transform: scale(1.08); opacity: 0.5; }
+    @keyframes turretAim {
+      0%, 100% { transform: translateY(-50%) rotate(-10deg); }
+      50% { transform: translateY(-50%) rotate(50deg); }
     }
-
-    /* 敌人沿路径推进 */
     .enemy {
       position: absolute;
-      top: 50%;
-      width: 22px;
-      height: 22px;
-      margin-top: -11px;
-      border: 2px solid var(--crimson);
-      border-radius: 50% 50% 30% 30%;
-      background: rgba(239, 68, 68, 0.15);
-      animation: advance 6s linear infinite;
-    }
-    .enemy.e2 { animation-delay: -2s; animation-duration: 7s; }
-    .enemy.e3 { animation-delay: -4s; animation-duration: 5.5s; }
-    @keyframes advance {
-      0% { left: 6%; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { left: 92%; opacity: 0; }
-    }
-
-    /* Luminary 光球 */
-    .luminary {
-      position: absolute;
-      right: 38px;
-      top: 38px;
-      width: 54px;
-      height: 54px;
+      width: 14px; height: 14px;
       border-radius: 50%;
-      background: radial-gradient(circle, var(--gold), rgba(240, 198, 116, 0.3));
-      animation: lum 4s ease-in-out infinite;
+      background: var(--crimson);
+      box-shadow: 0 0 8px var(--crimson-dim);
+      animation: enemyMove 6s linear infinite;
     }
-    @keyframes lum {
-      0%, 100% { box-shadow: 0 0 24px rgba(240, 198, 116, 0.7), 0 0 70px rgba(240, 198, 116, 0.25); }
-      50% { box-shadow: 0 0 40px rgba(240, 198, 116, 0.9), 0 0 120px rgba(240, 198, 116, 0.4); }
+    @keyframes enemyMove {
+      from { left: 100%; }
+      to { left: -20px; }
     }
-
-    .bf-caption {
+    .gold-spark {
       position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
-      padding: 12px 16px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(6, 8, 10, 0.7);
-      backdrop-filter: blur(8px);
-      color: var(--ink-dim);
-      font-size: 13px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      animation: spark 2.5s ease-in-out infinite;
     }
-    .bf-caption b { color: var(--ink); font-weight: 600; }
+    @keyframes spark {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    .hero h1 {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: clamp(28px, 6vw, 56px);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .hero h1 .gold { color: var(--gold); }
+    .hero .sub {
+      margin: 22px auto 0;
+      max-width: 600px;
+      color: var(--ink-dim);
+      font-size: clamp(14px, 2vw, 17px);
+      line-height: 1.8;
+    }
+    .hero .sub b { color: var(--gold); font-weight: 600; }
+
+    /* 信息条 */
+    .meta-bar {
+      margin: 36px auto 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+      width: fit-content;
+      max-width: 100%;
+      font-family: var(--mono);
+    }
+    .meta-bar .item {
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--ink-dim);
+      border-right: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .meta-bar .item:last-child { border-right: none; }
+    .meta-bar .item b { color: var(--gold); font-weight: 600; }
 
     /* ---------- 滚动浮现 ---------- */
     .reveal {
       opacity: 0;
-      transform: translateY(26px);
+      transform: translateY(28px);
       transition: opacity 0.9s ease, transform 0.9s ease;
     }
-    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal.in { opacity: 1; transform: none; }
 
-    /* ---------- 故事 ---------- */
-    .story {
-      padding: 80px 0;
-      max-width: 720px;
-      margin: 0 auto;
+    /* ---------- 章节标题 ---------- */
+    .section-head {
       text-align: center;
+      margin-bottom: 40px;
     }
-    .story .kicker {
-      color: var(--faint);
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 12px;
-      letter-spacing: 0.2em;
+    .section-head .kicker {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
-      margin: 0 0 24px;
+      color: var(--faint);
+      margin: 0 0 12px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: clamp(22px, 3.6vw, 34px);
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .section-head p {
+      margin: 10px 0 0;
+      color: var(--ink-dim);
+      font-size: 14px;
+    }
+
+    /* ---------- 故事区 ---------- */
+    .story {
+      padding: 70px 0;
+    }
+    .story-body {
+      max-width: 680px;
+      margin: 0 auto;
     }
     .story p {
-      margin: 0 0 18px;
-      font-size: clamp(18px, 2.6vw, 24px);
-      line-height: 1.6;
+      margin: 0 0 24px;
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 2;
       color: var(--ink);
     }
-    .story p .g { color: var(--gold); }
-    .story p .r { color: var(--crimson); }
-
-    /* ---------- 防御循环 ---------- */
-    .loop {
-      padding: 60px 0;
-    }
-    .loop-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 36px;
-    }
-    .loop-head h2 {
-      margin: 0;
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
-    .loop-head p {
-      margin: 0;
-      max-width: 380px;
-      color: var(--ink-dim);
-      font-size: 15px;
-    }
-    .loop-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-    .loop-card {
-      padding: 28px 24px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(231, 236, 242, 0.02);
-      transition: border-color 0.4s ease, background 0.4s ease;
-    }
-    .loop-card:hover {
-      border-color: rgba(231, 236, 242, 0.3);
-      background: rgba(231, 236, 242, 0.04);
-    }
-    .loop-card .num {
-      display: block;
-      margin-bottom: 14px;
-      color: var(--faint);
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 12px;
-      letter-spacing: 0.15em;
-    }
-    .loop-card h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--ink);
-    }
-    .loop-card p {
-      margin: 0;
-      color: var(--ink-dim);
-      font-size: 14px;
-    }
-
-    /* ---------- 关键物（碎片叙事，源自北落之光.xlsx） ---------- */
-    .keyitems {
-      padding: 60px 0;
-    }
-    .keyitems-head {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .keyitems-head h2 {
-      margin: 0 0 8px;
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: clamp(22px, 3.6vw, 30px);
-      font-weight: 700;
-    }
-    .keyitems-head p {
-      margin: 0;
-      color: var(--faint);
+    .story p .gold { color: var(--gold); }
+    .story p .crimson { color: var(--crimson); }
+    .story-fragment {
+      margin: 36px 0;
+      padding: 20px 24px;
+      border-left: 2px solid var(--gold-dim);
+      background: rgba(240,198,116,.04);
+      border-radius: 0 6px 6px 0;
+      font-family: var(--mono);
       font-size: 13px;
-      letter-spacing: 0.06em;
-    }
-    .keyitems-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 14px;
-      max-width: 820px;
-      margin: 0 auto;
-    }
-    .keyitem {
-      padding: 20px 22px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(231, 236, 242, 0.02);
-      transition: border-color 0.4s ease;
-    }
-    .keyitem:hover {
-      border-color: rgba(240, 198, 116, 0.35);
-    }
-    .keyitem .ki-name {
-      color: var(--gold);
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 14px;
-      letter-spacing: 0.05em;
-      margin: 0 0 8px;
-    }
-    .keyitem .ki-desc {
-      margin: 0;
       color: var(--ink-dim);
-      font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.8;
     }
-
-    /* ---------- 数据 ---------- */
-    .stats {
-      padding: 50px 0;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-    .stat {
-      padding: 26px 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      text-align: center;
-    }
-    .stat .n {
-      display: block;
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: clamp(28px, 4vw, 40px);
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-    }
-    .stat .l {
-      display: block;
-      margin-top: 8px;
-      color: var(--faint);
-      font-size: 12px;
-      letter-spacing: 0.1em;
+    .story-fragment .label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
     }
+
+    /* ---------- 反攻进度 ---------- */
+    .campaign {
+      padding: 70px 0;
+    }
+    .campaign-track {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+    .campaign-line {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--crimson-dim), var(--gold-dim), var(--ink-dim));
+      transform: translateY(-50%);
+    }
+    .campaign-nodes {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+    }
+    .camp-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .camp-node:hover { transform: translateY(-4px); }
+    .camp-node .dot {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--ink-dim);
+      background: var(--bg);
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+    .camp-node.start .dot { border-color: var(--crimson); background: var(--crimson); box-shadow: 0 0 12px var(--crimson-dim); }
+    .camp-node.end .dot { border-color: var(--gold); background: var(--gold); box-shadow: 0 0 12px var(--gold-dim); }
+    .camp-node:hover .dot { transform: scale(1.3); }
+    .camp-node .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--faint);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .camp-node.start .label { color: var(--crimson); }
+    .camp-node.end .label { color: var(--gold); }
+    .campaign-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .campaign-labels .start { color: var(--crimson); }
+    .campaign-labels .end { color: var(--gold); }
+    .campaign-note {
+      text-align: center;
+      margin-top: 32px;
+      color: var(--faint);
+      font-size: 13px;
+      font-family: var(--mono);
+    }
+
+    /* ---------- 军备图鉴 ---------- */
+    .armory {
+      padding: 70px 0;
+    }
+    .armory-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .armory-panel {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg-soft);
+      padding: 28px;
+    }
+    .armory-panel .panel-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .armory-panel .panel-icon {
+      width: 36px; height: 36px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .armory-panel.turrets .panel-icon { border: 1px solid var(--ink-dim); }
+    .armory-panel.enemies .panel-icon { border: 1px solid var(--crimson-dim); }
+    .armory-panel h3 {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .armory-panel .count {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .armory-panel.turrets .count { color: var(--ink); }
+    .armory-panel.enemies .count { color: var(--crimson); }
+    .armory-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .armory-item {
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-dim);
+      transition: all 0.3s;
+      cursor: default;
+    }
+    .armory-item:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: rgba(240,198,116,.06);
+    }
+    .armory-panel.enemies .armory-item:hover {
+      border-color: var(--crimson-dim);
+      color: var(--crimson);
+      background: rgba(239,68,68,.06);
+    }
+
+    /* ---------- 美术与叙事 ---------- */
+    .art-narrative {
+      padding: 70px 0;
+    }
+    .an-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .an-card {
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg-soft);
+      transition: border-color 0.4s;
+    }
+    .an-card:hover { border-color: var(--gold-dim); }
+    .an-card .an-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .an-card h3 {
+      margin: 0 0 12px;
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .an-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--ink-dim);
+      line-height: 1.8;
+    }
+    .an-card p .gold { color: var(--gold); }
 
     /* ---------- 截图 ---------- */
     .media {
-      padding: 50px 0;
-    }
-    .media-head {
-      margin-bottom: 30px;
-    }
-    .media-head h2 {
-      margin: 0 0 8px;
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 700;
-    }
-    .media-head p {
-      margin: 0;
-      color: var(--ink-dim);
-      font-size: 14px;
+      padding: 60px 0;
     }
     .media-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
     }
     .shot {
       position: relative;
       overflow: hidden;
-      border-radius: 12px;
       border: 1px solid var(--line);
+      border-radius: 4px;
       cursor: pointer;
+      background: var(--bg-soft);
+      padding: 0;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .shot:hover,
+    .shot:focus-visible {
+      border-color: var(--gold-dim);
+      transform: translateY(-3px);
+      outline: none;
     }
     .shot img {
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      filter: grayscale(0.3) brightness(0.85);
-      transition: filter 0.5s ease, transform 0.5s ease;
+      filter: grayscale(.3) contrast(1.05);
+      transition: filter 0.5s, transform 0.5s;
     }
     .shot:hover img,
     .shot:focus-visible img {
-      filter: grayscale(0) brightness(1);
-      transform: scale(1.03);
+      filter: grayscale(0) contrast(1.1);
+      transform: scale(1.04);
     }
+
+    /* ---------- 信息栏 ---------- */
+    .info-grid {
+      padding: 60px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .info-cell {
+      background: var(--bg);
+      padding: 22px;
+      text-align: center;
+    }
+    .info-cell .label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 8px;
+    }
+    .info-cell .value {
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .info-cell .value.gold { color: var(--gold); }
 
     /* ---------- 底部 ---------- */
     .bottom {
-      padding: 80px 0 64px;
+      padding: 70px 0 60px;
       text-align: center;
+    }
+    .bottom h2 {
+      margin: 0 0 14px;
+      font-family: var(--mono);
+      font-size: clamp(22px, 3.6vw, 32px);
+      color: var(--ink);
+    }
+    .bottom p {
+      margin: 0 0 30px;
+      color: var(--ink-dim);
+      font-size: 14px;
     }
     .bottom .links {
       display: inline-flex;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -501,40 +551,50 @@
       gap: 8px;
       padding: 13px 26px;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--ink);
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 13px;
-      letter-spacing: 0.06em;
-      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.3s;
     }
     .bottom .links a:hover {
-      border-color: var(--ink);
-      background: rgba(231, 236, 242, 0.05);
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(240,198,116,.06);
     }
     .bottom .links a.primary {
       border-color: var(--gold);
-      color: var(--gold);
+      color: var(--bg);
+      background: var(--gold);
+      font-weight: 700;
+    }
+    .bottom .links a.primary:hover {
+      background: #f5d48a;
+      box-shadow: 0 0 40px rgba(240,198,116,.25);
     }
     .bottom .sign {
-      margin-top: 44px;
+      margin-top: 40px;
       color: var(--faint);
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 12px;
-      letter-spacing: 0.15em;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
     }
 
     /* ---------- 响应式 ---------- */
     @media (max-width: 860px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
-      .battlefield { height: 320px; }
-      .loop-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .media-grid { grid-template-columns: 1fr; }
-      .loop-head { flex-direction: column; align-items: flex-start; }
+      .armory-grid, .an-grid { grid-template-columns: 1fr; }
+      .media-grid { grid-template-columns: 1fr 1fr; }
+      .campaign-nodes { flex-wrap: wrap; gap: 20px; justify-content: center; }
+      .campaign-line { display: none; }
     }
     @media (max-width: 520px) {
-      .stats-grid { grid-template-columns: 1fr; }
+      .media-grid { grid-template-columns: 1fr; }
+      .meta-bar { border-radius: 6px; }
+      .meta-bar .item { border-right: none; border-bottom: 1px solid var(--line); width: 100%; text-align: center; }
+      .meta-bar .item:last-child { border-bottom: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -551,111 +611,213 @@
   <div class="wrap">
     <div class="topbar">
       <a class="back" href="../../index.html">返回作品集</a>
-      <span class="brand-tag mono">A · LUMINARY</span>
-      <a href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">Steam 页面</a>
+      <span class="tag">TOWER DEFENSE · 14 LEVELS</span>
+      <a href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">Steam</a>
     </div>
 
+    <!-- Hero -->
     <section class="hero">
-      <div class="hero-grid">
-        <div class="reveal">
-          <p class="eyebrow mono">Minimalist 2D Tower Defense</p>
-          <h1>ARCHIPELAGO<br /><span class="accent">LUMINARY</span></h1>
-          <p class="zh-title">阿奇佩拉戈 · 北落之光</p>
-          <p class="lead">一款极简 2D 塔防游戏。建造炮塔、管理资源、抵挡波次，从最后的庇护所反攻至失去的领土。</p>
-          <p class="quote-line">黑白战场中，颜色是稀缺的宝物——直到它涌入整片战场。</p>
+      <p class="kicker reveal">MINIMALIST 2D TOWER DEFENSE · STEAM · 2025</p>
+      <div class="battlefield-hero reveal">
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="turret" style="top:18%;left:12%;"></div>
+        <div class="turret" style="top:44%;left:28%;"></div>
+        <div class="turret" style="top:68%;left:15%;"></div>
+        <div class="turret" style="top:35%;left:52%;"></div>
+        <div class="turret" style="top:58%;left:68%;"></div>
+        <div class="enemy" style="top:20%;animation-delay:0s;"></div>
+        <div class="enemy" style="top:46%;animation-delay:2s;"></div>
+        <div class="enemy" style="top:70%;animation-delay:4s;"></div>
+        <div class="gold-spark" style="top:30%;left:40%;animation-delay:.5s;"></div>
+        <div class="gold-spark" style="top:55%;left:60%;animation-delay:1.5s;"></div>
+        <div class="gold-spark" style="top:40%;left:78%;animation-delay:2.5s;"></div>
+      </div>
+      <h1 class="reveal">ARCHIPELAGO <span class="gold">LUMINARY</span></h1>
+      <p class="sub reveal">极简 2D 塔防。<b>黑白战场中，颜色是稀缺的宝物</b>——直到它淹没战场。14 关反攻，从最后庇护所到失去的领土。</p>
+      <div class="meta-bar reveal">
+        <div class="item"><b>Steam</b> · ¥11</div>
+        <div class="item">发行 <b>2025.05.29</b></div>
+        <div class="item"><b>14</b> 成就</div>
+        <div class="item"><b>8</b> 语言</div>
+      </div>
+    </section>
+
+    <!-- 故事 -->
+    <section class="story">
+      <div class="section-head reveal">
+        <p class="kicker">// Story</p>
+        <h2>北方王国的黄昏</h2>
+      </div>
+      <div class="story-body">
+        <p class="reveal">一夜，<span class="gold">一束光</span>落入北海。从那一刻起，无尽的怪物从深处涌出。</p>
+        <p class="reveal">北方王国的人们一步步撤退，直到只剩下最后的庇护所——直到<span class="gold">人类建造了第一座炮塔</span>……</p>
+        <div class="story-fragment reveal">
+          <div class="label">// FRAGMENT 01 · 关键物</div>
+          "散落的岛屿"（Archipelago）映射破碎的世界，"发光体"（Luminary）照亮核心谜团。拼凑碎片叙事与关键物品，重建被遗忘的真相。
         </div>
-        <div class="battlefield reveal" aria-label="战场概念示意">
-          <span class="bf-label mono">SECTOR 01</span>
-          <span class="bf-label r mono">WAVE 14</span>
-          <span class="path"></span>
-          <span class="turret" style="left: 22%; top: 28%;"></span>
-          <span class="turret" style="left: 48%; top: 64%;"></span>
-          <span class="turret" style="left: 70%; top: 30%;"></span>
-          <span class="luminary"></span>
-          <span class="enemy"></span>
-          <span class="enemy e2"></span>
-          <span class="enemy e3"></span>
-          <div class="bf-caption">三座炮塔守卫最后庇护所，<b>白色</b>是友军，<b style="color:var(--crimson)">红色</b>是入侵，<b style="color:var(--gold)">金色</b>是 Luminary。</div>
+        <p class="reveal">跨越 <span class="gold">14 张地图</span>，从简单的通道到错综复杂的路径，一步步逼近神之所在。</p>
+        <p class="reveal">在 stark 黑白美学中，颜色成为稀世珍宝——直到它淹没战场。</p>
+      </div>
+    </section>
+
+    <!-- 反攻进度 -->
+    <section class="campaign">
+      <div class="section-head reveal">
+        <p class="kicker">// Campaign</p>
+        <h2>14 关反攻路线</h2>
+        <p>从最后庇护所，一步步收复失去的领土</p>
+      </div>
+      <div class="campaign-track reveal">
+        <div class="campaign-line"></div>
+        <div class="campaign-nodes">
+          <div class="camp-node start"><div class="dot"></div><div class="label">01</div></div>
+          <div class="camp-node"><div class="dot"></div><div class="label">04</div></div>
+          <div class="camp-node"><div class="dot"></div><div class="label">07</div></div>
+          <div class="camp-node"><div class="dot"></div><div class="label">10</div></div>
+          <div class="camp-node end"><div class="dot"></div><div class="label">14</div></div>
+        </div>
+      </div>
+      <div class="campaign-labels reveal">
+        <span class="start">最后庇护所</span>
+        <span class="end">失去的领土 · Luminary 真相</span>
+      </div>
+      <p class="campaign-note reveal">每关平均 10 分钟以内（如果一切顺利），无强制推进——随时可玩。</p>
+    </section>
+
+    <!-- 军备图鉴 -->
+    <section class="armory">
+      <div class="section-head reveal">
+        <p class="kicker">// Armory</p>
+        <h2>军备与敌情</h2>
+        <p>14+ 炮塔类型 · 10+ 敌人变体</p>
+      </div>
+      <div class="armory-grid">
+        <div class="armory-panel turrets reveal">
+          <div class="panel-head">
+            <div class="panel-icon">▣</div>
+            <h3>炮塔图鉴</h3>
+            <span class="count">14+</span>
+          </div>
+          <div class="armory-list">
+            <span class="armory-item">基础炮塔</span>
+            <span class="armory-item">速射炮塔</span>
+            <span class="armory-item">狙击炮塔</span>
+            <span class="armory-item">范围炮塔</span>
+            <span class="armory-item">减速炮塔</span>
+            <span class="armory-item">穿透炮塔</span>
+            <span class="armory-item">溅射炮塔</span>
+            <span class="armory-item">连锁炮塔</span>
+            <span class="armory-item">毒素炮塔</span>
+            <span class="armory-item">冰冻炮塔</span>
+            <span class="armory-item">激光炮塔</span>
+            <span class="armory-item">导弹炮塔</span>
+            <span class="armory-item">电磁炮塔</span>
+            <span class="armory-item">终极炮塔</span>
+          </div>
+        </div>
+        <div class="armory-panel enemies reveal">
+          <div class="panel-head">
+            <div class="panel-icon">●</div>
+            <h3>敌人图鉴</h3>
+            <span class="count">10+</span>
+          </div>
+          <div class="armory-list">
+            <span class="armory-item">普通怪物</span>
+            <span class="armory-item">快速怪物</span>
+            <span class="armory-item">重甲怪物</span>
+            <span class="armory-item">飞行怪物</span>
+            <span class="armory-item">分裂怪物</span>
+            <span class="armory-item">治愈怪物</span>
+            <span class="armory-item">护盾怪物</span>
+            <span class="armory-item">隐身怪物</span>
+            <span class="armory-item">狂暴怪物</span>
+            <span class="armory-item">BOSS</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="story reveal">
-      <p class="kicker mono">// STORY</p>
-      <p>某夜，<span class="g">一束光</span>坠入北方海域——那是撞击点。</p>
-      <p>三角神掷下它，本想清理世界滋生的<span class="r">害虫</span>，却出了意外。怪物自深海涌出，王国步步后退，直到只剩最后的庇护所——</p>
-      <p>直到守卫放下武器，人类建起第一座炮塔。</p>
-    </section>
-
-    <section class="keyitems">
-      <div class="keyitems-head reveal">
-        <h2>KEY ITEMS</h2>
-        <p>42 个关键物，拼出这个世界的碎片叙事</p>
+    <!-- 美术与叙事 -->
+    <section class="art-narrative">
+      <div class="section-head reveal">
+        <p class="kicker">// Art & Narrative</p>
+        <h2>美术与叙事</h2>
       </div>
-      <div class="keyitems-grid">
-        <article class="keyitem reveal"><p class="ki-name">// 开端</p><p class="ki-desc">好的故事要有一个开端，大到如同流星划过夜空，小到仅仅剩一粒光。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 撞击点</p><p class="ki-desc">按照推断，那粒光击中的地方，不过现在人们终于猜到了具体位置。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 守卫</p><p class="ki-desc">他曾经也是一位战士，拼死守护人类最后的净土，直到第一座炮塔被建造。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 生命树</p><p class="ki-desc">能否这样理解，如果把世界比做生命树的枝叶，那么害虫就是怪物。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 宗教论</p><p class="ki-desc">长话短说，三角神掷下一粒光清理世界内部滋生的害虫，但是出现了意外。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 三角</p><p class="ki-desc">面对一个三角，根本无法拒绝，它是如此的完美，绝对与和谐。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 你</p><p class="ki-desc">你不过是三角神的一缕幻觉，在你收回光粒之后，这场闹剧就该结束了。</p></article>
-        <article class="keyitem reveal"><p class="ki-name">// 纪念碑</p><p class="ki-desc">以此纪念我们最后的一次失败，以此纪念我们最后的一片净土。</p></article>
-      </div>
-    </section>
-
-    <section class="loop">
-      <div class="loop-head reveal">
-        <h2>DEFENSE LOOP</h2>
-        <p>把塔防压缩到清晰的路线、费用、炮塔和波次压力里，让每一局都围绕取舍展开。</p>
-      </div>
-      <div class="loop-grid">
-        <article class="loop-card reveal">
-          <span class="num mono">01</span>
-          <h3>建造炮塔</h3>
-          <p>根据路线和敌人节奏部署炮塔，用有限资源撑过越来越紧的战场。</p>
-        </article>
-        <article class="loop-card reveal">
-          <span class="num mono">02</span>
-          <h3>反攻地图</h3>
-          <p>从最后庇护所出发，关卡路线逐渐复杂，像把失地一格格夺回来。</p>
-        </article>
-        <article class="loop-card reveal">
-          <span class="num mono">03</span>
+      <div class="an-grid">
+        <div class="an-card reveal">
+          <div class="an-icon">◐</div>
+          <h3>黑白美学</h3>
+          <p>在 stark 黑白美学中，<span class="gold">颜色成为稀世珍宝</span>。玩家在几乎无色的战场上作战，直到关键时刻颜色淹没战场——每一抹色彩都有其重量。</p>
+        </div>
+        <div class="an-card reveal">
+          <div class="an-icon">◈</div>
           <h3>碎片叙事</h3>
-          <p>黑白极简美术让颜色显得更稀有，文本和物件拼出 Luminary 的真相。</p>
-        </article>
+          <p>故事不直接讲述，而是通过<span class="gold">关键物品与散落的 lore 碎片</span>逐渐拼凑。Lore hunters 可以在战场细节中重建被遗忘的真相，揭开 Luminary 的核心谜团。</p>
+        </div>
       </div>
     </section>
 
-    <section class="stats reveal">
-      <div class="stats-grid">
-        <div class="stat"><span class="n mono">14</span><span class="l">关卡</span></div>
-        <div class="stat"><span class="n mono">14+</span><span class="l">炮塔类型</span></div>
-        <div class="stat"><span class="n mono">10+</span><span class="l">敌人变体</span></div>
-        <div class="stat"><span class="n mono">8</span><span class="l">种语言</span></div>
-      </div>
-    </section>
-
+    <!-- 截图 -->
     <section class="media">
-      <div class="media-head reveal">
-        <h2>MEDIA</h2>
-        <p>来自 Steam 商店页的截图，点击可放大。默认略去色彩，靠近恢复。</p>
+      <div class="section-head reveal">
+        <p class="kicker">// Screenshots</p>
+        <h2>实机画面</h2>
       </div>
       <div class="media-grid">
-        <button class="shot" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="Archipelago Luminary 截图 1" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="Archipelago Luminary 截图 2" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="Archipelago Luminary 截图 3" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="Archipelago Luminary 截图 1" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="Archipelago Luminary 截图 2" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="Archipelago Luminary 截图 3" loading="lazy"></button>
       </div>
     </section>
 
-    <section class="bottom">
-      <div class="links">
-        <a class="primary" href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">在 Steam 查看 →</a>
-        <a href="https://www.bilibili.com/video/BV1b97HzqEkS/" target="_blank" rel="noreferrer">Bilibili 演示 →</a>
-        <a href="../../index.html">返回作品集 →</a>
+    <!-- 信息栏 -->
+    <section class="info-grid reveal">
+      <div class="info-cell">
+        <p class="label">平台</p>
+        <p class="value">Steam · PC</p>
       </div>
-      <p class="sign mono">ARCHIPELAGO LUMINARY — GOVE</p>
+      <div class="info-cell">
+        <p class="label">价格</p>
+        <p class="value gold">¥ 11.00</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">发行日期</p>
+        <p class="value">2025.05.29</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">类型</p>
+        <p class="value">塔防 / 策略</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">成就</p>
+        <p class="value">14 个</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">语言</p>
+        <p class="value">8 种</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">灵感来源</p>
+        <p class="value">Plants vs. Zombies</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">开发 / 发行</p>
+        <p class="value">Gove</p>
+      </div>
+    </section>
+
+    <!-- 底部 -->
+    <section class="bottom">
+      <h2 class="reveal">加入反攻</h2>
+      <p class="reveal">在 Steam 购买，从最后庇护所开始，一步步揭开 Luminary 的真相。</p>
+      <div class="links reveal">
+        <a class="primary" href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">在 Steam 购买 ¥11 -></a>
+        <a href="https://www.bilibili.com/video/BV1b97HzqEkS/" target="_blank" rel="noreferrer">Bilibili 演示 -></a>
+        <a href="../../index.html">返回作品集 -></a>
+      </div>
+      <p class="sign">ARCHIPELAGO LUMINARY — GOVE · 2025 · STEAM</p>
     </section>
   </div>
 
@@ -669,15 +831,15 @@
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.2 });
+      }, { threshold: 0.15 });
       document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
       // 截图放大
       const shots = document.querySelectorAll('.shot');
       const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.92);cursor:zoom-out;';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.94);cursor:zoom-out;';
       const big = document.createElement('img');
-      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:12px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
+      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:6px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
       overlay.appendChild(big);
       document.body.appendChild(overlay);
       shots.forEach((s) => {

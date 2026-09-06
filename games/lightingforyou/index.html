@@ -11,10 +11,12 @@
       --black-soft: #0a0a0c;
       --light: #ffd76b;
       --light-soft: #ffe9a8;
+      --light-dim: rgba(255, 215, 107, .4);
       --text: #e8e2d4;
       --muted: #8a8472;
       --faint: #46423a;
       --line: rgba(255, 215, 107, 0.12);
+      --serif: Georgia, "Times New Roman", "Songti SC", serif;
     }
 
     * { box-sizing: border-box; }
@@ -25,7 +27,7 @@
       min-height: 100vh;
       background: var(--black);
       color: var(--text);
-      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-family: var(--serif);
       line-height: 1.9;
       overflow-x: hidden;
     }
@@ -38,20 +40,20 @@
       z-index: 0;
       pointer-events: none;
       background:
-        radial-gradient(circle at 50% 0%, rgba(255, 215, 107, 0.07), transparent 42vh),
+        radial-gradient(circle at 50% 0%, rgba(255, 215, 107, 0.06), transparent 42vh),
         radial-gradient(circle at 50% 100%, rgba(255, 215, 107, 0.04), transparent 42vh);
     }
 
     /* 鼠标光晕 —— 微弱视野机制 */
     .cursor-glow {
       position: fixed;
-      width: 560px;
-      height: 560px;
+      width: 640px;
+      height: 640px;
       left: 0;
       top: 0;
-      margin: -280px 0 0 -280px;
+      margin: -320px 0 0 -320px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 215, 107, 0.13), rgba(255, 215, 107, 0.04) 38%, transparent 70%);
+      background: radial-gradient(circle, rgba(255, 215, 107, 0.10), rgba(255, 215, 107, 0.03) 38%, transparent 68%);
       pointer-events: none;
       z-index: 2;
       transform: translate(-1000px, -1000px);
@@ -65,7 +67,7 @@
     .wrap {
       position: relative;
       z-index: 1;
-      width: min(820px, calc(100% - 48px));
+      width: min(960px, calc(100% - 48px));
       margin: 0 auto;
     }
 
@@ -77,80 +79,108 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 22px 0;
+      padding: 18px 0;
       background: linear-gradient(180deg, rgba(5, 5, 6, 0.92), rgba(5, 5, 6, 0));
+      font-size: 13px;
+      letter-spacing: 0.08em;
     }
     .topbar a {
       color: var(--muted);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.06em;
       transition: color 0.3s ease;
     }
     .topbar a:hover { color: var(--light); }
     .topbar .back::before { content: "← "; }
+    .topbar .tag {
+      color: var(--faint);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
 
     /* ---------- Hero ---------- */
     .hero {
-      min-height: 92vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      padding: 80px 0 60px;
       text-align: center;
-      padding: 60px 0;
-    }
-    .light-orb {
       position: relative;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--light);
-      box-shadow:
-        0 0 24px rgba(255, 215, 107, 0.9),
-        0 0 64px rgba(255, 215, 107, 0.5),
-        0 0 140px rgba(255, 215, 107, 0.25);
-      animation: breathe 4s ease-in-out infinite;
-      margin-bottom: 46px;
     }
-    @keyframes breathe {
-      0%, 100% { transform: scale(1); opacity: 0.95; }
-      50% { transform: scale(1.25); opacity: 1; }
+    .hero-orb {
+      width: clamp(120px, 18vw, 180px);
+      height: clamp(120px, 18vw, 180px);
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    .hero-orb .core {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 50px; height: 50px;
+      margin: -25px 0 0 -25px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff, var(--light) 50%, transparent 75%);
+      box-shadow: 0 0 80px 30px rgba(255,215,107,.35);
+      animation: heroPulse 3.5s ease-in-out infinite;
+    }
+    @keyframes heroPulse {
+      0%, 100% { box-shadow: 0 0 80px 30px rgba(255,215,107,.35); }
+      50% { box-shadow: 0 0 120px 45px rgba(255,215,107,.5); }
+    }
+    .hero-orb .ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      transform: translate(-50%, -50%);
+    }
+    .hero-orb .ring:nth-child(2) { width: 100px; height: 100px; animation: ringOut 4s ease-out infinite; }
+    .hero-orb .ring:nth-child(3) { width: 150px; height: 150px; animation: ringOut 4s ease-out infinite 1.3s; }
+    @keyframes ringOut {
+      0% { opacity: .5; transform: translate(-50%,-50%) scale(.7); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(1.2); }
     }
     .hero h1 {
       margin: 0;
-      font-size: clamp(46px, 9vw, 92px);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      color: var(--text);
-    }
-    .hero h1 em {
-      font-style: normal;
-      color: transparent;
-      background: linear-gradient(180deg, var(--light-soft), var(--light));
-      -webkit-background-clip: text;
-      background-clip: text;
+      font-size: clamp(40px, 8vw, 72px);
+      font-weight: 700;
+      color: var(--light-soft);
+      letter-spacing: 0.02em;
+      line-height: 1.2;
     }
     .hero .sub {
-      margin: 28px 0 0;
-      max-width: 520px;
+      margin: 24px auto 0;
+      max-width: 560px;
       color: var(--muted);
-      font-size: clamp(16px, 2.4vw, 19px);
-      font-style: italic;
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 1.8;
     }
-    .hero .meta {
-      margin-top: 40px;
-      display: inline-flex;
-      gap: 14px;
-      align-items: center;
-      color: var(--faint);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+    .hero .sub em {
+      font-style: normal;
+      color: var(--light);
     }
-    .hero .meta span { color: var(--light); }
+
+    /* 信息条 */
+    .meta-bar {
+      margin: 40px auto 0;
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .meta-bar .item {
+      padding: 10px 22px;
+      font-size: 13px;
+      color: var(--muted);
+      border-right: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .meta-bar .item:last-child { border-right: none; }
+    .meta-bar .item b {
+      color: var(--light);
+      font-weight: 600;
+    }
 
     /* ---------- 滚动浮现 ---------- */
     .reveal {
@@ -158,299 +188,309 @@
       transform: translateY(28px);
       transition: opacity 1s ease, transform 1s ease;
     }
-    .reveal.in {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .reveal.in { opacity: 1; transform: none; }
 
-    /* ---------- 引言 ---------- */
-    .intro {
-      padding: 90px 0;
-      text-align: center;
-    }
-    .intro p {
+    /* ---------- 故事区 ---------- */
+    .story {
+      padding: 80px 0;
+      max-width: 680px;
       margin: 0 auto;
-      max-width: 560px;
-      font-size: clamp(20px, 3vw, 28px);
-      line-height: 1.7;
-      color: var(--text);
-      font-style: italic;
     }
-    .intro p::first-letter {
+    .story-head {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .story-head .kicker {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 12px;
+    }
+    .story-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 36px);
+      color: var(--light-soft);
+      font-weight: 600;
+    }
+    .story p {
+      margin: 0 0 28px;
+      font-size: clamp(16px, 2.2vw, 19px);
+      line-height: 2;
+      color: var(--text);
+    }
+    .story p .hl {
       color: var(--light);
     }
+    .story-divider {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, transparent, var(--light-dim), transparent);
+      margin: 40px auto;
+    }
 
-    /* ---------- 14 关卡光点路径 ---------- */
+    /* ---------- 14关光点路径 ---------- */
     .levels {
-      padding: 70px 0;
+      padding: 60px 0;
     }
     .levels-head {
       text-align: center;
-      margin-bottom: 64px;
+      margin-bottom: 48px;
+    }
+    .levels-head .kicker {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 12px;
     }
     .levels-head h2 {
-      margin: 0 0 10px;
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      color: var(--text);
+      margin: 0;
+      font-size: clamp(22px, 3.6vw, 32px);
+      color: var(--light-soft);
     }
     .levels-head p {
-      margin: 0;
-      color: var(--faint);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.1em;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 14px;
     }
     .level-path {
-      position: relative;
-      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0;
+      max-width: 700px;
       margin: 0 auto;
-      padding: 0;
-      max-width: 620px;
+      position: relative;
     }
-    .level-path::before {
+    .level-node {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--black-soft);
+      color: var(--faint);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      margin: 6px;
+      font-family: var(--serif);
+    }
+    .level-node:hover,
+    .level-node:focus-visible {
+      border-color: var(--light);
+      color: var(--light);
+      background: rgba(255,215,107,.08);
+      box-shadow: 0 0 24px rgba(255,215,107,.25);
+      transform: scale(1.15);
+      outline: none;
+    }
+    .level-node .tooltip {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--black-soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 20;
+    }
+    .level-node .tooltip::after {
       content: "";
       position: absolute;
+      top: 100%;
       left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(180deg, transparent, var(--line) 12%, var(--line) 88%, transparent);
       transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--line);
     }
-    .level {
-      position: relative;
-      display: flex;
-      align-items: center;
-      min-height: 84px;
-      padding: 0 0 0 50%;
+    .level-node:hover .tooltip,
+    .level-node:focus-visible .tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
-    .level:nth-child(even) {
-      padding: 0 50% 0 0;
-      justify-content: flex-end;
-      text-align: right;
+    .level-connector {
+      width: 20px;
+      height: 1px;
+      background: var(--line);
+      align-self: center;
+      flex-shrink: 0;
     }
-    .level .dot {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 9px;
-      height: 9px;
-      margin: -4.5px 0 0 -4.5px;
-      border-radius: 50%;
-      background: var(--black);
-      border: 1px solid var(--faint);
-      transition: all 0.6s ease;
-    }
-    .level.lit .dot {
-      background: var(--light);
-      border-color: var(--light);
-      box-shadow: 0 0 16px rgba(255, 215, 107, 0.8), 0 0 40px rgba(255, 215, 107, 0.35);
-    }
-    .level .frag {
-      max-width: 240px;
-      padding: 0 28px;
-      color: var(--faint);
-      font-style: italic;
-      font-size: 15px;
-      transition: color 0.6s ease;
-    }
-    .level:nth-child(even) .frag { padding: 0 28px 0 0; }
-    .level.lit .frag { color: var(--text); }
-
-    /* ---------- 大引用 ---------- */
-    .bigquote {
-      padding: 120px 0;
+    .levels-note {
       text-align: center;
-    }
-    .bigquote blockquote {
-      margin: 0 auto;
-      max-width: 640px;
-      font-size: clamp(26px, 4.6vw, 44px);
-      line-height: 1.45;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      font-weight: 400;
-    }
-    .bigquote blockquote em {
-      font-style: normal;
-      color: var(--light);
-    }
-    .bigquote .cite {
-      margin-top: 32px;
+      margin-top: 36px;
       color: var(--faint);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 12px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-    }
-
-    /* ---------- 体验三主题 ---------- */
-    .experience {
-      padding: 70px 0;
-    }
-    .exp-head {
-      text-align: center;
-      margin-bottom: 50px;
-    }
-    .exp-head h2 {
-      margin: 0;
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 400;
-      color: var(--text);
-    }
-    .exp-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-    .exp-card {
-      padding: 30px 24px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255, 215, 107, 0.02);
-      transition: border-color 0.4s ease, background 0.4s ease;
-    }
-    .exp-card:hover {
-      border-color: rgba(255, 215, 107, 0.4);
-      background: rgba(255, 215, 107, 0.05);
-    }
-    .exp-card h3 {
-      margin: 0 0 12px;
-      font-size: 19px;
-      font-weight: 400;
-      color: var(--light);
-    }
-    .exp-card p {
-      margin: 0;
-      color: var(--muted);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    /* ---------- 光量（5 级视野系统，源自 game_control.gd） ---------- */
-    .volume {
-      padding: 70px 0;
-      text-align: center;
-    }
-    .volume-head {
-      margin-bottom: 44px;
-    }
-    .volume-head h2 {
-      margin: 0 0 10px;
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 400;
-      color: var(--text);
-    }
-    .volume-head p {
-      margin: 0;
-      color: var(--faint);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
       font-size: 13px;
-      letter-spacing: 0.08em;
-    }
-    .volume-bars {
-      display: flex;
-      justify-content: center;
-      gap: 26px;
-      flex-wrap: wrap;
-    }
-    .vol {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-    .vol-orb {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      border: 1px solid var(--line);
-    }
-    .vol-orb.v1 { background: radial-gradient(circle, #3b82f6, transparent 72%); box-shadow: 0 0 28px rgba(59, 130, 246, 0.6); }
-    .vol-orb.v2 { background: radial-gradient(circle, #6ee7b7, transparent 72%); box-shadow: 0 0 28px rgba(110, 231, 183, 0.6); }
-    .vol-orb.v3 { background: radial-gradient(circle, #ffffff, transparent 72%); box-shadow: 0 0 28px rgba(255, 255, 255, 0.6); }
-    .vol-orb.v4 { background: radial-gradient(circle, #ffd76b, transparent 72%); box-shadow: 0 0 28px rgba(255, 215, 107, 0.6); }
-    .vol-orb.v5 { background: radial-gradient(circle, #ef4444, transparent 72%); box-shadow: 0 0 28px rgba(239, 68, 68, 0.6); }
-    .vol-name {
-      color: var(--text);
-      font-size: 15px;
-      letter-spacing: 0.14em;
+      font-style: italic;
     }
 
-    /* ---------- 截图（昏暗 → 点亮） ---------- */
+    /* ---------- 开发者的话 ---------- */
+    .devnote {
+      padding: 80px 0;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .devnote-head {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .devnote-head .kicker {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 12px;
+    }
+    .devnote-head h2 {
+      margin: 0;
+      font-size: clamp(22px, 3.6vw, 30px);
+      color: var(--light-soft);
+    }
+    .devnote blockquote {
+      margin: 0;
+      padding: 32px 36px;
+      border-left: 2px solid var(--light-dim);
+      background: rgba(255,215,107,.03);
+      border-radius: 0 12px 12px 0;
+    }
+    .devnote blockquote p {
+      margin: 0 0 18px;
+      font-size: clamp(15px, 2vw, 17px);
+      line-height: 2;
+      color: var(--text);
+    }
+    .devnote blockquote p:last-child { margin-bottom: 0; }
+    .devnote blockquote .sig {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+    .devnote blockquote .sig b {
+      color: var(--light);
+      font-style: normal;
+    }
+
+    /* ---------- 截图 ---------- */
     .media {
-      padding: 70px 0;
+      padding: 60px 0;
     }
     .media-head {
+      margin-bottom: 28px;
       text-align: center;
-      margin-bottom: 44px;
+    }
+    .media-head .kicker {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 12px;
     }
     .media-head h2 {
-      margin: 0 0 8px;
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 400;
-      color: var(--text);
-    }
-    .media-head p {
       margin: 0;
-      color: var(--faint);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.08em;
+      font-size: clamp(22px, 3.6vw, 30px);
+      color: var(--light-soft);
     }
     .media-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
     }
     .shot {
       position: relative;
       overflow: hidden;
-      border-radius: 14px;
       border: 1px solid var(--line);
+      border-radius: 8px;
       cursor: pointer;
+      background: var(--black-soft);
+      padding: 0;
+      transition: border-color 0.4s ease, transform 0.4s ease;
+    }
+    .shot:hover,
+    .shot:focus-visible {
+      border-color: var(--light-dim);
+      transform: translateY(-3px);
+      outline: none;
     }
     .shot img {
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      filter: brightness(0.32) saturate(0.7);
-      transition: filter 0.6s ease, transform 0.6s ease;
+      filter: brightness(.85) contrast(1.05);
+      transition: filter 0.5s ease, transform 0.5s ease;
     }
     .shot:hover img,
     .shot:focus-visible img {
-      filter: brightness(1) saturate(1);
-      transform: scale(1.03);
+      filter: brightness(1) contrast(1.1);
+      transform: scale(1.04);
     }
     .shot::after {
-      content: "靠近，才能看清";
+      content: "";
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      opacity: 1;
-      transition: opacity 0.5s ease;
       pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.4) 100%);
     }
-    .shot:hover::after,
-    .shot:focus-visible::after { opacity: 0; }
 
-    /* ---------- 底部 ---------- */
-    .bottom {
-      padding: 90px 0 70px;
+    /* ---------- 信息栏 ---------- */
+    .info-grid {
+      padding: 60px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .info-cell {
+      background: var(--black);
+      padding: 24px;
       text-align: center;
+    }
+    .info-cell .label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 8px;
+    }
+    .info-cell .value {
+      font-size: 16px;
+      color: var(--light-soft);
+      font-weight: 600;
+    }
+
+    /* ---------- 底部 CTA ---------- */
+    .bottom {
+      padding: 80px 0 64px;
+      text-align: center;
+    }
+    .bottom h2 {
+      margin: 0 0 16px;
+      font-size: clamp(24px, 4vw, 36px);
+      color: var(--light-soft);
+    }
+    .bottom p {
+      margin: 0 0 32px;
+      color: var(--muted);
+      font-size: 15px;
     }
     .bottom .links {
       display: inline-flex;
-      gap: 18px;
+      gap: 14px;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -458,39 +498,50 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 13px 26px;
+      padding: 14px 30px;
       border: 1px solid var(--line);
       border-radius: 999px;
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
       font-size: 14px;
-      letter-spacing: 0.04em;
-      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
     }
     .bottom .links a:hover {
       border-color: var(--light);
       color: var(--light);
-      background: rgba(255, 215, 107, 0.05);
+      background: rgba(255,215,107,.06);
+    }
+    .bottom .links a.primary {
+      border-color: var(--light);
+      color: var(--black);
+      background: var(--light);
+      font-weight: 600;
+    }
+    .bottom .links a.primary:hover {
+      background: var(--light-soft);
+      box-shadow: 0 0 40px rgba(255,215,107,.3);
     }
     .bottom .sign {
-      margin-top: 50px;
+      margin-top: 48px;
       color: var(--faint);
-      font-style: italic;
-      font-size: 14px;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
     }
 
     /* ---------- 响应式 ---------- */
     @media (max-width: 720px) {
-      .exp-grid { grid-template-columns: 1fr; }
+      .media-grid { grid-template-columns: 1fr 1fr; }
+      .meta-bar .item { padding: 8px 14px; font-size: 12px; }
+      .level-node { width: 38px; height: 38px; font-size: 12px; }
+      .level-connector { width: 12px; }
+      .devnote blockquote { padding: 24px 20px; }
+    }
+    @media (max-width: 480px) {
       .media-grid { grid-template-columns: 1fr; }
-      .level, .level:nth-child(even) {
-        padding: 0 0 0 50%;
-        justify-content: flex-start;
-        text-align: left;
-      }
-      .level:nth-child(even) .frag { padding: 0 0 0 28px; }
-      .level .frag { padding: 0 0 0 28px; }
-      .cursor-glow { display: none; }
+      .meta-bar { border-radius: 12px; }
+      .meta-bar .item { border-right: none; border-bottom: 1px solid var(--line); width: 100%; text-align: center; }
+      .meta-bar .item:last-child { border-bottom: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -500,147 +551,197 @@
         animation: none !important;
       }
       .reveal { opacity: 1; transform: none; }
+      .cursor-glow { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="cursor-glow" id="glow" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
 
   <div class="wrap">
     <div class="topbar">
       <a class="back" href="../../index.html">返回作品集</a>
-      <a href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">TapTap 页面</a>
+      <span class="tag">Narrative · 14 Levels</span>
+      <a href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">TapTap</a>
     </div>
 
+    <!-- Hero -->
     <section class="hero">
-      <div class="light-orb" aria-hidden="true"></div>
-      <h1>Lighting<em>ForYou</em></h1>
-      <p class="sub">Light，光。每个人的生活都缺了一点光。</p>
-      <p class="meta">TapTap 聚光灯 2024 · <span>21 天游戏创作挑战</span></p>
+      <div class="hero-orb reveal">
+        <div class="core"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+      </div>
+      <h1 class="reveal">LightingForYou</h1>
+      <p class="sub reveal">黑暗中一粒光。<em>14 个关卡</em>，<em>14 个隐藏故事</em>。<br>你可能找不到那一点光，但你会想起来，为什么少了它。</p>
+      <div class="meta-bar reveal">
+        <div class="item"><b>TapTap</b> · 安卓 / iOS</div>
+        <div class="item">上线 <b>2024.12.01</b></div>
+        <div class="item">评分 <b>8.8</b></div>
+        <div class="item">关注 <b>1.1 万</b></div>
+      </div>
     </section>
 
-    <section class="intro reveal">
-      <p>尽管所有人都确实活着，但是，说真的，你不觉得你也缺了一点光吗？遗憾的是，我们已经找不到那点光了。</p>
+    <!-- 故事 -->
+    <section class="story">
+      <div class="story-head reveal">
+        <p class="kicker">// About</p>
+        <h2>关于那一点光</h2>
+      </div>
+      <p class="reveal">Light，光。每个人的生活都缺了一点光，尽管所有人都确实活着，但是，说真的，你不觉得你也缺了一点光吗？</p>
+      <p class="reveal">遗憾的是，我们已经找不到那点光了。更遗憾的是，即便你完全通关 LightingForYou 的 <span class="hl">14 个胡乱设计的关卡</span>，并且成功解锁 <span class="hl">14 个隐藏的故事</span>，你也不会从中找到那一点光。</p>
+      <div class="story-divider reveal"></div>
+      <p class="reveal">不过还好，并不是一无所有。至少你可能在某一关突然想起来些东西，比如说，<span class="hl">为什么你会少了这一点光</span>。</p>
+      <p class="reveal" style="text-align:center;color:var(--light);font-size:20px;margin-top:36px;">LightingForYou。</p>
     </section>
 
+    <!-- 14关光点路径 -->
     <section class="levels">
       <div class="levels-head reveal">
-        <h2>14 个关卡，14 段隐藏故事</h2>
-        <p>迷宫中 · 光之心 · 暗中人 · 光柱体 · 游荡灵 · 机关门 · 传送穴</p>
+        <p class="kicker">// Levels</p>
+        <h2>14 关 · 14 个隐藏故事</h2>
+        <p>悬停光点，查看每一关的编号</p>
       </div>
-      <ul class="level-path">
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>奇点</b> · 灵光一闪，诸般皆有</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>所有物</b> · 静下来，微光如呼吸</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>蛋糕</b> · 好想吃，好想吃，好想吃</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>独角兽</b> · 我刚好有一只，借你玩玩</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>讨厌</b> · 他们讨厌我，我也讨厌他们</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>社会学</b> · 我想静静，但母亲电脑不让</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>奇迹</b> · 小时候的奇迹轻而易举</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>海</b> · 你知道我说的不止是海</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>我死后</b> · 尽管仍然年轻，但这也说不准</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>三段论</b> · 山不过来，我便过去</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>门</b> · 通道或者隔阂，这是一个问题</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>预告片</b> · 在过去，预言家看到了未来</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>世界线</b> · 龙不吃青草与肉，蛇只吃自己的手</span></li>
-        <li class="level reveal"><span class="dot"></span><span class="frag"><b>矩阵</b> · 另一位观察者阻止了你的访问</span></li>
-      </ul>
+      <div class="level-path reveal" id="levelPath">
+        <!-- JS 动态生成 14 个节点 -->
+      </div>
+      <p class="levels-note reveal">每一关都藏着一个故事。通关之后，你可能会想起来些什么。</p>
     </section>
 
-    <section class="bigquote reveal">
-      <blockquote>你不会从中找到那<em>一点光</em>。<br />不过还好，<em>并不是一无所有</em>。</blockquote>
-      <p class="cite">— LightingForYou</p>
+    <!-- 开发者的话 -->
+    <section class="devnote">
+      <div class="devnote-head reveal">
+        <p class="kicker">// Developer's Note</p>
+        <h2>开发者的话</h2>
+      </div>
+      <blockquote class="reveal">
+        <p>很高兴你能玩我们做的游戏（如果还没完就赶紧去玩啊楞着干嘛 bushi）。总之，你现在看到了我们做到的游戏。</p>
+        <p>我很难给你描述游戏的内容，游戏的本质和游戏的目的。有时候，甚至连我们自己都弄不清楚这些问题。</p>
+        <p>也许，你已经玩过了我们的游戏，也许没有。但无论如何，我们的确是想在游戏中表达一些什么的。也许，你也已读出我们想表达的内容，但这不一定对，我们欢迎你分享你的所见，所感。</p>
+        <p class="sig">这段话是 <b>Gove</b> 写的，但我仍想在这里写下 <b>EumlanK</b>。</p>
+      </blockquote>
     </section>
 
-    <section class="volume reveal">
-      <div class="volume-head">
-        <h2>光量</h2>
-        <p>视野即生命——光的体积决定你能看见多少</p>
-      </div>
-      <div class="volume-bars">
-        <div class="vol"><span class="vol-orb v1"></span><span class="vol-name">冗余</span></div>
-        <div class="vol"><span class="vol-orb v2"></span><span class="vol-name">闲置</span></div>
-        <div class="vol"><span class="vol-orb v3"></span><span class="vol-name">额定</span></div>
-        <div class="vol"><span class="vol-orb v4"></span><span class="vol-name">负荷</span></div>
-        <div class="vol"><span class="vol-orb v5"></span><span class="vol-name">超载</span></div>
-      </div>
-    </section>
-
-    <section class="experience">
-      <div class="exp-head reveal">
-        <h2>体验</h2>
-      </div>
-      <div class="exp-grid">
-        <article class="exp-card reveal">
-          <h3>微弱视野</h3>
-          <p>玩家像一粒光在黑暗中移动，能看到的范围本身就是生命、方向和不安。</p>
-        </article>
-        <article class="exp-card reveal">
-          <h3>隐藏故事</h3>
-          <p>14 个隐藏故事让关卡不只是通关目标，也像一组被拾起的记忆碎片。</p>
-        </article>
-        <article class="exp-card reveal">
-          <h3>情绪关卡</h3>
-          <p>迷宫、敌人和文本都服务于"少了一点光"的主题，而不是单纯追求爽快。</p>
-        </article>
-      </div>
-    </section>
-
+    <!-- 截图 -->
     <section class="media">
       <div class="media-head reveal">
-        <h2>实机截图</h2>
-        <p>靠近，才能看清</p>
+        <p class="kicker">// Screenshots</p>
+        <h2>实机画面</h2>
       </div>
       <div class="media-grid">
-        <button class="shot" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="LightingForYou 截图 1" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="LightingForYou 截图 2" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="LightingForYou 截图 3" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="LightingForYou 截图 4" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="LightingForYou 截图 5" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 6"><img src="screenshot-06.jpg" alt="LightingForYou 截图 6" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="LightingForYou 截图 1" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="LightingForYou 截图 2" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="LightingForYou 截图 3" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="LightingForYou 截图 4" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="LightingForYou 截图 5" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 6"><img src="screenshot-06.jpg" alt="LightingForYou 截图 6" loading="lazy"></button>
       </div>
     </section>
 
+    <!-- 信息栏 -->
+    <section class="info-grid reveal">
+      <div class="info-cell">
+        <p class="label">平台</p>
+        <p class="value">TapTap · 安卓 / iOS</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">发行日期</p>
+        <p class="value">2024.12.01</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">当前版本</p>
+        <p class="value">1.1.0</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">类型</p>
+        <p class="value">叙事冒险</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">开发</p>
+        <p class="value">Gove</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">音乐音效</p>
+        <p class="value">Eumlank</p>
+      </div>
+    </section>
+
+    <!-- 底部 CTA -->
     <section class="bottom">
-      <div class="links">
-        <a href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">在 TapTap 查看 →</a>
+      <h2 class="reveal">去寻找你的那一点光</h2>
+      <p class="reveal">在 TapTap 免费下载，开始 14 关的旅程。</p>
+      <div class="links reveal">
+        <a class="primary" href="https://www.taptap.cn/app/727198" target="_blank" rel="noreferrer">在 TapTap 下载 →</a>
         <a href="../../index.html">返回作品集 →</a>
       </div>
-      <p class="sign">LightingForYou — Gove</p>
+      <p class="sign">LIGHTINGFORYOU — GOVE · 2024</p>
     </section>
   </div>
 
   <script>
     (function () {
-      // 鼠标光晕跟随 —— 微弱视野
-      const glow = document.getElementById('glow');
-      let tx = -1000, ty = -1000, cx = -1000, cy = -1000;
-      window.addEventListener('mousemove', (e) => { tx = e.clientX; ty = e.clientY; });
-      function loop() {
-        cx += (tx - cx) * 0.12;
-        cy += (ty - cy) * 0.12;
-        glow.style.transform = `translate(${cx}px, ${cy}px)`;
-        requestAnimationFrame(loop);
+      // 鼠标光晕
+      const glow = document.getElementById('cursorGlow');
+      if (glow && window.matchMedia('(pointer: fine)').matches) {
+        let mx = -1000, my = -1000, gx = -1000, gy = -1000;
+        document.addEventListener('mousemove', (e) => {
+          mx = e.clientX; my = e.clientY;
+        });
+        function animate() {
+          gx += (mx - gx) * 0.12;
+          gy += (my - gy) * 0.12;
+          glow.style.transform = `translate(${gx}px, ${gy}px)`;
+          requestAnimationFrame(animate);
+        }
+        animate();
+        document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
+        document.addEventListener('mouseenter', () => { glow.style.opacity = '1'; });
       }
-      loop();
 
-      // 滚动浮现 + 关卡光点点亮
+      // 滚动浮现
       const io = new IntersectionObserver((entries) => {
         entries.forEach((en) => {
           if (en.isIntersecting) {
             en.target.classList.add('in');
-            if (en.target.classList.contains('level')) en.target.classList.add('lit');
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.35 });
-      document.querySelectorAll('.reveal, .level').forEach((el) => io.observe(el));
+      }, { threshold: 0.15 });
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-      // 截图简易放大
+      // 生成 14 关光点
+      const path = document.getElementById('levelPath');
+      if (path) {
+        const levelNames = [
+          '第一关', '第二关', '第三关', '第四关', '第五关',
+          '第六关', '第七关', '第八关', '第九关', '第十关',
+          '第十一关', '第十二关', '第十三关', '第十四关'
+        ];
+        levelNames.forEach((name, i) => {
+          if (i > 0) {
+            const conn = document.createElement('div');
+            conn.className = 'level-connector';
+            path.appendChild(conn);
+          }
+          const node = document.createElement('button');
+          node.className = 'level-node';
+          node.type = 'button';
+          node.setAttribute('aria-label', name);
+          node.textContent = String(i + 1).padStart(2, '0');
+          const tip = document.createElement('span');
+          tip.className = 'tooltip';
+          tip.textContent = name + ' · 隐藏故事待解锁';
+          node.appendChild(tip);
+          path.appendChild(node);
+        });
+      }
+
+      // 截图放大
       const shots = document.querySelectorAll('.shot');
       const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.9);cursor:zoom-out;';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.94);cursor:zoom-out;';
       const big = document.createElement('img');
-      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:14px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
+      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:8px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
       overlay.appendChild(big);
       document.body.appendChild(overlay);
       shots.forEach((s) => {

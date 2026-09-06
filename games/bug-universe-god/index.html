@@ -17,6 +17,7 @@
       --dim: #b08f93;
       --faint: #6b4a4d;
       --line: rgba(239, 68, 68, 0.18);
+      --hand: "Bradley Hand", "Comic Sans MS", "Marker Felt", "Segoe Print", cursive, "Microsoft YaHei", sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -26,12 +27,12 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 18% 16%, rgba(239, 68, 68, 0.14), transparent 28rem),
-        radial-gradient(circle at 82% 24%, rgba(251, 146, 60, 0.1), transparent 24rem),
-        radial-gradient(circle at 50% 100%, rgba(167, 139, 250, 0.1), transparent 28rem),
+        radial-gradient(circle at 18% 16%, rgba(239, 68, 68, .12), transparent 28rem),
+        radial-gradient(circle at 82% 24%, rgba(251, 146, 60, .09), transparent 24rem),
+        radial-gradient(circle at 50% 100%, rgba(167, 139, 250, .09), transparent 28rem),
         var(--bg);
       color: var(--ink);
-      font-family: "Bradley Hand", "Comic Sans MS", "Marker Felt", "Segoe Print", cursive, "Microsoft YaHei", sans-serif;
+      font-family: var(--hand);
       line-height: 1.7;
       overflow-x: hidden;
     }
@@ -43,11 +44,11 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.4;
+      opacity: 0.35;
       background-image:
-        radial-gradient(circle, rgba(239, 68, 68, 0.08) 1px, transparent 1px);
+        radial-gradient(circle, rgba(239, 68, 68, 0.07) 1px, transparent 1px);
       background-size: 26px 26px;
-      mask-image: linear-gradient(to bottom, black, transparent 80%);
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
     }
 
     a { color: inherit; text-decoration: none; }
@@ -73,11 +74,12 @@
       align-items: center;
       justify-content: space-between;
       padding: 18px 0;
-      background: linear-gradient(180deg, rgba(13, 10, 20, 0.9), rgba(13, 10, 20, 0));
+      background: linear-gradient(180deg, rgba(20, 10, 12, 0.92), rgba(20, 10, 12, 0));
+      font-family: var(--hand);
     }
     .topbar a {
       color: var(--dim);
-      font-size: 14px;
+      font-size: 15px;
       transition: color 0.3s ease;
     }
     .topbar a:hover { color: var(--magenta); }
@@ -90,18 +92,20 @@
 
     /* ---------- Hero ---------- */
     .hero {
-      padding: 60px 0 40px;
+      padding: 70px 0 50px;
       text-align: center;
     }
     .hero .kicker {
       color: var(--lime);
       font-size: 15px;
       letter-spacing: 0.1em;
-      margin: 0 0 22px;
+      margin: 0 0 28px;
+      transform: rotate(-1deg);
+      display: inline-block;
     }
     h1 {
       margin: 0;
-      font-size: clamp(40px, 8vw, 78px);
+      font-size: clamp(40px, 9vw, 84px);
       font-weight: 700;
       line-height: 1;
       transform: rotate(-2deg);
@@ -112,14 +116,37 @@
     h1 .b3 { color: var(--purple); }
     .hero .sub {
       margin: 30px auto 0;
-      max-width: 560px;
+      max-width: 600px;
       color: var(--dim);
-      font-size: 18px;
+      font-size: clamp(15px, 2.2vw, 19px);
+      line-height: 1.8;
     }
     .hero .sub em {
       font-style: normal;
       color: var(--amber);
     }
+
+    /* 信息条 */
+    .meta-bar {
+      margin: 36px auto 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      border: 2px dashed var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .meta-bar .item {
+      padding: 10px 22px;
+      font-size: 14px;
+      color: var(--dim);
+      border-right: 1px dashed var(--line);
+      white-space: nowrap;
+    }
+    .meta-bar .item:last-child { border-right: none; }
+    .meta-bar .item b { color: var(--lime); font-weight: 700; }
 
     /* ---------- 滚动浮现 ---------- */
     .reveal {
@@ -127,50 +154,61 @@
       transform: translateY(26px);
       transition: opacity 0.9s ease, transform 0.9s ease;
     }
-    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ---------- 章节标题 ---------- */
+    .section-head {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .section-head .kicker {
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 10px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(26px, 5vw, 42px);
+      color: var(--ink);
+      transform: rotate(-1deg);
+      display: inline-block;
+    }
+    .section-head p {
+      margin: 12px 0 0;
+      color: var(--dim);
+      font-size: 15px;
+      font-family: var(--hand);
+    }
 
     /* ---------- 造物合成台 ---------- */
     .lab {
       padding: 60px 0;
     }
-    .lab-head {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .lab-head h2 {
-      margin: 0 0 8px;
-      font-size: clamp(26px, 5vw, 40px);
-      color: var(--ink);
-      transform: rotate(-1deg);
-      display: inline-block;
-    }
-    .lab-head p {
-      margin: 0;
-      color: var(--dim);
-      font-size: 15px;
-    }
     .lab-board {
-      padding: 30px;
+      padding: 36px 30px;
       border: 2px dashed var(--line);
-      border-radius: 22px;
+      border-radius: 24px;
       background: rgba(239, 68, 68, 0.03);
+      transform: rotate(0.3deg);
     }
     .lab-hint {
       text-align: center;
       color: var(--faint);
-      font-size: 14px;
-      margin: 0 0 22px;
+      font-size: 15px;
+      margin: 0 0 24px;
     }
     .elements {
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
       justify-content: center;
-      margin-bottom: 26px;
+      margin-bottom: 28px;
     }
     .el {
-      width: 84px;
-      height: 84px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       border: 2px solid var(--line);
       background: var(--bg-soft);
@@ -182,31 +220,35 @@
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      font-family: inherit;
+      font-family: var(--hand);
     }
+    .el:nth-child(3n) { transform: rotate(-3deg); }
+    .el:nth-child(3n+1) { transform: rotate(2deg); }
+    .el:nth-child(3n+2) { transform: rotate(-1deg); }
     .el:hover {
       border-color: var(--magenta);
-      transform: scale(1.08) rotate(-4deg);
+      transform: scale(1.1) rotate(-4deg);
     }
     .el.sel {
       border-color: var(--lime);
-      background: rgba(251, 146, 60, 0.15);
+      background: rgba(251, 146, 60, .15);
       color: var(--lime);
-      box-shadow: 0 0 24px rgba(251, 146, 60, 0.35);
+      box-shadow: 0 0 28px rgba(251, 146, 60, .35);
     }
     .result {
-      min-height: 96px;
+      min-height: 110px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
     }
     .result-card {
-      padding: 18px 30px;
-      border-radius: 16px;
+      padding: 20px 32px;
+      border-radius: 18px;
       border: 2px solid var(--lime);
-      background: rgba(251, 146, 60, 0.08);
+      background: rgba(251, 146, 60, .08);
       animation: pop 0.5s ease;
+      max-width: 420px;
     }
     @keyframes pop {
       from { transform: scale(0.7) rotate(-6deg); opacity: 0; }
@@ -214,125 +256,100 @@
     }
     .result-card .label {
       color: var(--faint);
-      font-size: 13px;
-      letter-spacing: 0.1em;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
     }
     .result-card .name {
       color: var(--lime);
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
-      margin-top: 4px;
+      margin-top: 6px;
     }
     .result-card .desc {
       color: var(--ink);
       font-size: 14px;
-      margin-top: 10px;
-      max-width: 320px;
-      line-height: 1.5;
+      margin-top: 12px;
+      line-height: 1.6;
       font-family: ui-sans-serif, system-ui, sans-serif;
     }
     .result-empty {
       color: var(--faint);
-      font-size: 15px;
+      font-size: 16px;
     }
 
     /* ---------- 概念图谱 ---------- */
     .concepts {
-      padding: 50px 0;
-    }
-    .concepts-head {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .concepts-head h2 {
-      margin: 0 0 6px;
-      font-size: clamp(22px, 4vw, 32px);
-      color: var(--ink);
-      transform: rotate(1deg);
-      display: inline-block;
-    }
-    .concepts-head p {
-      margin: 0;
-      color: var(--dim);
-      font-size: 14px;
+      padding: 60px 0;
     }
     .concept-cloud {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
       justify-content: center;
-      max-width: 680px;
+      max-width: 760px;
       margin: 0 auto;
     }
     .concept-chip {
-      padding: 9px 18px;
+      padding: 10px 20px;
       border-radius: 999px;
       border: 1.5px solid var(--line);
       background: var(--bg-soft);
       color: var(--dim);
-      font-size: 15px;
+      font-size: 16px;
       transition: all 0.3s ease;
+      cursor: default;
     }
-    .concept-chip:nth-child(3n) { color: var(--magenta); border-color: rgba(239, 68, 68, 0.35); }
-    .concept-chip:nth-child(3n+1) { color: var(--lime); border-color: rgba(251, 146, 60, 0.3); }
-    .concept-chip:nth-child(3n+2) { color: var(--purple); border-color: rgba(167, 139, 250, 0.3); }
+    .concept-chip:nth-child(4n) { color: var(--magenta); border-color: rgba(239,68,68,.35); transform: rotate(-1deg); }
+    .concept-chip:nth-child(4n+1) { color: var(--lime); border-color: rgba(251,146,60,.3); transform: rotate(1deg); }
+    .concept-chip:nth-child(4n+2) { color: var(--purple); border-color: rgba(167,139,250,.3); transform: rotate(-0.5deg); }
+    .concept-chip:nth-child(4n+3) { color: var(--amber); border-color: rgba(251,191,36,.3); transform: rotate(0.5deg); }
     .concept-chip:hover {
-      transform: translateY(-3px) rotate(-2deg);
+      transform: translateY(-4px) rotate(-2deg) scale(1.05);
     }
 
-    /* ---------- 反思 ---------- */
-    .reflect {
-      padding: 60px 0;
-      max-width: 720px;
+    /* ---------- 开发者的话 ---------- */
+    .devnote {
+      padding: 70px 0;
+    }
+    .devnote blockquote {
       margin: 0 auto;
-      text-align: center;
+      max-width: 720px;
+      padding: 36px 40px;
+      border: 2px dashed rgba(239, 68, 68, .25);
+      border-radius: 20px;
+      background: rgba(239, 68, 68, .04);
+      transform: rotate(-0.5deg);
     }
-    .reflect .kicker {
-      color: var(--magenta);
-      font-size: 14px;
-      letter-spacing: 0.1em;
+    .devnote blockquote p {
       margin: 0 0 18px;
-    }
-    .reflect blockquote {
-      margin: 0;
-      font-size: clamp(20px, 3vw, 28px);
-      line-height: 1.5;
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 2;
       color: var(--ink);
-      transform: rotate(-1deg);
-      display: inline-block;
     }
-    .reflect blockquote em {
-      font-style: normal;
+    .devnote blockquote p:last-child { margin-bottom: 0; }
+    .devnote blockquote .hl { color: var(--magenta); font-weight: 700; }
+    .devnote blockquote .hl2 { color: var(--lime); }
+    .devnote blockquote .sig {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--line);
+      color: var(--dim);
+      font-size: 15px;
+      text-align: right;
+    }
+    .devnote blockquote .sig b {
       color: var(--magenta);
-    }
-    .reflect .cite {
-      margin-top: 18px;
-      color: var(--faint);
-      font-size: 14px;
     }
 
     /* ---------- 截图 ---------- */
     .media {
-      padding: 50px 0;
-    }
-    .media-head {
-      margin-bottom: 26px;
-    }
-    .media-head h2 {
-      margin: 0 0 6px;
-      font-size: clamp(22px, 4vw, 32px);
-      transform: rotate(-1deg);
-      display: inline-block;
-    }
-    .media-head p {
-      margin: 0;
-      color: var(--dim);
-      font-size: 14px;
+      padding: 60px 0;
     }
     .media-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      gap: 14px;
     }
     .shot {
       position: relative;
@@ -341,11 +358,17 @@
       border-radius: 16px;
       cursor: pointer;
       background: var(--bg-soft);
+      padding: 0;
       transform: rotate(-0.5deg);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, border-color 0.3s;
     }
     .shot:nth-child(even) { transform: rotate(0.6deg); }
-    .shot:hover { transform: rotate(0) scale(1.03); }
+    .shot:hover,
+    .shot:focus-visible {
+      transform: rotate(0) scale(1.03);
+      border-color: var(--magenta);
+      outline: none;
+    }
     .shot img {
       width: 100%;
       aspect-ratio: 16 / 9;
@@ -354,10 +377,52 @@
       transition: filter 0.4s ease;
     }
 
+    /* ---------- 信息栏 ---------- */
+    .info-grid {
+      padding: 60px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 2px dashed var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .info-cell {
+      background: var(--bg);
+      padding: 24px;
+      text-align: center;
+    }
+    .info-cell .label {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 8px;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+    .info-cell .value {
+      font-size: 16px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
     /* ---------- 底部 ---------- */
     .bottom {
       padding: 70px 0 60px;
       text-align: center;
+    }
+    .bottom h2 {
+      margin: 0 0 16px;
+      font-size: clamp(26px, 5vw, 40px);
+      color: var(--ink);
+      transform: rotate(-1deg);
+      display: inline-block;
+    }
+    .bottom p {
+      margin: 0 0 32px;
+      color: var(--dim);
+      font-size: 16px;
     }
     .bottom .links {
       display: inline-flex;
@@ -369,25 +434,31 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border: 2px solid var(--line);
       border-radius: 999px;
       color: var(--ink);
-      font-size: 15px;
-      transition: border-color 0.3s ease, color 0.3s ease;
+      font-size: 16px;
+      transition: all 0.3s ease;
     }
     .bottom .links a:hover {
       border-color: var(--magenta);
       color: var(--magenta);
+      background: rgba(239,68,68,.06);
     }
     .bottom .links a.primary {
       border-color: var(--lime);
       color: var(--lime);
+      background: rgba(251,146,60,.08);
+      font-weight: 700;
+    }
+    .bottom .links a.primary:hover {
+      box-shadow: 0 0 40px rgba(251,146,60,.2);
     }
     .bottom .sign {
-      margin-top: 40px;
+      margin-top: 44px;
       color: var(--faint);
-      font-size: 14px;
+      font-size: 13px;
       transform: rotate(-1deg);
       display: inline-block;
     }
@@ -395,10 +466,15 @@
     /* ---------- 响应式 ---------- */
     @media (max-width: 720px) {
       .media-grid { grid-template-columns: 1fr 1fr; }
+      .meta-bar .item { padding: 8px 14px; font-size: 13px; }
+      .el { width: 76px; height: 76px; font-size: 14px; }
+      .devnote blockquote { padding: 24px 20px; }
     }
-    @media (max-width: 520px) {
+    @media (max-width: 480px) {
       .media-grid { grid-template-columns: 1fr; }
-      .el { width: 72px; height: 72px; font-size: 14px; }
+      .meta-bar { border-radius: 16px; }
+      .meta-bar .item { border-right: none; border-bottom: 1px dashed var(--line); width: 100%; text-align: center; }
+      .meta-bar .item:last-child { border-bottom: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -408,7 +484,7 @@
         animation: none !important;
       }
       .reveal { opacity: 1; transform: none; }
-      h1, .lab-head h2, .concepts-head h2, .reflect blockquote, .media-head h2, .bottom .sign { transform: none; }
+      h1, .section-head h2, .bottom h2, .bottom .sign, .lab-board, .devnote blockquote { transform: none; }
     }
   </style>
 </head>
@@ -420,16 +496,38 @@
       <a href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">TapTap 页面</a>
     </div>
 
+    <!-- Hero -->
     <section class="hero">
-      <p class="kicker">TapTap 聚光灯 2025 · 21 天游戏创作挑战</p>
-      <h1><span class="b1">Bug</span> <span class="b2">Universe</span> <span class="b3">God</span></h1>
-      <p class="sub">你相信世界是被创造出来的吗？作为潜在未来的造物者，你的工作并非挥舞刀剑，而是<em>操控概念本身</em>。</p>
+      <p class="kicker reveal">TapTap 聚光灯 2025 · 21 天游戏创作挑战</p>
+      <h1 class="reveal"><span class="b1">Bug</span> <span class="b2">Universe</span> <span class="b3">God</span></h1>
+      <p class="sub reveal">你相信世界是被创造出来的吗？作为潜在未来的造物者，你的工作并非挥舞刀剑，而是<em>操控概念本身</em>。</p>
+      <div class="meta-bar reveal">
+        <div class="item"><b>TapTap</b> · 安卓 / iOS / PC</div>
+        <div class="item">上线 <b>2025.10.27</b></div>
+        <div class="item">评分 <b>9.0</b></div>
+        <div class="item">关注 <b>3492</b></div>
+      </div>
     </section>
 
+    <!-- 官方介绍 -->
+    <section class="story" style="padding:50px 0;">
+      <div class="section-head reveal">
+        <p class="kicker">// About</p>
+        <h2>欢迎来到 God Universe Bug</h2>
+      </div>
+      <div style="max-width:680px;margin:0 auto;">
+        <p class="reveal" style="font-size:clamp(15px,2.2vw,18px);line-height:2;color:var(--ink);margin:0 0 20px;">公司致力于理解并塑造世界本征。在这里，我们相信世界源于虚无，而造物主的伟业，如今将由我们造物者来继承。</p>
+        <p class="reveal" style="font-size:clamp(15px,2.2vw,18px);line-height:2;color:var(--ink);margin:0 0 20px;">你将使用公司最核心的技术<span style="color:var(--amber);">"原型的雏形"</span>，从最基本的元素，逐渐开始定义万物，最终创造整个世界。</p>
+        <p class="reveal" style="font-size:clamp(15px,2.2vw,18px);line-height:2;color:var(--ink);margin:0;">神学，哲学，文学，物理学，天文学，航海学，经济学，政治学，甚至是神秘学，魔法还有科技。你的每一次组合，都将影响一个世界的演化。</p>
+      </div>
+    </section>
+
+    <!-- 造物合成台 -->
     <section class="lab">
-      <div class="lab-head reveal">
+      <div class="section-head reveal">
+        <p class="kicker">// Alchemy</p>
         <h2>造物合成台</h2>
-        <p>选两个元素，看它们合成什么——万物始于光与影。</p>
+        <p>选两个元素，看它们合成什么——万物始于光与影</p>
       </div>
       <div class="lab-board reveal">
         <p class="lab-hint">点击选择两个元素 ↓</p>
@@ -440,6 +538,8 @@
           <button class="el" type="button" data-el="界">界</button>
           <button class="el" type="button" data-el="暗面">暗面</button>
           <button class="el" type="button" data-el="世界">世界</button>
+          <button class="el" type="button" data-el="神话传说">神话</button>
+          <button class="el" type="button" data-el="科学">科学</button>
         </div>
         <div class="result" id="result">
           <p class="result-empty">等待合成…</p>
@@ -447,10 +547,12 @@
       </div>
     </section>
 
+    <!-- 概念图谱 -->
     <section class="concepts">
-      <div class="concepts-head reveal">
+      <div class="section-head reveal">
+        <p class="kicker">// Concept Map</p>
         <h2>概念图谱</h2>
-        <p>从光与影开始，五大系列定义一个世界</p>
+        <p>从光与影开始，定义一个世界的全部维度</p>
       </div>
       <div class="concept-cloud reveal">
         <span class="concept-chip">光</span>
@@ -481,32 +583,79 @@
       </div>
     </section>
 
-    <section class="reflect reveal">
-      <p class="kicker">// 开发者的话</p>
-      <blockquote>"很抱歉，虫虫宇宙神真的不是一款好玩的游戏。<br />追求设计性而抛弃游戏性，追求内容量而失去<em>内容质</em>。"</blockquote>
-      <p class="cite">— 但它依然是一次真诚的造物实验</p>
+    <!-- 开发者的话 -->
+    <section class="devnote">
+      <div class="section-head reveal">
+        <p class="kicker">// Developer's Note</p>
+        <h2>开发者的话</h2>
+      </div>
+      <blockquote class="reveal">
+        <p>我很抱歉，虫虫宇宙神真的<span class="hl">不是一款好玩的游戏</span>。（开发者都这样说）</p>
+        <p>其中最大的一个错误就是，<span class="hl">追求设计性而抛弃了游戏性</span>。另一个同样致命的错误就是，<span class="hl">追求内容量而失去内容质</span>。</p>
+        <p>具体点，犯了什么错误？</p>
+        <p>1. 强硬结合原本的 Archipelago Pale 的故事和 Bug 的主题。<br>
+        2. 无引导，无提示，自己无从得知的负反馈和无的正反馈。<br>
+        3. 合成逻辑毫无规律，不可预测，只能穷举。</p>
+        <p>既然知道这么多错误，为什么还要犯？为什么不改？</p>
+        <p>游戏在设计阶段未能预测到后续的计划崩坏。并且目前游戏表现远超原型以至于我觉得还行。我接下来只会修复小 bug，做好小引导，但改变不了这<span class="hl2">艺术大粪</span>的本质。</p>
+        <p>作为玩家，你能做什么？</p>
+        <p>遗憾的是，作为玩家，你什么都做不了。没有人能受得了它恶心人，包括我。</p>
+        <p class="sig">— <b>Gove</b>，策划 / 程序 / 剧情文案 / 制作人</p>
+      </blockquote>
     </section>
 
+    <!-- 截图 -->
     <section class="media">
-      <div class="media-head reveal">
-        <h2>实机截图</h2>
-        <p>来自 TapTap 页面，点击放大</p>
+      <div class="section-head reveal">
+        <p class="kicker">// Screenshots</p>
+        <h2>实机画面</h2>
       </div>
       <div class="media-grid">
-        <button class="shot" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="Bug Universe God 截图 1" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="Bug Universe God 截图 2" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="Bug Universe God 截图 3" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="Bug Universe God 截图 4" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="Bug Universe God 截图 5" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="Bug Universe God 截图 1" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="Bug Universe God 截图 2" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="Bug Universe God 截图 3" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="Bug Universe God 截图 4" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="Bug Universe God 截图 5" loading="lazy"></button>
       </div>
     </section>
 
+    <!-- 信息栏 -->
+    <section class="info-grid reveal">
+      <div class="info-cell">
+        <p class="label">平台</p>
+        <p class="value">TapTap · 安卓 / iOS / PC</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">上线日期</p>
+        <p class="value">2025.10.27</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">当前版本</p>
+        <p class="value">1.1.0</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">类型</p>
+        <p class="value">概念合成 / 休闲</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">评分</p>
+        <p class="value">9.0</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">开发</p>
+        <p class="value">Gove</p>
+      </div>
+    </section>
+
+    <!-- 底部 -->
     <section class="bottom">
-      <div class="links">
-        <a class="primary" href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">在 TapTap 查看 →</a>
+      <h2 class="reveal">成为造物者</h2>
+      <p class="reveal">在 TapTap 免费下载，用原型的雏形定义你的世界。</p>
+      <div class="links reveal">
+        <a class="primary" href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">在 TapTap 下载 →</a>
         <a href="../../index.html">返回作品集 →</a>
       </div>
-      <p class="sign">Bug Universe God — Gove</p>
+      <p class="sign">Bug Universe God — Gove · 2025 · TapTap 聚光灯</p>
     </section>
   </div>
 
@@ -520,7 +669,7 @@
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.2 });
+      }, { threshold: 0.15 });
       document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
       // 合成台
@@ -531,7 +680,11 @@
         '界|光': { name: '视界', desc: '光锥之内就是命运，视界之外便是虚无' },
         '界|影': { name: '势界', desc: '一个动态的、正在被争夺和塑造的领域' },
         '界|界': { name: '世界', desc: '古往今来曰世，上下四方曰界' },
-        '暗面|无上圣光': { name: '对立面', desc: '有无相生，难易相成，长短相形' }
+        '暗面|无上圣光': { name: '对立面', desc: '有无相生，难易相成，长短相形' },
+        '世界|神话传说': { name: '文明', desc: '神话是文明的童年，文明是神话的衰老' },
+        '世界|科学': { name: '理性', desc: '以可证伪的方式，逼近世界的本征' },
+        '光|神话传说': { name: '奇迹', desc: '超越自然法则的显现，信仰的具象化' },
+        '影|科学': { name: '未知', desc: '已知的边界之外，永远存在的阴影' }
       };
       const els = document.querySelectorAll('.el');
       const result = document.getElementById('result');

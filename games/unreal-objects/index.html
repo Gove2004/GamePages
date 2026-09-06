@@ -17,6 +17,7 @@
       --dim: #6b6c80;
       --faint: #3a3b4d;
       --line: rgba(131, 118, 156, 0.18);
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
     }
 
     * { box-sizing: border-box; }
@@ -27,7 +28,7 @@
       min-height: 100vh;
       background: var(--bg);
       color: var(--ink);
-      font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
+      font-family: var(--mono);
       line-height: 1.7;
       overflow-x: hidden;
     }
@@ -39,7 +40,7 @@
       inset: 0;
       z-index: 55;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+      background: radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.6) 100%);
     }
     /* CRT 扫描线 */
     body::after {
@@ -48,7 +49,7 @@
       inset: 0;
       z-index: 56;
       pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
       mix-blend-mode: multiply;
     }
 
@@ -71,7 +72,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 18px 0;
-      background: linear-gradient(180deg, rgba(10, 10, 18, 0.92), rgba(10, 10, 18, 0));
+      background: linear-gradient(180deg, rgba(10, 10, 18, 0.94), rgba(10, 10, 18, 0));
       font-size: 12px;
       letter-spacing: 0.1em;
     }
@@ -80,7 +81,7 @@
       transition: color 0.3s ease;
     }
     .topbar a:hover { color: var(--cyan); }
-    .topbar .back::before { content: "← "; }
+    .topbar .back::before { content: "<- "; }
     .topbar .tag {
       color: var(--faint);
       text-transform: uppercase;
@@ -91,46 +92,73 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       text-shadow:
-        2px 0 0 rgba(255, 119, 168, 0.5),
-        -2px 0 0 rgba(41, 173, 255, 0.5);
+        2px 0 0 rgba(255, 119, 168, 0.4),
+        -2px 0 0 rgba(41, 173, 255, 0.4);
     }
 
     /* ---------- Hero ---------- */
     .hero {
-      padding: 60px 0 40px;
+      padding: 70px 0 50px;
       text-align: center;
     }
     .hero .kicker {
       color: var(--violet);
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      margin: 0 0 28px;
+      margin: 0 0 32px;
     }
     .impossible-hero {
-      width: clamp(180px, 30vw, 260px);
-      height: clamp(180px, 30vw, 260px);
+      width: clamp(200px, 32vw, 280px);
+      height: clamp(200px, 32vw, 280px);
       margin: 0 auto 36px;
       animation: spin 24s linear infinite;
+      cursor: pointer;
+      transition: filter 0.3s;
     }
+    .impossible-hero:hover { filter: brightness(1.2); }
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
     h1 {
       margin: 0;
-      font-size: clamp(32px, 6vw, 58px);
+      font-size: clamp(32px, 7vw, 64px);
       font-weight: 700;
       color: var(--ink);
     }
     h1 .o { color: var(--pink); }
+    h1 .r { color: var(--orange); }
     .hero .sub {
-      margin: 22px auto 0;
-      max-width: 520px;
+      margin: 24px auto 0;
+      max-width: 560px;
       color: var(--dim);
-      font-size: 15px;
+      font-size: clamp(13px, 1.8vw, 15px);
+      line-height: 1.8;
     }
     .hero .sub b { color: var(--orange); font-weight: 700; }
+
+    /* 信息条 */
+    .meta-bar {
+      margin: 36px auto 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .meta-bar .item {
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--dim);
+      border-right: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .meta-bar .item:last-child { border-right: none; }
+    .meta-bar .item b { color: var(--cyan); font-weight: 600; }
 
     /* ---------- 滚动浮现 ---------- */
     .reveal {
@@ -138,7 +166,7 @@
       transform: translateY(24px);
       transition: opacity 0.9s ease, transform 0.9s ease;
     }
-    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal.in { opacity: 1; transform: none; }
 
     /* ---------- 不可能物体图鉴 ---------- */
     .catalog {
@@ -146,57 +174,101 @@
     }
     .catalog-head {
       text-align: center;
-      margin-bottom: 44px;
+      margin-bottom: 48px;
+    }
+    .catalog-head .kicker {
+      color: var(--violet);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
     }
     .catalog-head h2 {
       margin: 0 0 8px;
-      font-size: clamp(20px, 3.4vw, 28px);
+      font-size: clamp(22px, 3.6vw, 32px);
       font-weight: 700;
       color: var(--ink);
     }
     .catalog-head p {
       margin: 0;
       color: var(--faint);
-      font-size: 13px;
+      font-size: 12px;
       letter-spacing: 0.08em;
     }
     .catalog-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
+      gap: 20px;
     }
     .obj-card {
-      padding: 28px;
+      padding: 32px 28px;
       border: 1px solid var(--line);
       border-radius: 4px;
       background: var(--bg-soft);
-      transition: border-color 0.4s ease, transform 0.4s ease;
+      transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .obj-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity 0.4s;
     }
     .obj-card:hover {
-      border-color: var(--violet);
       transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.4);
     }
+    .obj-card:hover::before { opacity: .6; }
+    .obj-card:nth-child(1) { color: var(--violet); }
+    .obj-card:nth-child(2) { color: var(--pink); }
+    .obj-card:nth-child(3) { color: var(--orange); }
+    .obj-card:nth-child(4) { color: var(--cyan); }
+    .obj-card:nth-child(1):hover { border-color: var(--violet); }
+    .obj-card:nth-child(2):hover { border-color: var(--pink); }
+    .obj-card:nth-child(3):hover { border-color: var(--orange); }
+    .obj-card:nth-child(4):hover { border-color: var(--cyan); }
     .obj-card .icon {
-      width: 72px;
-      height: 72px;
-      margin-bottom: 18px;
-      color: var(--violet);
+      width: 88px;
+      height: 88px;
+      margin-bottom: 20px;
+      transition: transform 0.6s ease;
     }
-    .obj-card:nth-child(2) .icon { color: var(--pink); }
-    .obj-card:nth-child(3) .icon { color: var(--orange); }
-    .obj-card:nth-child(4) .icon { color: var(--cyan); }
+    .obj-card:hover .icon {
+      transform: rotate(15deg) scale(1.08);
+    }
+    .obj-card .num {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 36px;
+      font-weight: 700;
+      opacity: 0.12;
+      color: var(--ink);
+    }
     .obj-card h3 {
-      margin: 0 0 8px;
-      font-size: 15px;
+      margin: 0 0 10px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--ink);
       letter-spacing: 0.04em;
+    }
+    .obj-card .en {
+      font-size: 11px;
+      color: var(--faint);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
     }
     .obj-card p {
       margin: 0;
       color: var(--dim);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     /* ---------- 概念 ---------- */
@@ -208,36 +280,46 @@
     }
     .concept .kicker {
       color: var(--cyan);
-      font-size: 12px;
-      letter-spacing: 0.25em;
+      font-size: 11px;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
-      margin: 0 0 24px;
+      margin: 0 0 28px;
     }
     .concept p {
-      margin: 0 0 18px;
-      font-size: clamp(18px, 2.6vw, 24px);
-      line-height: 1.6;
+      margin: 0 0 20px;
+      font-size: clamp(17px, 2.4vw, 22px);
+      line-height: 1.7;
       color: var(--ink);
     }
     .concept p .v { color: var(--violet); }
     .concept p .p { color: var(--pink); }
+    .concept p .o { color: var(--orange); }
+    .concept .note {
+      margin-top: 28px;
+      font-size: 13px;
+      color: var(--faint);
+      line-height: 1.8;
+    }
 
     /* ---------- 截图 ---------- */
     .media {
-      padding: 50px 0;
+      padding: 60px 0;
     }
     .media-head {
       margin-bottom: 28px;
+      text-align: center;
+    }
+    .media-head .kicker {
+      color: var(--violet);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
     }
     .media-head h2 {
-      margin: 0 0 6px;
-      font-size: clamp(20px, 3.4vw, 28px);
-      font-weight: 700;
-    }
-    .media-head p {
       margin: 0;
-      color: var(--dim);
-      font-size: 13px;
+      font-size: clamp(22px, 3.6vw, 30px);
+      font-weight: 700;
     }
     .media-grid {
       display: grid;
@@ -251,6 +333,13 @@
       border-radius: 4px;
       cursor: pointer;
       background: var(--bg-soft);
+      padding: 0;
+      transition: border-color 0.3s;
+    }
+    .shot:hover,
+    .shot:focus-visible {
+      border-color: var(--violet);
+      outline: none;
     }
     .shot img {
       width: 100%;
@@ -270,18 +359,57 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 3px);
       mix-blend-mode: multiply;
+    }
+
+    /* ---------- 信息栏 ---------- */
+    .info-grid {
+      padding: 60px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .info-cell {
+      background: var(--bg);
+      padding: 22px;
+      text-align: center;
+    }
+    .info-cell .label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin: 0 0 8px;
+    }
+    .info-cell .value {
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 600;
     }
 
     /* ---------- 底部 ---------- */
     .bottom {
-      padding: 80px 0 64px;
+      padding: 70px 0 60px;
       text-align: center;
+    }
+    .bottom h2 {
+      margin: 0 0 14px;
+      font-size: clamp(22px, 3.6vw, 32px);
+      color: var(--ink);
+    }
+    .bottom p {
+      margin: 0 0 30px;
+      color: var(--dim);
+      font-size: 13px;
     }
     .bottom .links {
       display: inline-flex;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -289,27 +417,32 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 22px;
+      padding: 12px 24px;
       border: 1px solid var(--line);
       border-radius: 4px;
       color: var(--ink);
       font-size: 12px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      transition: border-color 0.3s ease, color 0.3s ease;
+      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s;
     }
     .bottom .links a:hover {
       border-color: var(--cyan);
       color: var(--cyan);
+      background: rgba(41,173,255,.05);
     }
     .bottom .links a.primary {
       border-color: var(--pink);
       color: var(--pink);
     }
+    .bottom .links a.primary:hover {
+      background: rgba(255,119,168,.08);
+      box-shadow: 0 0 30px rgba(255,119,168,.15);
+    }
     .bottom .sign {
-      margin-top: 42px;
+      margin-top: 40px;
       color: var(--faint);
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.25em;
       text-transform: uppercase;
     }
@@ -317,7 +450,14 @@
     /* ---------- 响应式 ---------- */
     @media (max-width: 720px) {
       .catalog-grid { grid-template-columns: 1fr; }
+      .media-grid { grid-template-columns: 1fr 1fr; }
+      .meta-bar .item { padding: 8px 12px; font-size: 11px; }
+    }
+    @media (max-width: 480px) {
       .media-grid { grid-template-columns: 1fr; }
+      .meta-bar { border-radius: 4px; }
+      .meta-bar .item { border-right: none; border-bottom: 1px solid var(--line); width: 100%; text-align: center; }
+      .meta-bar .item:last-child { border-bottom: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -338,96 +478,151 @@
       <a href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">itch.io</a>
     </div>
 
+    <!-- Hero -->
     <section class="hero">
-      <p class="kicker">GameJam · Impossible Objects</p>
-      <!-- 旋转的彭罗斯三角形 -->
-      <svg class="impossible-hero" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+      <p class="kicker reveal">GameJam · Impossible Objects · 2025</p>
+      <svg class="impossible-hero reveal" viewBox="0 0 200 200" fill="none" aria-hidden="true">
         <g stroke="#83769c" stroke-width="14" stroke-linejoin="round" fill="none">
-          <path d="M100 40 L150 130 L50 130 Z" />
-          <path d="M100 40 L122 78 L78 78 Z" fill="#83769c" />
+          <path d="M100 30 L160 150 L40 150 Z" />
+          <path d="M100 30 L124 76 L76 76 Z" fill="#83769c" />
         </g>
-        <g stroke="#ff77a8" stroke-width="6" fill="none">
-          <path d="M100 40 L150 130 L50 130 Z" />
+        <g stroke="#ff77a8" stroke-width="4" fill="none">
+          <path d="M100 30 L160 150 L40 150 Z" />
         </g>
+        <circle cx="100" cy="30" r="5" fill="#ffa300" />
+        <circle cx="160" cy="150" r="5" fill="#29adff" />
+        <circle cx="40" cy="150" r="5" fill="#ff77a8" />
       </svg>
-      <h1 class="pixel">UNREAL <span class="o">OBJECTS</span></h1>
-      <p class="sub">围绕"不可能物体"的像素解谜。它关注<b>二维图形与三维逻辑之间的冲突</b>——眼睛相信的结构，空间未必承认。</p>
+      <h1 class="pixel reveal">UNREAL <span class="o">OBJECTS</span></h1>
+      <p class="sub reveal">围绕"不可能物体"的像素解谜。它关注<b>二维图形与三维逻辑之间的冲突</b>——眼睛相信的结构，空间未必承认。</p>
+      <div class="meta-bar reveal">
+        <div class="item"><b>itch.io</b> · Windows</div>
+        <div class="item">发布 <b>2025.03.31</b></div>
+        <div class="item">引擎 <b>Godot</b></div>
+        <div class="item">大小 <b>85 MB</b></div>
+      </div>
     </section>
 
+    <!-- 不可能物体图鉴 -->
     <section class="catalog">
       <div class="catalog-head reveal">
-        <h2 class="pixel">CATALOG</h2>
-        <p>四种不可能物体，构成关卡与交互的设计源头</p>
+        <p class="kicker">// CATALOG</p>
+        <h2 class="pixel">四种不可能物体</h2>
+        <p>构成关卡与交互的设计源头 · 点击卡片查看</p>
       </div>
       <div class="catalog-grid">
-        <article class="obj-card reveal">
+        <article class="obj-card reveal" tabindex="0">
+          <span class="num">01</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round">
-            <path d="M36 12 L60 56 L12 56 Z" />
-            <path d="M36 12 L46 30 L26 30 Z" fill="currentColor" />
+            <path d="M36 10 L62 58 L10 58 Z" />
+            <path d="M36 10 L47 30 L25 30 Z" fill="currentColor" />
           </svg>
           <h3>彭罗斯三角形</h3>
+          <p class="en">Penrose Triangle</p>
           <p>由三个直角连接的条形构成，看似闭合的三角形，实际无法在三维空间中存在。</p>
         </article>
-        <article class="obj-card reveal">
+        <article class="obj-card reveal" tabindex="0">
+          <span class="num">02</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4">
-            <path d="M18 18 L54 18 L54 54 L18 54 Z" />
-            <path d="M18 18 L36 36 L54 18" />
-            <path d="M18 54 L36 36" />
-            <path d="M54 54 L36 36" />
+            <path d="M16 16 L56 16 L56 56 L16 56 Z" />
+            <path d="M16 16 L36 36 L56 16" />
+            <path d="M16 56 L36 36" />
+            <path d="M56 56 L36 36" />
           </svg>
           <h3>不可能立方体</h3>
+          <p class="en">Impossible Cube</p>
           <p>立方体的边缘连接方式违反透视规律，部分棱角看似同时朝前和朝后。</p>
         </article>
-        <article class="obj-card reveal">
+        <article class="obj-card reveal" tabindex="0">
+          <span class="num">03</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
-            <path d="M12 60 L12 48 L24 48 L24 36 L36 36 L36 24 L48 24 L48 12 L60 12" />
-            <path d="M12 60 L60 60" />
+            <path d="M10 60 L10 48 L22 48 L22 36 L34 36 L34 24 L46 24 L46 12 L58 12" />
+            <path d="M10 60 L58 60" />
           </svg>
           <h3>埃舍尔阶梯</h3>
+          <p class="en">Escherian Stairwell</p>
           <p>无限循环的阶梯，始终向上或向下却回到原点，违背重力法则。</p>
         </article>
-        <article class="obj-card reveal">
+        <article class="obj-card reveal" tabindex="0">
+          <span class="num">04</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
-            <path d="M20 16 L20 40 M20 40 L12 48 M20 40 L28 48" />
-            <path d="M52 16 L52 44 M44 16 L44 44 L60 44 L60 16" />
+            <path d="M18 14 L18 40 M18 40 L10 48 M18 40 L26 48" />
+            <path d="M54 14 L54 44 M46 14 L46 44 L62 44 L62 14" />
           </svg>
           <h3>恶魔音叉</h3>
+          <p class="en">Devil's Tuning Fork</p>
           <p>物体末端看似同时具有三个和两个分叉，无法确定其真实结构。</p>
         </article>
       </div>
     </section>
 
+    <!-- 概念 -->
     <section class="concept reveal">
       <p class="kicker">// CONCEPT</p>
-      <p>玩家看到的画面<span class="v">看似合理</span>，</p>
-      <p>但真实空间关系<span class="p">未必成立</span>。</p>
-      <p style="font-size:15px;color:var(--dim);">放下习惯性的空间直觉，重新理解移动、拾取、提示与关卡结构。</p>
+      <p>不可能物体是在现实世界中，<span class="v">不可能客观存在</span>的事物，</p>
+      <p>只会在<span class="p">二维世界</span>存在的一种图形。</p>
+      <p>这些图形通过"欺骗"大脑的<span class="o">透视处理机制</span>，</p>
+      <p>展现了二维与三维逻辑的冲突。</p>
+      <p class="note">放下习惯性的空间直觉，重新理解移动、拾取、提示与关卡结构。<br>玩家看到的画面看似合理，但真实空间关系未必成立。</p>
     </section>
 
+    <!-- 截图 -->
     <section class="media">
       <div class="media-head reveal">
-        <h2 class="pixel">MEDIA</h2>
-        <p>来自 itch.io 页面截图，带 CRT 扫描线质感，点击放大。</p>
+        <p class="kicker">// MEDIA</p>
+        <h2 class="pixel">实机画面</h2>
       </div>
       <div class="media-grid">
-        <button class="shot" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="UnReal Objects 截图 1" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="UnReal Objects 截图 2" loading="lazy"></button>
-        <button class="shot" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="UnReal Objects 截图 3" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="UnReal Objects 截图 1" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="UnReal Objects 截图 2" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="UnReal Objects 截图 3" loading="lazy"></button>
       </div>
     </section>
 
-    <section class="bottom">
-      <div class="links">
-        <a class="primary" href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">在 itch.io 查看 →</a>
-        <a href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">GitHub 源码 →</a>
-        <a href="../../index.html">返回作品集 →</a>
+    <!-- 信息栏 -->
+    <section class="info-grid reveal">
+      <div class="info-cell">
+        <p class="label">平台</p>
+        <p class="value">itch.io · Windows</p>
       </div>
-      <p class="sign">UNREAL OBJECTS — GOVE / GODOT</p>
+      <div class="info-cell">
+        <p class="label">发布日期</p>
+        <p class="value">2025.03.31</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">引擎</p>
+        <p class="value">Godot</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">类型</p>
+        <p class="value">像素解谜</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">大小</p>
+        <p class="value">85 MB</p>
+      </div>
+      <div class="info-cell">
+        <p class="label">开发</p>
+        <p class="value">Gove</p>
+      </div>
+    </section>
+
+    <!-- 底部 -->
+    <section class="bottom">
+      <h2 class="pixel reveal">下载体验</h2>
+      <p class="reveal">在 itch.io 免费下载 Windows 版，或查看 GitHub 源码。</p>
+      <div class="links reveal">
+        <a class="primary" href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">在 itch.io 下载 -></a>
+        <a href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">GitHub 源码 -></a>
+        <a href="../../index.html">返回作品集 -></a>
+      </div>
+      <p class="sign">UNREAL OBJECTS — GOVE / GODOT · 2025</p>
     </section>
   </div>
 
   <script>
     (function () {
+      // 滚动浮现
       const io = new IntersectionObserver((entries) => {
         entries.forEach((en) => {
           if (en.isIntersecting) {
@@ -435,9 +630,25 @@
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.2 });
+      }, { threshold: 0.15 });
       document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
+      // 物体卡片点击旋转
+      document.querySelectorAll('.obj-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const icon = card.querySelector('.icon');
+          if (icon) {
+            icon.style.transition = 'transform 0.8s ease';
+            icon.style.transform = 'rotate(360deg) scale(1.1)';
+            setTimeout(() => {
+              icon.style.transition = '';
+              icon.style.transform = '';
+            }, 800);
+          }
+        });
+      });
+
+      // 截图放大
       const shots = document.querySelectorAll('.shot');
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.94);cursor:zoom-out;';
