@@ -3,20 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UnReal Objects | Gove</title>
-  <meta name="description" content="UnReal Objects：围绕不可能物体的像素解谜，二维成立而三维冲突的反直觉实验。" />
+  <title>UnReal Objects · 不可能物体 | Gove</title>
+  <meta name="description" content="UnReal Objects：Godot 4.3 制作的俯视像素解谜。彭罗斯三角、不可能立方体、埃舍尔阶梯、恶魔音叉——二维成立而三维冲突的透视错觉实验。" />
   <style>
     :root {
       --bg: #0a0a12;
       --bg-soft: #12121e;
-      --violet: #83769c;
-      --pink: #ff77a8;
-      --orange: #ffa300;
-      --cyan: #29adff;
-      --ink: #c2c3d4;
-      --dim: #6b6c80;
-      --faint: #3a3b4d;
-      --line: rgba(131, 118, 156, 0.18);
+      --bg-card: #161626;
+      --violet: #9b8cff;
+      --violet-dim: rgba(155, 140, 255, 0.16);
+      --cyan: #40e0ff;
+      --red: #ff4d6d;
+      --amber: #ffb347;
+      --green: #7ba04a;
+      --ink: #d8d6e8;
+      --dim: #8a89a3;
+      --faint: #4a4960;
+      --line: rgba(155, 140, 255, 0.18);
+      --line-soft: rgba(155, 140, 255, 0.09);
       --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
     }
 
@@ -40,7 +44,7 @@
       inset: 0;
       z-index: 55;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.6) 100%);
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.65) 100%);
     }
     /* CRT 扫描线 */
     body::after {
@@ -49,21 +53,22 @@
       inset: 0;
       z-index: 56;
       pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px);
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
       mix-blend-mode: multiply;
     }
 
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
+    button { font-family: inherit; }
 
     .wrap {
       position: relative;
       z-index: 1;
-      width: min(1000px, calc(100% - 48px));
+      width: min(1040px, calc(100% - 40px));
       margin: 0 auto;
     }
 
-    /* ---------- 顶部 ---------- */
+    /* ---------- 顶部导航 ---------- */
     .topbar {
       position: sticky;
       top: 0;
@@ -71,76 +76,93 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 0;
-      background: linear-gradient(180deg, rgba(10, 10, 18, 0.94), rgba(10, 10, 18, 0));
+      padding: 16px 0;
+      background: linear-gradient(180deg, rgba(10, 10, 18, 0.96), rgba(10, 10, 18, 0));
       font-size: 12px;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
     }
     .topbar a {
       color: var(--dim);
-      transition: color 0.3s ease;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
     }
-    .topbar a:hover { color: var(--cyan); }
-    .topbar .back::before { content: "<- "; }
+    .topbar a:hover, .topbar a:focus-visible {
+      color: var(--violet);
+      text-shadow: 0 0 12px var(--violet-dim);
+      outline: none;
+    }
+    .topbar .back::before { content: "<- "; color: var(--violet); }
     .topbar .tag {
       color: var(--faint);
       text-transform: uppercase;
+      font-size: 10px;
     }
 
-    /* 像素标题色差效果 */
+    /* 像素标题色差 */
     .pixel {
       text-transform: uppercase;
       letter-spacing: 0.08em;
       text-shadow:
-        2px 0 0 rgba(255, 119, 168, 0.4),
-        -2px 0 0 rgba(41, 173, 255, 0.4);
+        2px 0 0 rgba(255, 77, 109, 0.35),
+        -2px 0 0 rgba(64, 224, 255, 0.35);
     }
 
     /* ---------- Hero ---------- */
     .hero {
-      padding: 70px 0 50px;
+      padding: 56px 0 48px;
       text-align: center;
+      position: relative;
     }
     .hero .kicker {
       color: var(--violet);
       font-size: 11px;
-      letter-spacing: 0.3em;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      margin: 0 0 32px;
+      margin: 0 0 28px;
     }
     .impossible-hero {
-      width: clamp(200px, 32vw, 280px);
-      height: clamp(200px, 32vw, 280px);
-      margin: 0 auto 36px;
-      animation: spin 24s linear infinite;
+      width: clamp(180px, 28vw, 240px);
+      height: clamp(180px, 28vw, 240px);
+      margin: 0 auto 28px;
+      animation: spin 26s linear infinite;
       cursor: pointer;
       transition: filter 0.3s;
+      filter: drop-shadow(0 0 18px var(--violet-dim));
     }
-    .impossible-hero:hover { filter: brightness(1.2); }
+    .impossible-hero:hover { filter: drop-shadow(0 0 28px rgba(155,140,255,0.45)); }
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
     h1 {
       margin: 0;
-      font-size: clamp(32px, 7vw, 64px);
+      font-size: clamp(30px, 6.5vw, 60px);
       font-weight: 700;
       color: var(--ink);
+      line-height: 1.1;
     }
-    h1 .o { color: var(--pink); }
-    h1 .r { color: var(--orange); }
-    .hero .sub {
-      margin: 24px auto 0;
-      max-width: 560px;
+    h1 .o { color: var(--violet); }
+    h1 .cn {
+      display: block;
+      font-size: clamp(13px, 2vw, 17px);
+      letter-spacing: 0.5em;
       color: var(--dim);
-      font-size: clamp(13px, 1.8vw, 15px);
-      line-height: 1.8;
+      text-transform: none;
+      margin-top: 10px;
+      text-shadow: none;
+      font-weight: 400;
     }
-    .hero .sub b { color: var(--orange); font-weight: 700; }
+    .hero .sub {
+      margin: 22px auto 0;
+      max-width: 600px;
+      color: var(--dim);
+      font-size: clamp(13px, 1.7vw, 15px);
+      line-height: 1.85;
+    }
+    .hero .sub b { color: var(--violet); font-weight: 700; }
 
     /* 信息条 */
     .meta-bar {
-      margin: 36px auto 0;
+      margin: 32px auto 0;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
@@ -149,16 +171,52 @@
       overflow: hidden;
       width: fit-content;
       max-width: 100%;
+      background: var(--bg-soft);
     }
     .meta-bar .item {
-      padding: 10px 20px;
-      font-size: 12px;
+      padding: 10px 18px;
+      font-size: 11px;
       color: var(--dim);
-      border-right: 1px solid var(--line);
+      border-right: 1px solid var(--line-soft);
       white-space: nowrap;
     }
     .meta-bar .item:last-child { border-right: none; }
-    .meta-bar .item b { color: var(--cyan); font-weight: 600; }
+    .meta-bar .item b { color: var(--violet); font-weight: 600; }
+
+    /* cover 展示 */
+    .cover-frame {
+      margin: 40px auto 0;
+      max-width: 720px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    .cover-frame img {
+      width: 100%;
+      display: block;
+      image-rendering: pixelated;
+      filter: contrast(1.05);
+    }
+    .cover-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0 1px, transparent 1px 3px);
+      mix-blend-mode: multiply;
+    }
+    .cover-frame .label {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      font-size: 10px;
+      color: var(--faint);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
 
     /* ---------- 滚动浮现 ---------- */
     .reveal {
@@ -168,43 +226,120 @@
     }
     .reveal.in { opacity: 1; transform: none; }
 
-    /* ---------- 不可能物体图鉴 ---------- */
-    .catalog {
-      padding: 70px 0;
+    /* ---------- 通用 section 头 ---------- */
+    .sec {
+      padding: 64px 0;
     }
-    .catalog-head {
+    .sec-head {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
-    .catalog-head .kicker {
+    .sec-head .kicker {
       color: var(--violet);
       font-size: 11px;
       letter-spacing: 0.3em;
       text-transform: uppercase;
       margin: 0 0 12px;
     }
-    .catalog-head h2 {
-      margin: 0 0 8px;
+    .sec-head h2 {
+      margin: 0 0 10px;
       font-size: clamp(22px, 3.6vw, 32px);
       font-weight: 700;
       color: var(--ink);
     }
-    .catalog-head p {
+    .sec-head p {
       margin: 0;
       color: var(--faint);
       font-size: 12px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
     }
+
+    /* ---------- 前提 ---------- */
+    .premise {
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 56px 0;
+    }
+    .premise p {
+      margin: 0 0 18px;
+      font-size: clamp(15px, 2.2vw, 20px);
+      line-height: 1.85;
+      color: var(--ink);
+    }
+    .premise p .v { color: var(--violet); }
+    .premise p .c { color: var(--cyan); }
+    .premise .note {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--faint);
+      line-height: 1.9;
+    }
+
+    /* ---------- 操作方式 ---------- */
+    .howto {
+      background: var(--bg-soft);
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .key-card {
+      padding: 22px 20px;
+      border: 1px solid var(--line-soft);
+      border-radius: 4px;
+      background: var(--bg-card);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .key-card:hover { border-color: var(--violet); transform: translateY(-2px); }
+    .key-cap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-bottom-width: 3px;
+      border-radius: 4px;
+      background: var(--bg);
+      color: var(--violet);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+    }
+    .key-card h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .key-card p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--dim);
+      line-height: 1.7;
+    }
+    .key-card .impossible {
+      color: var(--red);
+    }
+
+    /* ---------- 不可能物体图鉴 ---------- */
     .catalog-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      gap: 18px;
     }
     .obj-card {
-      padding: 32px 28px;
-      border: 1px solid var(--line);
+      padding: 30px 26px;
+      border: 1px solid var(--line-soft);
       border-radius: 4px;
-      background: var(--bg-soft);
+      background: var(--bg-card);
       transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s;
       cursor: pointer;
       position: relative;
@@ -219,23 +354,24 @@
       opacity: 0;
       transition: opacity 0.4s;
     }
-    .obj-card:hover {
+    .obj-card:hover, .obj-card:focus-visible {
       transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,.4);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      outline: none;
     }
-    .obj-card:hover::before { opacity: .6; }
+    .obj-card:hover::before, .obj-card:focus-visible::before { opacity: 0.7; }
     .obj-card:nth-child(1) { color: var(--violet); }
-    .obj-card:nth-child(2) { color: var(--pink); }
-    .obj-card:nth-child(3) { color: var(--orange); }
-    .obj-card:nth-child(4) { color: var(--cyan); }
-    .obj-card:nth-child(1):hover { border-color: var(--violet); }
-    .obj-card:nth-child(2):hover { border-color: var(--pink); }
-    .obj-card:nth-child(3):hover { border-color: var(--orange); }
-    .obj-card:nth-child(4):hover { border-color: var(--cyan); }
+    .obj-card:nth-child(2) { color: var(--cyan); }
+    .obj-card:nth-child(3) { color: var(--amber); }
+    .obj-card:nth-child(4) { color: var(--red); }
+    .obj-card:nth-child(1):hover, .obj-card:nth-child(1):focus-visible { border-color: var(--violet); }
+    .obj-card:nth-child(2):hover, .obj-card:nth-child(2):focus-visible { border-color: var(--cyan); }
+    .obj-card:nth-child(3):hover, .obj-card:nth-child(3):focus-visible { border-color: var(--amber); }
+    .obj-card:nth-child(4):hover, .obj-card:nth-child(4):focus-visible { border-color: var(--red); }
     .obj-card .icon {
-      width: 88px;
-      height: 88px;
-      margin-bottom: 20px;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 18px;
       transition: transform 0.6s ease;
     }
     .obj-card:hover .icon {
@@ -243,24 +379,24 @@
     }
     .obj-card .num {
       position: absolute;
-      top: 20px;
-      right: 24px;
-      font-size: 36px;
+      top: 18px;
+      right: 22px;
+      font-size: 32px;
       font-weight: 700;
-      opacity: 0.12;
+      opacity: 0.1;
       color: var(--ink);
     }
     .obj-card h3 {
-      margin: 0 0 10px;
+      margin: 0 0 4px;
       font-size: 17px;
       font-weight: 700;
       color: var(--ink);
       letter-spacing: 0.04em;
     }
-    .obj-card .en {
-      font-size: 11px;
+    .obj-card .scene {
+      font-size: 10px;
       color: var(--faint);
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       margin-bottom: 12px;
     }
@@ -271,56 +407,7 @@
       line-height: 1.7;
     }
 
-    /* ---------- 概念 ---------- */
-    .concept {
-      padding: 70px 0;
-      text-align: center;
-      max-width: 680px;
-      margin: 0 auto;
-    }
-    .concept .kicker {
-      color: var(--cyan);
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      margin: 0 0 28px;
-    }
-    .concept p {
-      margin: 0 0 20px;
-      font-size: clamp(17px, 2.4vw, 22px);
-      line-height: 1.7;
-      color: var(--ink);
-    }
-    .concept p .v { color: var(--violet); }
-    .concept p .p { color: var(--pink); }
-    .concept p .o { color: var(--orange); }
-    .concept .note {
-      margin-top: 28px;
-      font-size: 13px;
-      color: var(--faint);
-      line-height: 1.8;
-    }
-
     /* ---------- 截图 ---------- */
-    .media {
-      padding: 60px 0;
-    }
-    .media-head {
-      margin-bottom: 28px;
-      text-align: center;
-    }
-    .media-head .kicker {
-      color: var(--violet);
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      margin: 0 0 12px;
-    }
-    .media-head h2 {
-      margin: 0;
-      font-size: clamp(22px, 3.6vw, 30px);
-      font-weight: 700;
-    }
     .media-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -329,15 +416,14 @@
     .shot {
       position: relative;
       overflow: hidden;
-      border: 1px solid var(--line);
+      border: 1px solid var(--line-soft);
       border-radius: 4px;
-      cursor: pointer;
-      background: var(--bg-soft);
+      cursor: zoom-in;
+      background: var(--bg-card);
       padding: 0;
       transition: border-color 0.3s;
     }
-    .shot:hover,
-    .shot:focus-visible {
+    .shot:hover, .shot:focus-visible {
       border-color: var(--violet);
       outline: none;
     }
@@ -346,37 +432,35 @@
       aspect-ratio: 16 / 9;
       object-fit: cover;
       image-rendering: pixelated;
-      filter: contrast(1.1) saturate(0.85);
+      filter: contrast(1.08) saturate(0.9);
       transition: transform 0.5s ease, filter 0.5s ease;
     }
-    .shot:hover img,
-    .shot:focus-visible img {
+    .shot:hover img, .shot:focus-visible img {
       transform: scale(1.05);
-      filter: contrast(1.15) saturate(1.1);
+      filter: contrast(1.12) saturate(1.1);
     }
     .shot::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 3px);
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
       mix-blend-mode: multiply;
     }
 
-    /* ---------- 信息栏 ---------- */
+    /* ---------- 技术信息 ---------- */
     .info-grid {
-      padding: 60px 0;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
+      background: var(--line-soft);
+      border: 1px solid var(--line-soft);
       border-radius: 4px;
       overflow: hidden;
     }
     .info-cell {
       background: var(--bg);
-      padding: 22px;
+      padding: 22px 16px;
       text-align: center;
     }
     .info-cell .label {
@@ -387,14 +471,15 @@
       margin: 0 0 8px;
     }
     .info-cell .value {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--ink);
       font-weight: 600;
     }
+    .info-cell .value.accent { color: var(--violet); }
 
     /* ---------- 底部 ---------- */
     .bottom {
-      padding: 70px 0 60px;
+      padding: 64px 0 56px;
       text-align: center;
     }
     .bottom h2 {
@@ -403,7 +488,7 @@
       color: var(--ink);
     }
     .bottom p {
-      margin: 0 0 30px;
+      margin: 0 0 28px;
       color: var(--dim);
       font-size: 13px;
     }
@@ -418,46 +503,86 @@
       align-items: center;
       gap: 8px;
       padding: 12px 24px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--line-soft);
       border-radius: 4px;
       color: var(--ink);
       font-size: 12px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s;
+      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s, box-shadow 0.3s;
     }
-    .bottom .links a:hover {
-      border-color: var(--cyan);
-      color: var(--cyan);
-      background: rgba(41,173,255,.05);
+    .bottom .links a:hover, .bottom .links a:focus-visible {
+      border-color: var(--violet);
+      color: var(--violet);
+      background: var(--violet-dim);
+      outline: none;
     }
     .bottom .links a.primary {
-      border-color: var(--pink);
-      color: var(--pink);
+      border-color: var(--violet);
+      color: var(--violet);
+      background: var(--violet-dim);
     }
-    .bottom .links a.primary:hover {
-      background: rgba(255,119,168,.08);
-      box-shadow: 0 0 30px rgba(255,119,168,.15);
+    .bottom .links a.primary:hover, .bottom .links a.primary:focus-visible {
+      box-shadow: 0 0 30px rgba(155, 140, 255, 0.25);
     }
     .bottom .sign {
-      margin-top: 40px;
+      margin-top: 36px;
       color: var(--faint);
       font-size: 10px;
       letter-spacing: 0.25em;
       text-transform: uppercase;
     }
 
+    /* ---------- Lightbox ---------- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(5, 5, 12, 0.95);
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: min(1100px, 96vw);
+      max-height: 88vh;
+      border-radius: 4px;
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.7);
+      image-rendering: pixelated;
+      border: 1px solid var(--line);
+    }
+    .lightbox .close-hint {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--faint);
+      letter-spacing: 0.15em;
+    }
+
     /* ---------- 响应式 ---------- */
     @media (max-width: 720px) {
       .catalog-grid { grid-template-columns: 1fr; }
       .media-grid { grid-template-columns: 1fr 1fr; }
-      .meta-bar .item { padding: 8px 12px; font-size: 11px; }
+      .meta-bar .item { padding: 8px 12px; font-size: 10px; }
+      .hero { padding: 36px 0 32px; }
+      .sec { padding: 44px 0; }
     }
     @media (max-width: 480px) {
       .media-grid { grid-template-columns: 1fr; }
-      .meta-bar { border-radius: 4px; }
-      .meta-bar .item { border-right: none; border-bottom: 1px solid var(--line); width: 100%; text-align: center; }
+      .meta-bar { border-radius: 4px; width: 100%; }
+      .meta-bar .item {
+        border-right: none;
+        border-bottom: 1px solid var(--line-soft);
+        width: 100%;
+        text-align: center;
+      }
       .meta-bar .item:last-child { border-bottom: none; }
+      .topbar .tag { display: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -474,196 +599,282 @@
   <div class="wrap">
     <div class="topbar">
       <a class="back" href="../../index.html">返回作品集</a>
-      <span class="tag">IMPOSSIBLE / PIXEL</span>
+      <span class="tag">IMPOSSIBLE / PIXEL / GODOT 4.3</span>
       <a href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">itch.io</a>
     </div>
 
     <!-- Hero -->
     <section class="hero">
-      <p class="kicker reveal">GameJam · Impossible Objects · 2025</p>
+      <p class="kicker reveal">Top-Down Puzzle · Pixel Art · 2025</p>
       <svg class="impossible-hero reveal" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-        <g stroke="#83769c" stroke-width="14" stroke-linejoin="round" fill="none">
-          <path d="M100 30 L160 150 L40 150 Z" />
-          <path d="M100 30 L124 76 L76 76 Z" fill="#83769c" />
+        <!-- Penrose Triangle -->
+        <g stroke="#9b8cff" stroke-width="13" stroke-linejoin="round" fill="none">
+          <path d="M100 28 L168 152 L32 152 Z" />
+          <path d="M100 28 L126 78 L74 78 Z" fill="#9b8cff" stroke="none" />
         </g>
-        <g stroke="#ff77a8" stroke-width="4" fill="none">
-          <path d="M100 30 L160 150 L40 150 Z" />
+        <g stroke="#40e0ff" stroke-width="2.5" fill="none" opacity="0.7">
+          <path d="M100 28 L168 152 L32 152 Z" />
         </g>
-        <circle cx="100" cy="30" r="5" fill="#ffa300" />
-        <circle cx="160" cy="150" r="5" fill="#29adff" />
-        <circle cx="40" cy="150" r="5" fill="#ff77a8" />
+        <circle cx="100" cy="28" r="4" fill="#ff4d6d" />
+        <circle cx="168" cy="152" r="4" fill="#40e0ff" />
+        <circle cx="32" cy="152" r="4" fill="#ffb347" />
       </svg>
-      <h1 class="pixel reveal">UNREAL <span class="o">OBJECTS</span></h1>
-      <p class="sub reveal">围绕"不可能物体"的像素解谜。它关注<b>二维图形与三维逻辑之间的冲突</b>——眼睛相信的结构，空间未必承认。</p>
+      <h1 class="pixel reveal">UNREAL <span class="o">OBJECTS</span><span class="cn">不 可 能 物 体</span></h1>
+      <p class="sub reveal">围绕"不可能物体"的俯视像素解谜。<b>二维成立，三维冲突</b>——眼睛相信的结构，空间未必承认。</p>
       <div class="meta-bar reveal">
-        <div class="item"><b>itch.io</b> · Windows</div>
+        <div class="item">平台 <b>Windows</b></div>
+        <div class="item">引擎 <b>Godot 4.3</b></div>
+        <div class="item">关卡 <b>5</b></div>
         <div class="item">发布 <b>2025.03.31</b></div>
-        <div class="item">引擎 <b>Godot</b></div>
         <div class="item">大小 <b>85 MB</b></div>
+      </div>
+      <div class="cover-frame reveal">
+        <img src="cover.jpg" alt="UnReal Objects 标题界面：彭罗斯三角 logo 与 Start Game / Exit Game 菜单" />
+        <span class="label">// title screen</span>
+      </div>
+    </section>
+
+    <!-- 前提 -->
+    <section class="premise reveal">
+      <p>不可能物体是在现实世界中，<span class="v">不可能客观存在</span>的事物，</p>
+      <p>只会在<span class="c">二维世界</span>存在的一种图形。</p>
+      <p>这些图形通过"欺骗"大脑的透视处理机制，</p>
+      <p>展现了<span class="v">二维与三维逻辑的冲突</span>。</p>
+      <p class="note">放下习惯性的空间直觉——玩家在棋盘格上移动一步，<br>屏幕上的位移却可能同时朝三个方向发生。</p>
+    </section>
+
+    <!-- 操作方式 -->
+    <section class="howto sec">
+      <div class="sec-head reveal">
+        <p class="kicker">// HOW TO PLAY</p>
+        <h2 class="pixel">操作：一步一错觉</h2>
+        <p>WASD 走格子 · Space 撤销 · 特殊键触发不可能位移</p>
+      </div>
+      <div class="key-grid">
+        <div class="key-card reveal">
+          <span class="key-cap">W A S D</span>
+          <h3>方向移动</h3>
+          <p>每个键让角色沿棋盘格走一格：上 / 左 / 下 / 右。绿色与棕色相间的草地格子是你的全部舞台。</p>
+        </div>
+        <div class="key-card reveal">
+          <span class="key-cap">Space</span>
+          <h3>撤销一步</h3>
+          <p>走错了？空格回退上一步。游戏内置了完整的步骤记录（源码中该动作名为 <span style="color:var(--violet)">uodo</span>），允许你反复试错。</p>
+        </div>
+        <div class="key-card reveal">
+          <span class="keycap key-cap impossible">N</span>
+          <h3 class="impossible">不可能位移</h3>
+          <p>某些格子上的特殊键会同时朝多个方向移动——例如 <b>N = 上+1 右+1 下+1</b>。一步走出三个方向，空间关系当场崩塌。</p>
+        </div>
+        <div class="key-card reveal">
+          <span class="key-cap">U / Q</span>
+          <h3>触发机关</h3>
+          <p>走到特定格子会浮现 <b>U</b> 等按键标记。按下后角色执行一次违反透视的位移，穿过花苞障碍、抵达红旗。</p>
+        </div>
       </div>
     </section>
 
     <!-- 不可能物体图鉴 -->
-    <section class="catalog">
-      <div class="catalog-head reveal">
+    <section class="sec catalog">
+      <div class="sec-head reveal">
         <p class="kicker">// CATALOG</p>
         <h2 class="pixel">四种不可能物体</h2>
-        <p>构成关卡与交互的设计源头 · 点击卡片查看</p>
+        <p>源码 Objects/ 目录下的四个场景 · 构成全部关卡</p>
       </div>
       <div class="catalog-grid">
         <article class="obj-card reveal" tabindex="0">
           <span class="num">01</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round">
-            <path d="M36 10 L62 58 L10 58 Z" />
-            <path d="M36 10 L47 30 L25 30 Z" fill="currentColor" />
+            <path d="M36 8 L64 58 L8 58 Z" />
+            <path d="M36 8 L48 30 L24 30 Z" fill="currentColor" stroke="none" />
           </svg>
           <h3>彭罗斯三角形</h3>
-          <p class="en">Penrose Triangle</p>
-          <p>由三个直角连接的条形构成，看似闭合的三角形，实际无法在三维空间中存在。</p>
+          <p class="scene">Objects/Triangle</p>
+          <p>由三个直角连接的条形构成，看似闭合的三角形，实际无法在三维空间中存在。它也是游戏的启动画面与图标。</p>
         </article>
         <article class="obj-card reveal" tabindex="0">
           <span class="num">02</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4">
-            <path d="M16 16 L56 16 L56 56 L16 56 Z" />
-            <path d="M16 16 L36 36 L56 16" />
-            <path d="M16 56 L36 36" />
-            <path d="M56 56 L36 36" />
+            <path d="M16 18 L56 18 L56 54 L16 54 Z" />
+            <path d="M16 18 L36 36 L56 18" />
+            <path d="M16 54 L36 36" />
+            <path d="M56 54 L36 36" />
           </svg>
           <h3>不可能立方体</h3>
-          <p class="en">Impossible Cube</p>
+          <p class="scene">Objects/Cube</p>
           <p>立方体的边缘连接方式违反透视规律，部分棱角看似同时朝前和朝后。</p>
         </article>
         <article class="obj-card reveal" tabindex="0">
           <span class="num">03</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
-            <path d="M10 60 L10 48 L22 48 L22 36 L34 36 L34 24 L46 24 L46 12 L58 12" />
-            <path d="M10 60 L58 60" />
+            <path d="M10 62 L10 50 L22 50 L22 38 L34 38 L34 26 L46 26 L46 14 L58 14" />
+            <path d="M10 62 L58 62" />
           </svg>
           <h3>埃舍尔阶梯</h3>
-          <p class="en">Escherian Stairwell</p>
+          <p class="scene">Objects/Stair</p>
           <p>无限循环的阶梯，始终向上或向下却回到原点，违背重力法则。</p>
         </article>
         <article class="obj-card reveal" tabindex="0">
           <span class="num">04</span>
           <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
-            <path d="M18 14 L18 40 M18 40 L10 48 M18 40 L26 48" />
+            <path d="M18 14 L18 40 M18 40 L10 50 M18 40 L26 50" />
             <path d="M54 14 L54 44 M46 14 L46 44 L62 44 L62 14" />
           </svg>
           <h3>恶魔音叉</h3>
-          <p class="en">Devil's Tuning Fork</p>
+          <p class="scene">Objects/Fork</p>
           <p>物体末端看似同时具有三个和两个分叉，无法确定其真实结构。</p>
         </article>
       </div>
     </section>
 
-    <!-- 概念 -->
-    <section class="concept reveal">
-      <p class="kicker">// CONCEPT</p>
-      <p>不可能物体是在现实世界中，<span class="v">不可能客观存在</span>的事物，</p>
-      <p>只会在<span class="p">二维世界</span>存在的一种图形。</p>
-      <p>这些图形通过"欺骗"大脑的<span class="o">透视处理机制</span>，</p>
-      <p>展现了二维与三维逻辑的冲突。</p>
-      <p class="note">放下习惯性的空间直觉，重新理解移动、拾取、提示与关卡结构。<br>玩家看到的画面看似合理，但真实空间关系未必成立。</p>
-    </section>
-
     <!-- 截图 -->
-    <section class="media">
-      <div class="media-head reveal">
+    <section class="sec media">
+      <div class="sec-head reveal">
         <p class="kicker">// MEDIA</p>
         <h2 class="pixel">实机画面</h2>
+        <p>点击放大 · Esc 关闭</p>
       </div>
       <div class="media-grid">
-        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="UnReal Objects 截图 1" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="UnReal Objects 截图 2" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="UnReal Objects 截图 3" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图 1：棋盘格与方向键 D">
+          <img src="screenshot-01.jpg" alt="UnReal Objects 截图：绿色棕色棋盘格上的像素角色与红旗，黑色按键 S/W/A/D，底部显示 D = Right+1" loading="lazy" />
+        </button>
+        <button class="shot reveal" type="button" aria-label="放大截图 2：Space 撤销提示">
+          <img src="screenshot-02.jpg" alt="UnReal Objects 截图：青色提示文字 Space to undo the previous step，底部排列 D/S/A/W 四个方向键" loading="lazy" />
+        </button>
+        <button class="shot reveal" type="button" aria-label="放大截图 3：N 键三方向不可能位移">
+          <img src="screenshot-03.jpg" alt="UnReal Objects 截图：花苞障碍围成的复杂关卡，角色站在中央，按键 U，底部 N = Up+1 Right+1 Down+1" loading="lazy" />
+        </button>
       </div>
     </section>
 
-    <!-- 信息栏 -->
-    <section class="info-grid reveal">
-      <div class="info-cell">
-        <p class="label">平台</p>
-        <p class="value">itch.io · Windows</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">发布日期</p>
-        <p class="value">2025.03.31</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">引擎</p>
-        <p class="value">Godot</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">类型</p>
-        <p class="value">像素解谜</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">大小</p>
-        <p class="value">85 MB</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">开发</p>
-        <p class="value">Gove</p>
+    <!-- 技术信息 -->
+    <section class="sec reveal">
+      <div class="info-grid">
+        <div class="info-cell">
+          <p class="label">引擎</p>
+          <p class="value accent">Godot 4.3</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">平台</p>
+          <p class="value">itch.io · Windows</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">类型</p>
+          <p class="value">俯视像素解谜</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">关卡数</p>
+          <p class="value">5（0 – 4）</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">版本</p>
+          <p class="value">v1.0.0.0</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">渲染</p>
+          <p class="value">像素吸附 · Nearest</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">字体</p>
+          <p class="value">VonwaonBitmap 16px</p>
+        </div>
+        <div class="info-cell">
+          <p class="label">开发</p>
+          <p class="value">Gove</p>
+        </div>
       </div>
     </section>
 
     <!-- 底部 -->
     <section class="bottom">
       <h2 class="pixel reveal">下载体验</h2>
-      <p class="reveal">在 itch.io 免费下载 Windows 版，或查看 GitHub 源码。</p>
+      <p class="reveal">在 itch.io 免费下载 Windows 版（85 MB），或查看 GitHub 源码。</p>
       <div class="links reveal">
         <a class="primary" href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">在 itch.io 下载 -></a>
         <a href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">GitHub 源码 -></a>
         <a href="../../index.html">返回作品集 -></a>
       </div>
-      <p class="sign">UNREAL OBJECTS — GOVE / GODOT · 2025</p>
+      <p class="sign">UNREAL OBJECTS — GOVE / GODOT 4.3 · 2025</p>
     </section>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="截图放大查看">
+    <img id="lightbox-img" src="" alt="" />
+    <span class="close-hint">ESC / 点击遮罩关闭</span>
   </div>
 
   <script>
     (function () {
       // 滚动浮现
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
           if (en.isIntersecting) {
             en.target.classList.add('in');
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.15 });
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
-      // 物体卡片点击旋转
-      document.querySelectorAll('.obj-card').forEach((card) => {
-        card.addEventListener('click', () => {
-          const icon = card.querySelector('.icon');
-          if (icon) {
-            icon.style.transition = 'transform 0.8s ease';
-            icon.style.transform = 'rotate(360deg) scale(1.1)';
-            setTimeout(() => {
-              icon.style.transition = '';
-              icon.style.transform = '';
-            }, 800);
+      // 物体卡片点击旋转图标
+      document.querySelectorAll('.obj-card').forEach(function (card) {
+        function spin() {
+          var icon = card.querySelector('.icon');
+          if (!icon) return;
+          icon.style.transition = 'transform 0.8s ease';
+          icon.style.transform = 'rotate(360deg) scale(1.1)';
+          setTimeout(function () {
+            icon.style.transition = '';
+            icon.style.transform = '';
+          }, 800);
+        }
+        card.addEventListener('click', spin);
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); spin(); }
+        });
+      });
+
+      // Hero 彭罗斯三角点击也转一圈
+      var heroTri = document.querySelector('.impossible-hero');
+      if (heroTri) {
+        heroTri.setAttribute('tabindex', '0');
+        heroTri.setAttribute('role', 'button');
+        heroTri.setAttribute('aria-label', '旋转的彭罗斯三角形');
+        heroTri.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            heroTri.style.animation = 'none';
+            heroTri.style.transform = 'rotate(720deg)';
+            setTimeout(function () {
+              heroTri.style.transform = '';
+              heroTri.style.animation = '';
+            }, 900);
           }
         });
-      });
+      }
 
-      // 截图放大
-      const shots = document.querySelectorAll('.shot');
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.94);cursor:zoom-out;';
-      const big = document.createElement('img');
-      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:4px;box-shadow:0 30px 100px rgba(0,0,0,0.6);image-rendering:pixelated;';
-      overlay.appendChild(big);
-      document.body.appendChild(overlay);
-      shots.forEach((s) => {
-        s.addEventListener('click', () => {
-          big.src = s.querySelector('img').src;
-          overlay.style.display = 'flex';
-        });
+      // Lightbox
+      var overlay = document.getElementById('lightbox');
+      var big = document.getElementById('lightbox-img');
+      var shots = document.querySelectorAll('.shot');
+
+      function openLightbox(shot) {
+        var img = shot.querySelector('img');
+        big.src = img.src;
+        big.alt = img.alt;
+        overlay.classList.add('open');
+      }
+      function closeLightbox() {
+        overlay.classList.remove('open');
+      }
+      shots.forEach(function (s) {
+        s.addEventListener('click', function () { openLightbox(s); });
       });
-      overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.style.display = 'none'; });
+      overlay.addEventListener('click', closeLightbox);
+      window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeLightbox();
+      });
     })();
   </script>
 </body>

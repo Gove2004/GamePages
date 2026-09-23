@@ -4,29 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06070c" />
-  <title>Gove | 游戏作品集</title>
-  <meta name="description" content="Gove 的独立游戏作品集——5 款横跨叙事冒险、塔防、解谜、概念合成与卡牌的作品，发布于 TapTap、Steam 与 itch.io。" />
+  <title>GOVE | 游戏作品集</title>
+  <meta name="description" content="Gove 的独立游戏作品集——从一束光到一整副牌，5 款独立游戏 5 种造物实验，发布于 TapTap、Steam 与 itch.io。" />
   <style>
     :root {
       --bg: #06070c;
-      --surface: #10131d;
       --text: #f5f7fb;
       --muted: #a9b2c4;
-      --subtle: #6b7488;
+      --subtle: #7c8496;
       --line: rgba(255, 255, 255, .08);
-      --line-2: rgba(255, 255, 255, .16);
-      --maxw: 1280px;
+      --line2: rgba(255, 255, 255, .16);
+      --maxw: 1180px;
       --header-h: 64px;
-
-      --mono: ui-monospace, "Cascadia Code", "SF Mono", "JetBrains Mono", Consolas, monospace;
-      --serif: Georgia, "Times New Roman", "Songti SC", serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+      --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Marker Felt", cursive;
       --ease: cubic-bezier(.2, .7, .3, 1);
-
-      --c-light: #ffd76b;
-      --c-luminary: #e7ecf2;
-      --c-unreal: #9b8cff;
-      --c-bug: #ff5a5a;
-      --c-slime: #2ee6ff;
     }
 
     * { box-sizing: border-box; }
@@ -41,990 +33,622 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
-
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
+    button { font-family: inherit; }
+    :focus-visible { outline: 2px solid #ffd76b; outline-offset: 3px; border-radius: 6px; }
 
-    /* ===== 顶部导航 ===== */
+    /* ============ 固定顶栏 ============ */
     .nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       height: var(--header-h);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 clamp(20px, 4vw, 48px);
-      background: rgba(6, 7, 12, .72);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(18px, 4vw, 44px);
+      background: rgba(6, 7, 12, .7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--line);
     }
-    .nav-brand {
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: .04em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .brand {
+      font-weight: 900; font-size: 18px; letter-spacing: .12em;
+      display: inline-flex; align-items: center; gap: 10px;
     }
-    .nav-brand .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--c-light);
-      box-shadow: 0 0 12px var(--c-light);
-      animation: pulse 2.4s ease-in-out infinite;
+    .brand .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #ffd76b; box-shadow: 0 0 12px #ffd76b;
+      animation: pulse 2.6s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: .5; transform: scale(.8); }
-    }
-    .nav-links {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
+    @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.7); } }
+    .nav-links { display: flex; align-items: center; gap: 2px; }
     .nav-links a {
-      font-size: 13px;
-      color: var(--muted);
-      padding: 6px 12px;
-      border-radius: 6px;
+      font-size: 13px; color: var(--muted);
+      padding: 7px 12px; border-radius: 7px; white-space: nowrap;
       transition: color .25s, background .25s;
-      white-space: nowrap;
     }
     .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .nav-links a.cur { color: var(--text); background: rgba(255,255,255,.08); }
     .nav-toggle {
       display: none;
-      background: none; border: 1px solid var(--line-2);
-      color: var(--text);
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 18px;
+      width: 38px; height: 38px; border-radius: 8px;
+      background: rgba(255,255,255,.05); border: 1px solid var(--line2); color: var(--text);
+      cursor: pointer; position: relative;
     }
+    .nav-toggle::before, .nav-toggle::after, .nav-toggle i {
+      content: ""; position: absolute; left: 10px; right: 10px; height: 2px;
+      background: currentColor; border-radius: 2px;
+    }
+    .nav-toggle::before { top: 13px; }
+    .nav-toggle i { top: 18px; }
+    .nav-toggle::after { top: 23px; }
 
-    /* ===== Hero ===== */
+    /* ============ Hero ============ */
     .hero {
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: calc(var(--header-h) + 40px) 24px 80px;
-      position: relative;
-      overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: calc(var(--header-h) + 48px) 24px 90px;
+      position: relative; overflow: hidden;
     }
     .hero-bg {
-      position: absolute; inset: 0;
-      z-index: 0;
+      position: absolute; inset: 0; z-index: 0;
       background:
-        radial-gradient(800px 500px at 50% 20%, rgba(255, 215, 107, .08), transparent 60%),
-        radial-gradient(600px 400px at 80% 80%, rgba(155, 140, 255, .07), transparent 60%),
-        radial-gradient(600px 400px at 20% 70%, rgba(46, 230, 255, .06), transparent 60%);
+        radial-gradient(700px 460px at 50% 18%, rgba(255,215,107,.09), transparent 62%),
+        radial-gradient(560px 400px at 82% 78%, rgba(155,140,255,.08), transparent 60%),
+        radial-gradient(560px 400px at 16% 72%, rgba(46,230,255,.07), transparent 60%),
+        radial-gradient(500px 380px at 50% 100%, rgba(255,90,90,.06), transparent 60%);
     }
     .hero-grid {
-      position: absolute; inset: 0;
-      z-index: 0;
+      position: absolute; inset: 0; z-index: 0;
       background-image:
         linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse at 50% 40%, black, transparent 75%);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(ellipse at 50% 42%, black, transparent 78%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 42%, black, transparent 78%);
     }
-    .hero-content { position: relative; z-index: 1; max-width: 780px; }
+    .hero-content { position: relative; z-index: 1; max-width: 820px; }
     .hero-kicker {
-      font-family: var(--mono);
-      font-size: 13px;
-      letter-spacing: .3em;
-      text-transform: uppercase;
-      color: var(--subtle);
-      margin: 0 0 28px;
+      font-family: var(--mono); font-size: 12px; letter-spacing: .34em;
+      text-transform: uppercase; color: var(--subtle); margin: 0 0 30px;
     }
     .hero h1 {
       margin: 0;
-      font-size: clamp(48px, 10vw, 110px);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -.02em;
-      background: linear-gradient(135deg, #fff 30%, var(--c-light) 60%, var(--c-unreal) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
+      font-size: clamp(64px, 13vw, 148px);
+      font-weight: 900; line-height: .95; letter-spacing: .02em;
+      background: linear-gradient(120deg, #fff 25%, #ffd76b 55%, #9b8cff 85%);
+      -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .hero-sub {
-      margin: 28px auto 0;
+      margin: 30px auto 0;
       font-size: clamp(16px, 2.4vw, 22px);
-      color: var(--muted);
-      max-width: 560px;
-      line-height: 1.7;
+      color: var(--muted); line-height: 1.75; max-width: 600px;
     }
-    .hero-sub em {
-      font-style: normal;
-      color: var(--c-light);
-    }
+    .hero-sub em { font-style: normal; color: #ffd76b; }
     .hero-meta {
-      margin-top: 40px;
-      display: flex;
-      gap: 32px;
-      justify-content: center;
-      flex-wrap: wrap;
+      margin-top: 46px;
+      display: flex; justify-content: center; gap: clamp(28px, 6vw, 64px); flex-wrap: wrap;
     }
-    .hero-meta .item {
-      text-align: center;
-    }
-    .hero-meta .num {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--text);
-    }
+    .hero-meta .num { font-size: clamp(28px, 4vw, 38px); font-weight: 800; }
     .hero-meta .label {
-      font-size: 12px;
-      color: var(--subtle);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      margin-top: 2px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--subtle); margin-top: 4px;
     }
     .hero-scroll {
-      position: absolute;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      color: var(--subtle);
-      font-size: 11px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 9px;
+      color: var(--subtle); font-size: 10px; letter-spacing: .24em; text-transform: uppercase;
     }
     .hero-scroll .line {
-      width: 1px;
-      height: 40px;
+      width: 1px; height: 42px;
       background: linear-gradient(to bottom, var(--subtle), transparent);
-      animation: scrollLine 2s ease-in-out infinite;
+      animation: drop 2.2s ease-in-out infinite;
     }
-    @keyframes scrollLine {
+    @keyframes drop {
       0% { transform: scaleY(0); transform-origin: top; }
-      50% { transform: scaleY(1); transform-origin: top; }
-      51% { transform-origin: bottom; }
+      45% { transform: scaleY(1); transform-origin: top; }
+      55% { transform-origin: bottom; }
       100% { transform: scaleY(0); transform-origin: bottom; }
     }
 
-    /* ===== 五扇门通用 ===== */
-    .gates { position: relative; }
+    /* ============ 五扇门通用 ============ */
     .gate {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 80px clamp(20px, 5vw, 80px);
-      position: relative;
-      overflow: hidden;
-      border-top: 1px solid var(--line);
+      --accent: #ffd76b;
+      --tint: rgba(255,215,107,.08);
+      --bg2: #070709;
+      --ink: #f5f7fb;
+      --tagc: #c4ccd9;
+      --desc: #7c8496;
+      --tagbg: rgba(255,215,107,.08);
+      --tagbd: rgba(255,215,107,.35);
+      --gx: 30%;
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      padding: calc(var(--header-h) + 48px) clamp(20px, 6vw, 84px) 70px;
+      overflow: hidden; border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--bg2), var(--bg));
+    }
+    .gate::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(65% 65% at var(--gx) 50%, var(--tint), transparent 72%);
+    }
+    .ghost {
+      position: absolute; top: 50%; right: clamp(10px, 4vw, 60px);
+      transform: translateY(-50%);
+      font-size: clamp(150px, 26vw, 300px); font-weight: 900; line-height: 1;
+      color: transparent; -webkit-text-stroke: 1px var(--tagbd);
+      opacity: .55; pointer-events: none; user-select: none;
     }
     .gate-inner {
-      width: 100%;
-      max-width: var(--maxw);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(32px, 6vw, 80px);
-      align-items: center;
+      position: relative; z-index: 1;
+      width: 100%; max-width: var(--maxw); margin: 0 auto;
+      display: grid; grid-template-columns: 1.05fr 1fr;
+      gap: clamp(36px, 6vw, 90px); align-items: center;
     }
-    .gate-visual {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 360px;
+    .flip .stage { order: 2; }
+
+    /* —— 封面门 + 微视觉 —— */
+    .stage { position: relative; padding: 26px 10px; }
+    .cover {
       position: relative;
+      aspect-ratio: 16 / 10;
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--line2);
+      background: #0a0d14;
+      transform: rotate(var(--tilt, -1.5deg));
+      box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 70px -28px var(--accent);
+      transition: transform .6s var(--ease), box-shadow .6s;
     }
-    .gate-info { position: relative; z-index: 1; }
-    .gate-num {
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: .3em;
-      text-transform: uppercase;
+    .cover:hover {
+      transform: rotate(0deg) translateY(-6px);
+      box-shadow: 0 55px 110px rgba(0,0,0,.6), 0 0 95px -24px var(--accent);
+    }
+    .cover img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .8s var(--ease);
+    }
+    .cover:hover img { transform: scale(1.05); }
+    .cover::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      border-radius: 14px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), inset 0 -40px 60px -30px rgba(0,0,0,.6);
+    }
+    .micro { position: absolute; z-index: 3; pointer-events: none; }
+
+    /* —— 文案 —— */
+    .kicker {
+      font-family: var(--mono); font-size: 12px; letter-spacing: .28em;
+      text-transform: uppercase; color: var(--accent);
+      margin: 0 0 18px;
+    }
+    .info h2 {
+      margin: 0 0 18px;
+      font-size: clamp(30px, 4.6vw, 52px);
+      font-weight: 800; line-height: 1.08; letter-spacing: -.01em;
+      color: var(--ink);
+    }
+    .info h2 .cn {
+      display: block; margin-top: 10px;
+      font-size: .4em; font-weight: 600; letter-spacing: .12em; color: var(--muted);
+    }
+    .tagline {
       margin: 0 0 16px;
+      font-size: clamp(16px, 2vw, 20px); line-height: 1.65; color: var(--tagc);
     }
-    .gate h2 {
-      margin: 0 0 14px;
-      font-size: clamp(32px, 5vw, 56px);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -.01em;
+    .desc { margin: 0 0 26px; font-size: 14.5px; line-height: 1.85; color: var(--desc); max-width: 46ch; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 30px; }
+    .tag {
+      font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+      padding: 5px 12px; border-radius: 999px;
+      color: var(--accent); background: var(--tagbg); border: 1px solid var(--tagbd);
     }
-    .gate-tagline {
-      margin: 0 0 20px;
-      font-size: clamp(15px, 2vw, 19px);
-      line-height: 1.7;
-      max-width: 480px;
-    }
-    .gate-desc {
-      margin: 0 0 28px;
-      font-size: 14px;
-      line-height: 1.8;
-      max-width: 460px;
-    }
-    .gate-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 28px;
-    }
-    .gate-tag {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .08em;
-      padding: 5px 12px;
-      border-radius: 999px;
-      border: 1px solid;
-    }
-    .gate-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 30px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      border: 1px solid;
+    .cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 28px; border-radius: 10px;
+      font-size: 14.5px; font-weight: 600;
+      color: var(--accent); background: var(--tagbg); border: 1px solid var(--tagbd);
       transition: transform .3s var(--ease), box-shadow .3s;
     }
-    .gate-cta:hover { transform: translateY(-2px); }
-    .gate-cta .arrow { transition: transform .3s; }
-    .gate-cta:hover .arrow { transform: translateX(4px); }
+    .cta:hover { transform: translateY(-2px); box-shadow: 0 12px 44px -12px var(--accent); }
+    .cta .ar { transition: transform .3s; }
+    .cta:hover .ar { transform: translateX(4px); }
 
-    /* 滚动浮现 */
-    .reveal {
-      opacity: 0;
-      transform: translateY(36px);
-      transition: opacity .9s var(--ease), transform .9s var(--ease);
+    /* ============ Gate 1 · LightingForYou（金） ============ */
+    .g-light { --accent:#ffd76b; --tint:rgba(255,215,107,.10); --bg2:#080708; --ink:#f4ecd4; --tagc:#cdc2a2; --desc:#8d8571; --tagbg:rgba(255,215,107,.08); --tagbd:rgba(255,215,107,.35); --gx:68%; --tilt:-1.6deg; }
+    .orb-micro { width: 130px; height: 130px; top: -26px; right: -14px; }
+    .orb-micro .mb-core {
+      position: absolute; top: 50%; left: 50%;
+      width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%;
+      background: radial-gradient(circle, #fff, #ffd76b 55%, transparent 75%);
+      box-shadow: 0 0 34px 12px rgba(255,215,107,.45);
+      animation: lpulse 3s ease-in-out infinite;
     }
-    .reveal.in { opacity: 1; transform: none; }
-    .reveal-delay-1 { transition-delay: .1s; }
-    .reveal-delay-2 { transition-delay: .2s; }
-    .reveal-delay-3 { transition-delay: .3s; }
-
-    /* ===== Gate 1: LightingForYou ===== */
-    .gate-light {
-      background:
-        radial-gradient(ellipse at 30% 50%, rgba(255, 215, 107, .07), transparent 55%),
-        #050506;
+    @keyframes lpulse { 0%,100%{ box-shadow:0 0 34px 12px rgba(255,215,107,.45);} 50%{ box-shadow:0 0 52px 20px rgba(255,215,107,.6);} }
+    .orb-micro .mb-ring {
+      position: absolute; top: 50%; left: 50%; border-radius: 50%;
+      border: 1px solid rgba(255,215,107,.3);
+      transform: translate(-50%,-50%);
+      animation: ringout 3.6s ease-out infinite;
     }
-    .gate-light .gate-num { color: var(--c-light); }
-    .gate-light h2 { color: #f0e8d0; }
-    .gate-light .gate-tagline { color: #c8c0a8; }
-    .gate-light .gate-desc { color: #8a8472; }
-    .gate-light .gate-tag { color: var(--c-light); border-color: rgba(255,215,107,.3); background: rgba(255,215,107,.06); }
-    .gate-light .gate-cta {
-      color: var(--c-light);
-      border-color: rgba(255,215,107,.4);
-      background: rgba(255,215,107,.08);
-      box-shadow: 0 0 30px rgba(255,215,107,.1);
-    }
-    .gate-light .gate-cta:hover { box-shadow: 0 0 50px rgba(255,215,107,.2); }
-
-    /* 光晕视觉 */
-    .light-orb {
-      position: relative;
-      width: clamp(220px, 30vw, 340px);
-      height: clamp(220px, 30vw, 340px);
-    }
-    .light-orb .core {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 60px; height: 60px;
-      margin: -30px 0 0 -30px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff, var(--c-light) 40%, transparent 70%);
-      box-shadow: 0 0 60px 20px rgba(255,215,107,.4);
-      animation: lightPulse 3s ease-in-out infinite;
-    }
-    @keyframes lightPulse {
-      0%, 100% { box-shadow: 0 0 60px 20px rgba(255,215,107,.4); }
-      50% { box-shadow: 0 0 90px 35px rgba(255,215,107,.55); }
-    }
-    .light-orb .ring {
-      position: absolute;
-      top: 50%; left: 50%;
-      border-radius: 50%;
-      border: 1px solid rgba(255,215,107,.15);
-      transform: translate(-50%, -50%);
-    }
-    .light-orb .ring:nth-child(2) { width: 140px; height: 140px; animation: ringExpand 4s ease-out infinite; }
-    .light-orb .ring:nth-child(3) { width: 220px; height: 220px; animation: ringExpand 4s ease-out infinite 1.3s; }
-    .light-orb .ring:nth-child(4) { width: 300px; height: 300px; animation: ringExpand 4s ease-out infinite 2.6s; }
-    @keyframes ringExpand {
-      0% { opacity: .6; transform: translate(-50%,-50%) scale(.7); }
-      100% { opacity: 0; transform: translate(-50%,-50%) scale(1.1); }
-    }
-    .light-dots {
-      position: absolute;
-      inset: -20px;
-    }
-    .light-dots span {
-      position: absolute;
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--c-light);
-      opacity: .6;
-      animation: dotFloat 6s ease-in-out infinite;
-    }
-    @keyframes dotFloat {
-      0%, 100% { transform: translateY(0); opacity: .3; }
-      50% { transform: translateY(-12px); opacity: .8; }
+    .orb-micro .mb-ring:nth-child(2) { width: 60px; height: 60px; }
+    .orb-micro .mb-ring:nth-child(3) { width: 104px; height: 104px; animation-delay: 1.8s; }
+    @keyframes ringout {
+      0% { opacity: .8; transform: translate(-50%,-50%) scale(.6); }
+      100% { opacity: 0; transform: translate(-50%,-50%) scale(1.15); }
     }
 
-    /* ===== Gate 2: UnReal Objects ===== */
-    .gate-unreal {
-      background:
-        radial-gradient(ellipse at 70% 40%, rgba(155, 140, 255, .08), transparent 55%),
-        #0a0a12;
-    }
-    .gate-unreal .gate-num { color: var(--c-unreal); }
-    .gate-unreal h2 { color: #d4d0e8; font-family: var(--mono); letter-spacing: .02em; }
-    .gate-unreal .gate-tagline { color: #9b98b0; }
-    .gate-unreal .gate-desc { color: #6b6c80; }
-    .gate-unreal .gate-tag { color: var(--c-unreal); border-color: rgba(155,140,255,.3); background: rgba(155,140,255,.06); }
-    .gate-unreal .gate-cta {
-      color: var(--c-unreal);
-      border-color: rgba(155,140,255,.4);
-      background: rgba(155,140,255,.08);
-    }
-    .gate-unreal .gate-cta:hover { box-shadow: 0 0 40px rgba(155,140,255,.2); }
-
-    .unreal-visual {
-      position: relative;
-      width: clamp(220px, 28vw, 320px);
-      height: clamp(220px, 28vw, 320px);
-    }
-    .unreal-triangle {
-      width: 100%; height: 100%;
-      animation: spinSlow 20s linear infinite;
-    }
-    @keyframes spinSlow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .unreal-crt {
-      position: absolute; inset: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0,0,0,.2) 0 1px, transparent 1px 3px);
+    /* ============ Gate 2 · UNREAL OBJECTS（紫） ============ */
+    .g-unreal { --accent:#9b8cff; --tint:rgba(155,140,255,.10); --bg2:#0a0a14; --ink:#e4dff6; --tagc:#a6a2c6; --desc:#707089; --tagbg:rgba(155,140,255,.08); --tagbd:rgba(155,140,255,.35); --gx:32%; --tilt:1.6deg; }
+    .g-unreal h2 { font-family: var(--mono); letter-spacing: .02em; }
+    .g-unreal .cover::before {
+      content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
       mix-blend-mode: multiply;
-      border-radius: 8px;
     }
+    .tri-micro {
+      width: 148px; height: 148px; bottom: -34px; left: -18px;
+      filter: drop-shadow(0 10px 24px rgba(155,140,255,.35));
+      animation: spin 18s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== Gate 3: Archipelago Luminary ===== */
-    .gate-luminary {
+    /* ============ Gate 3 · Archipelago Luminary（近白 + 金） ============ */
+    .g-luminary { --accent:#f0c674; --tint:rgba(231,236,242,.07); --bg2:#07090d; --ink:#eef2f7; --tagc:#9aa7b5; --desc:#66707e; --tagbg:rgba(240,198,116,.08); --tagbd:rgba(240,198,116,.35); --gx:68%; --tilt:-1.4deg; }
+    .g-luminary h2 { font-family: var(--mono); letter-spacing: .02em; }
+    .tape {
+      left: 6%; right: 6%; bottom: -14px; height: 38px;
+      border: 1px solid rgba(231,236,242,.22); border-radius: 5px;
       background:
-        linear-gradient(180deg, #06080a 0%, #0a0e14 100%);
+        linear-gradient(rgba(231,236,242,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(231,236,242,.06) 1px, transparent 1px),
+        rgba(7,9,13,.9);
+      background-size: 19px 19px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
     }
-    .gate-luminary .gate-num { color: var(--c-luminary); }
-    .gate-luminary h2 { color: #e7ecf2; font-family: var(--mono); letter-spacing: .02em; }
-    .gate-luminary .gate-tagline { color: #9aa3ad; }
-    .gate-luminary .gate-desc { color: #6a7280; }
-    .gate-luminary .gate-tag { color: #f0c674; border-color: rgba(240,198,116,.3); background: rgba(240,198,116,.06); }
-    .gate-luminary .gate-cta {
-      color: #f0c674;
-      border-color: rgba(240,198,116,.4);
-      background: rgba(240,198,116,.08);
+    .tape .tur {
+      position: absolute; top: 50%; width: 10px; height: 10px;
+      margin-top: -5px; border: 1.5px solid #e7ecf2; border-radius: 2px;
+      background: rgba(231,236,242,.15);
     }
-    .gate-luminary .gate-cta:hover { box-shadow: 0 0 40px rgba(240,198,116,.15); }
+    .tape .en {
+      position: absolute; top: 50%; width: 8px; height: 8px; margin-top: -4px;
+      border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,.7);
+      animation: march 4.5s linear infinite;
+    }
+    @keyframes march { from { left: 100%; } to { left: -12px; } }
+    .tape .sp {
+      position: absolute; width: 5px; height: 5px; border-radius: 50%;
+      background: #f0c674; box-shadow: 0 0 8px #f0c674;
+      animation: spark 2.2s ease-in-out infinite;
+    }
+    @keyframes spark { 0%,100%{ opacity:0; transform:scale(0);} 50%{ opacity:1; transform:scale(1);} }
 
-    .battlefield {
-      position: relative;
-      width: 100%;
-      max-width: 420px;
-      aspect-ratio: 4 / 3;
-      border: 1px solid rgba(231,236,242,.12);
-      border-radius: 4px;
-      background:
-        linear-gradient(rgba(231,236,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(231,236,242,.04) 1px, transparent 1px);
-      background-size: 32px 32px;
-      overflow: hidden;
-    }
-    .battlefield .lane {
+    /* ============ Gate 4 · Bug Universe God（红 + 橙） ============ */
+    .g-bug { --accent:#fb923c; --tint:rgba(255,90,90,.08); --bg2:#130a0c; --ink:#f8ecec; --tagc:#d3a8a2; --desc:#9c7373; --tagbg:rgba(251,146,60,.08); --tagbd:rgba(251,146,60,.35); --gx:32%; --tilt:1.4deg; }
+    .g-bug h2 { font-family: var(--hand); transform: rotate(-2deg); display: inline-block; }
+    .d-cir {
       position: absolute;
-      left: 0; right: 0;
-      height: 1px;
-      background: rgba(231,236,242,.08);
-    }
-    .battlefield .lane:nth-child(1) { top: 25%; }
-    .battlefield .lane:nth-child(2) { top: 50%; }
-    .battlefield .lane:nth-child(3) { top: 75%; }
-    .turret {
-      position: absolute;
-      width: 24px; height: 24px;
-      border: 2px solid #e7ecf2;
-      border-radius: 4px;
-      background: rgba(231,236,242,.1);
-    }
-    .turret::after {
-      content: "";
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 8px; height: 2px;
-      background: #e7ecf2;
-      transform-origin: left center;
-      animation: turretAim 3s ease-in-out infinite;
-    }
-    @keyframes turretAim {
-      0%, 100% { transform: translateY(-50%) rotate(0deg); }
-      50% { transform: translateY(-50%) rotate(45deg); }
-    }
-    .enemy {
-      position: absolute;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: #ef4444;
-      box-shadow: 0 0 10px rgba(239,68,68,.5);
-      animation: enemyMove 5s linear infinite;
-    }
-    @keyframes enemyMove {
-      from { left: 100%; }
-      to { left: -20px; }
-    }
-    .gold-spark {
-      position: absolute;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #f0c674;
-      box-shadow: 0 0 8px #f0c674;
-      animation: spark 2s ease-in-out infinite;
-    }
-    @keyframes spark {
-      0%, 100% { opacity: 0; transform: scale(0); }
-      50% { opacity: 1; transform: scale(1); }
-    }
-
-    /* ===== Gate 4: Bug Universe God ===== */
-    .gate-bug {
-      background:
-        radial-gradient(ellipse at 25% 60%, rgba(239, 68, 68, .08), transparent 50%),
-        radial-gradient(ellipse at 75% 30%, rgba(251, 146, 60, .06), transparent 50%),
-        #140a0c;
-    }
-    .gate-bug .gate-num { color: var(--c-bug); }
-    .gate-bug h2 {
-      color: #f5e9ea;
-      font-family: "Bradley Hand", "Comic Sans MS", "Marker Felt", "Segoe Print", cursive, "Microsoft YaHei", sans-serif;
-      transform: rotate(-2deg);
-      display: inline-block;
-    }
-    .gate-bug .gate-tagline { color: #c8a0a4; }
-    .gate-bug .gate-desc { color: #9a7074; }
-    .gate-bug .gate-tag { color: #fb923c; border-color: rgba(251,146,60,.3); background: rgba(251,146,60,.06); }
-    .gate-bug .gate-cta {
-      color: #fb923c;
-      border-color: rgba(251,146,60,.4);
-      background: rgba(251,146,60,.08);
-      font-family: inherit;
-    }
-    .gate-bug .gate-cta:hover { box-shadow: 0 0 40px rgba(251,146,60,.2); }
-
-    .bug-visual {
-      position: relative;
-      width: clamp(240px, 30vw, 340px);
-      height: clamp(240px, 30vw, 340px);
-    }
-    .bug-circle {
-      position: absolute;
-      border-radius: 50%;
+      width: 62px; height: 62px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--hand); font-size: 20px; font-weight: 700;
       border: 2px dashed;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 18px;
-      font-family: "Bradley Hand", "Comic Sans MS", cursive, "Microsoft YaHei", sans-serif;
+      animation: drift 5s ease-in-out infinite;
     }
-    .bug-circle.c1 {
-      width: 100px; height: 100px;
-      top: 10%; left: 15%;
-      border-color: rgba(239,68,68,.5);
-      color: #ef4444;
-      background: rgba(239,68,68,.08);
-      transform: rotate(-8deg);
-      animation: bugFloat 5s ease-in-out infinite;
-    }
-    .bug-circle.c2 {
-      width: 110px; height: 110px;
-      top: 30%; right: 10%;
-      border-color: rgba(251,146,60,.5);
-      color: #fb923c;
-      background: rgba(251,146,60,.08);
-      transform: rotate(6deg);
-      animation: bugFloat 6s ease-in-out infinite 1s;
-    }
-    .bug-circle.c3 {
-      width: 90px; height: 90px;
-      bottom: 15%; left: 30%;
-      border-color: rgba(167,139,250,.5);
-      color: #a78bfa;
-      background: rgba(167,139,250,.08);
-      transform: rotate(-4deg);
-      animation: bugFloat 7s ease-in-out infinite 2s;
-    }
-    .bug-plus {
-      position: absolute;
-      font-size: 32px;
-      color: rgba(255,255,255,.2);
-      font-weight: 300;
-    }
-    @keyframes bugFloat {
-      0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
-      50% { transform: translateY(-14px) rotate(calc(var(--r, 0deg) + 3deg)); }
-    }
+    .d-cir.d1 { top: -22px; left: -18px; color: #ff5a5a; border-color: rgba(255,90,90,.6); background: rgba(255,90,90,.1); transform: rotate(-8deg); }
+    .d-cir.d2 { top: 26px; right: -24px; color: #fb923c; border-color: rgba(251,146,60,.6); background: rgba(251,146,60,.1); transform: rotate(7deg); animation-delay: 1.2s; }
+    .d-cir.d3 { bottom: -16px; left: 26px; color: #a78bfa; border-color: rgba(167,139,250,.6); background: rgba(167,139,250,.1); transform: rotate(-5deg); animation-delay: 2.2s; }
+    @keyframes drift { 0%,100%{ translate: 0 0; } 50%{ translate: 0 -12px; } }
 
-    /* ===== Gate 5: 第九张史莱姆牌 ===== */
-    .gate-slime {
-      background:
-        radial-gradient(ellipse at 60% 50%, rgba(34, 211, 238, .07), transparent 55%),
-        #06121a;
-    }
-    .gate-slime .gate-num { color: var(--c-slime); }
-    .gate-slime h2 { color: #e6fbfd; font-family: var(--serif); }
-    .gate-slime .gate-tagline { color: #8fb3c0; }
-    .gate-slime .gate-desc { color: #5a8090; }
-    .gate-slime .gate-tag { color: var(--c-slime); border-color: rgba(34,211,238,.3); background: rgba(34,211,238,.06); }
-    .gate-slime .gate-cta {
-      color: var(--c-slime);
-      border-color: rgba(34,211,238,.4);
-      background: rgba(34,211,238,.08);
-    }
-    .gate-slime .gate-cta:hover { box-shadow: 0 0 40px rgba(34,211,238,.2); }
-
-    .card-fan {
-      position: relative;
-      width: clamp(240px, 30vw, 340px);
-      height: clamp(300px, 38vw, 420px);
-    }
-    .game-card {
-      position: absolute;
-      width: 140px;
-      height: 200px;
-      border-radius: 10px;
-      border: 1px solid rgba(34,211,238,.3);
+    /* ============ Gate 5 · 第九张史莱姆牌（青） ============ */
+    .g-slime { --accent:#2ee6ff; --tint:rgba(46,230,255,.09); --bg2:#061119; --ink:#e3fbfd; --tagc:#8fb6c2; --desc:#5a8291; --tagbg:rgba(46,230,255,.08); --tagbd:rgba(46,230,255,.35); --gx:68%; --tilt:-1.5deg; }
+    .fan { left: 50%; bottom: -46px; width: 200px; height: 110px; transform: translateX(-50%); }
+    .fan i {
+      position: absolute; bottom: 0; left: 50%;
+      width: 56px; height: 80px; border-radius: 7px;
+      border: 1.5px solid rgba(46,230,255,.55);
       background: linear-gradient(160deg, #0d2836, #06121a);
-      box-shadow: 0 8px 30px rgba(0,0,0,.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: transform .4s var(--ease), box-shadow .4s;
-      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(0,0,0,.45);
     }
-    .game-card:hover {
-      transform: translateY(-12px) scale(1.05) !important;
-      box-shadow: 0 16px 50px rgba(34,211,238,.25);
-      z-index: 10;
-    }
-    .game-card .card-icon {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-    .game-card .card-name {
-      font-family: var(--serif);
-      font-size: 14px;
-      color: #e6fbfd;
-      text-align: center;
-    }
-    .game-card .card-cost {
-      position: absolute;
-      top: 8px; left: 8px;
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      background: rgba(34,211,238,.2);
-      border: 1px solid rgba(34,211,238,.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--c-slime);
-    }
-    .card-fan .game-card:nth-child(1) {
-      bottom: 0; left: 50%;
-      transform: translateX(-50%) rotate(-18deg);
-      z-index: 1;
-    }
-    .card-fan .game-card:nth-child(2) {
-      bottom: 0; left: 50%;
-      transform: translateX(-50%) rotate(-9deg) translateX(-50px);
-      z-index: 2;
-    }
-    .card-fan .game-card:nth-child(3) {
-      bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      z-index: 3;
-    }
-    .card-fan .game-card:nth-child(4) {
-      bottom: 0; left: 50%;
-      transform: translateX(-50%) rotate(9deg) translateX(50px);
-      z-index: 2;
-    }
-    .card-fan .game-card:nth-child(5) {
-      bottom: 0; left: 50%;
-      transform: translateX(-50%) rotate(18deg);
-      z-index: 1;
-    }
+    .fan i:nth-child(1) { transform: translateX(-50%) rotate(-16deg); }
+    .fan i:nth-child(2) { transform: translateX(-50%) rotate(0deg); z-index: 2; }
+    .fan i:nth-child(3) { transform: translateX(-50%) rotate(16deg); }
 
-    /* ===== 关于区 ===== */
-    .about {
-      padding: 100px clamp(20px, 5vw, 80px);
-      background: var(--bg);
-      border-top: 1px solid var(--line);
+    /* ============ 侧栏目录（桌面） ============ */
+    .rail {
+      position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
+      z-index: 90; display: flex; flex-direction: column; gap: 16px;
     }
-    .about-inner {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
+    .rail a {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+      color: var(--rc, var(--subtle)); opacity: .55;
+      transition: opacity .25s, transform .25s;
     }
-    .about-kicker {
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: .3em;
-      text-transform: uppercase;
-      color: var(--subtle);
-      margin: 0 0 20px;
+    .rail a:hover, .rail a.cur { opacity: 1; transform: translateX(-4px); }
+    .rail a::before {
+      content: ""; width: 18px; height: 1px; background: currentColor;
     }
-    .about h2 {
-      margin: 0 0 24px;
-      font-size: clamp(28px, 4vw, 42px);
-      font-weight: 800;
-    }
-    .about p {
-      margin: 0 0 16px;
-      font-size: 16px;
-      color: var(--muted);
-      line-height: 1.9;
-    }
-    .about-links {
-      margin-top: 36px;
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .rail a span { opacity: 0; transition: opacity .25s; }
+    .rail a:hover span, .rail a.cur span { opacity: .9; }
+
+    /* ============ 关于区 ============ */
+    .about { padding: 120px clamp(20px, 6vw, 84px); background: var(--bg); border-top: 1px solid var(--line); }
+    .about-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+    .about-kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--subtle); margin: 0 0 22px; }
+    .about h2 { margin: 0 0 26px; font-size: clamp(28px, 4vw, 44px); font-weight: 800; }
+    .about p { margin: 0 auto 16px; font-size: 16px; color: var(--muted); line-height: 1.95; max-width: 60ch; }
+    .about-links { margin-top: 40px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .about-links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border: 1px solid var(--line-2);
-      border-radius: 10px;
-      font-size: 14px;
-      color: var(--muted);
-      transition: all .3s;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px;
+      border: 1px solid var(--line2); color: var(--muted); font-size: 14px;
+      transition: color .3s, border-color .3s, background .3s, transform .3s;
     }
-    .about-links a:hover {
-      color: var(--text);
-      border-color: var(--c-light);
-      background: rgba(255,215,107,.06);
-    }
+    .about-links a:hover { color: var(--text); border-color: #ffd76b; background: rgba(255,215,107,.06); transform: translateY(-2px); }
 
-    /* ===== 底部 ===== */
+    /* ============ 页脚 ============ */
     .footer {
-      padding: 40px clamp(20px, 5vw, 80px);
+      padding: 38px clamp(20px, 6vw, 84px);
       border-top: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 14px;
     }
-    .footer-copy {
-      font-size: 13px;
-      color: var(--subtle);
-    }
-    .footer-links {
-      display: flex;
-      gap: 20px;
-    }
-    .footer-links a {
-      font-size: 13px;
-      color: var(--subtle);
-      transition: color .25s;
-    }
+    .footer-copy { font-size: 13px; color: var(--subtle); }
+    .footer-links { display: flex; gap: 22px; }
+    .footer-links a { font-size: 13px; color: var(--subtle); transition: color .25s; }
     .footer-links a:hover { color: var(--text); }
 
-    /* ===== 响应式 ===== */
-    @media (max-width: 900px) {
-      .gate-inner {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-      .gate-visual { order: -1; min-height: 280px; }
-      .gate-info { text-align: center; }
-      .gate-tagline, .gate-desc { margin-left: auto; margin-right: auto; }
-      .gate-tags { justify-content: center; }
-      .nav-links { display: none; }
-      .nav-links.open {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: var(--header-h);
-        left: 0; right: 0;
-        background: rgba(6,7,12,.96);
-        backdrop-filter: blur(14px);
-        padding: 16px;
+    /* ============ 滚动浮现 ============ */
+    .reveal { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    .d1 { transition-delay: .08s; } .d2 { transition-delay: .18s; } .d3 { transition-delay: .28s; }
+
+    /* ============ 响应式 ============ */
+    @media (max-width: 980px) {
+      .rail { display: none; }
+    }
+    @media (max-width: 880px) {
+      .gate { padding: calc(var(--header-h) + 30px) 20px 60px; }
+      .gate-inner { grid-template-columns: 1fr; gap: 30px; }
+      .flip .stage { order: 0; }
+      .stage { padding: 16px 6px 26px; }
+      .ghost { font-size: 120px; opacity: .35; }
+      .desc { max-width: none; }
+      .nav-links {
+        display: none; flex-direction: column; gap: 4px;
+        position: absolute; top: var(--header-h); left: 0; right: 0;
+        padding: 14px 18px 20px;
+        background: rgba(6,7,12,.97);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
         border-bottom: 1px solid var(--line);
-        gap: 4px;
+        align-items: stretch;
       }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 12px 10px; font-size: 15px; }
       .nav-toggle { display: block; }
     }
-
     @media (max-width: 520px) {
-      .hero-meta { gap: 20px; }
-      .hero-meta .num { font-size: 24px; }
-      .gate { padding: 60px 20px; }
-      .card-fan { transform: scale(.85); }
+      .hero-kicker { font-size: 11px; letter-spacing: .16em; }
+      .hero-meta { gap: 14px 20px; margin-top: 34px; }
+      .hero-meta .num { font-size: 22px; }
+      .orb-micro { width: 100px; height: 100px; top: -18px; }
+      .tri-micro { width: 110px; height: 110px; bottom: -24px; }
+      .fan { transform: translateX(-50%) scale(.85); }
+      .footer { flex-direction: column; text-align: center; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        animation: none !important;
-      }
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
       .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
-  <!-- 顶部导航 -->
+
+  <!-- 固定顶栏 -->
   <nav class="nav">
-    <a href="#top" class="nav-brand"><span class="dot"></span>GOVE</a>
+    <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>GOVE</a>
     <div class="nav-links" id="navLinks">
-      <a href="#gate-light">LightingForYou</a>
-      <a href="#gate-unreal">UnReal Objects</a>
-      <a href="#gate-luminary">Archipelago</a>
-      <a href="#gate-bug">Bug Universe God</a>
-      <a href="#gate-slime">史莱姆牌</a>
+      <a href="#lighting">LightingForYou</a>
+      <a href="#unreal">Unreal Objects</a>
+      <a href="#luminary">Archipelago</a>
+      <a href="#bug">Bug God</a>
+      <a href="#slime">史莱姆牌</a>
       <a href="#about">关于</a>
     </div>
-    <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+    <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false" aria-controls="navLinks"><i></i></button>
   </nav>
 
   <!-- Hero -->
   <header class="hero" id="top">
-    <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
     <div class="hero-content">
       <p class="hero-kicker">Independent Game Portfolio · 2024 — 2026</p>
       <h1>GOVE</h1>
-      <p class="hero-sub">从<em>一束光</em>，到<em>一整副牌</em>。<br>5 款独立游戏，5 种造物实验。</p>
+      <p class="hero-sub">从<em>「一束光」</em>到<em>「一整副牌」</em>，<br>5 款独立游戏，5 种造物实验。</p>
       <div class="hero-meta">
-        <div class="item"><div class="num">5</div><div class="label">款游戏</div></div>
-        <div class="item"><div class="num">3</div><div class="label">个平台</div></div>
-        <div class="item"><div class="num">2</div><div class="label">年创作</div></div>
+        <div><div class="num">5</div><div class="label">款游戏</div></div>
+        <div><div class="num">3</div><div class="label">个平台</div></div>
+        <div><div class="num">2024—2026</div><div class="label">跨三年创作</div></div>
       </div>
     </div>
-    <div class="hero-scroll">
-      <span>Scroll</span>
-      <div class="line"></div>
-    </div>
+    <div class="hero-scroll" aria-hidden="true"><span>Scroll</span><div class="line"></div></div>
   </header>
 
-  <!-- 五扇门 -->
-  <main class="gates">
+  <main>
 
-    <!-- Gate 1: LightingForYou -->
-    <section class="gate gate-light" id="gate-light">
+    <!-- Gate 1 · LightingForYou -->
+    <section class="gate g-light" id="lighting">
+      <span class="ghost" aria-hidden="true">01</span>
       <div class="gate-inner">
-        <div class="gate-visual reveal">
-          <div class="light-orb">
-            <div class="core"></div>
-            <div class="ring"></div>
-            <div class="ring"></div>
-            <div class="ring"></div>
-            <div class="light-dots">
-              <span style="top:15%;left:20%;animation-delay:0s"></span>
-              <span style="top:30%;left:80%;animation-delay:1s"></span>
-              <span style="top:60%;left:10%;animation-delay:2s"></span>
-              <span style="top:75%;left:70%;animation-delay:.5s"></span>
-              <span style="top:45%;left:90%;animation-delay:1.5s"></span>
-              <span style="top:85%;left:35%;animation-delay:2.5s"></span>
-            </div>
+        <div class="stage reveal">
+          <div class="cover">
+            <img src="games/lightingforyou/cover.jpg" alt="LightingForYou 游戏封面" loading="lazy" />
+          </div>
+          <div class="micro orb-micro" aria-hidden="true">
+            <span class="mb-core"></span><span class="mb-ring"></span><span class="mb-ring"></span>
           </div>
         </div>
-        <div class="gate-info">
-          <p class="gate-num reveal reveal-delay-1">01 / 2024.12 · TapTap</p>
-          <h2 class="reveal reveal-delay-1">LightingForYou</h2>
-          <p class="gate-tagline reveal reveal-delay-2">黑暗中一粒光。14 个关卡，14 个隐藏故事。</p>
-          <p class="gate-desc reveal reveal-delay-2">每个人的生活都缺了一点光。即便通关全部 14 关、解锁 14 个隐藏故事，你也不会找到那一点光——但你可能会突然想起来，为什么会少了它。</p>
-          <div class="gate-tags reveal reveal-delay-3">
-            <span class="gate-tag">叙事冒险</span>
-            <span class="gate-tag">微弱视野</span>
-            <span class="gate-tag">哲理诗意</span>
-            <span class="gate-tag">评分 8.8</span>
+        <div class="info">
+          <p class="kicker reveal d1">01 / 2024.12 · TapTap · 叙事冒险</p>
+          <h2 class="reveal d1">LightingForYou</h2>
+          <p class="tagline reveal d2">黑暗中一粒光。14 个关卡，14 个隐藏故事。</p>
+          <p class="desc reveal d2">每个人的生活都缺了一点光。即便通关 14 关、解锁 14 个隐藏故事，你也不会找到那一点光——但你可能会突然想起来，为什么会少了它。微弱视野、光量 5 级。</p>
+          <div class="tags reveal d3">
+            <span class="tag">叙事冒险</span>
+            <span class="tag">微弱视野</span>
+            <span class="tag">光量 5 级</span>
+            <span class="tag">评分 8.8</span>
           </div>
-          <a href="games/lightingforyou/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+          <a class="cta reveal d3" href="games/lightingforyou/index.html">进入详情 <span class="ar">→</span></a>
         </div>
       </div>
     </section>
 
-    <!-- Gate 2: UnReal Objects -->
-    <section class="gate gate-unreal" id="gate-unreal">
+    <!-- Gate 2 · UNREAL OBJECTS -->
+    <section class="gate g-unreal flip" id="unreal">
+      <span class="ghost" aria-hidden="true">02</span>
       <div class="gate-inner">
-        <div class="gate-info">
-          <p class="gate-num reveal reveal-delay-1">02 / 2025.03 · itch.io</p>
-          <h2 class="reveal reveal-delay-1">UNREAL OBJECTS</h2>
-          <p class="gate-tagline reveal reveal-delay-2">不可能物体的像素解谜。二维成立，三维冲突。</p>
-          <p class="gate-desc reveal reveal-delay-2">彭罗斯三角形、不可能立方体、埃舍尔阶梯、恶魔音叉——四种只存在于二维的图形，通过欺骗大脑的透视机制，让你放下习惯性的空间直觉。</p>
-          <div class="gate-tags reveal reveal-delay-3">
-            <span class="gate-tag">像素解谜</span>
-            <span class="gate-tag">CRT 复古</span>
-            <span class="gate-tag">错觉实验</span>
-            <span class="gate-tag">Godot</span>
+        <div class="info">
+          <p class="kicker reveal d1">02 / 2025.03 · itch.io · 像素解谜</p>
+          <h2 class="reveal d1">UNREAL OBJECTS</h2>
+          <p class="tagline reveal d2">不可能物体的像素解谜。二维成立，三维冲突。</p>
+          <p class="desc reveal d2">彭罗斯三角形、不可能立方体、埃舍尔阶梯、恶魔音叉——四种只存在于二维的图形，用欺骗大脑的透视机制，放下习惯性的空间直觉。俯视棋盘 WASD 移动、Space 撤销、N 一次三向位移。</p>
+          <div class="tags reveal d3">
+            <span class="tag">像素解谜</span>
+            <span class="tag">不可能图形</span>
+            <span class="tag">CRT 复古</span>
+            <span class="tag">Godot</span>
           </div>
-          <a href="games/unreal-objects/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+          <a class="cta reveal d3" href="games/unreal-objects/index.html">进入详情 <span class="ar">→</span></a>
         </div>
-        <div class="gate-visual reveal">
-          <div class="unreal-visual">
-            <svg class="unreal-triangle" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-              <g stroke="#9b8cff" stroke-width="14" stroke-linejoin="round">
-                <path d="M100 30 L160 150 L40 150 Z" />
-                <path d="M100 30 L124 76 L76 76 Z" fill="#9b8cff" />
-              </g>
-              <g stroke="#ff77a8" stroke-width="4">
-                <path d="M100 30 L160 150 L40 150 Z" />
-              </g>
-              <circle cx="100" cy="30" r="5" fill="#ffa300" />
-              <circle cx="160" cy="150" r="5" fill="#29adff" />
-              <circle cx="40" cy="150" r="5" fill="#ff77a8" />
-            </svg>
-            <div class="unreal-crt"></div>
+        <div class="stage reveal">
+          <div class="cover">
+            <img src="games/unreal-objects/cover.jpg" alt="UNREAL OBJECTS 游戏封面" loading="lazy" />
           </div>
+          <svg class="micro tri-micro" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+            <g stroke="#9b8cff" stroke-width="14" stroke-linejoin="round">
+              <path d="M100 28 L162 152 L38 152 Z" />
+              <path d="M100 28 L126 78 L74 78 Z" fill="#9b8cff" stroke="none" />
+            </g>
+            <circle cx="100" cy="28" r="6" fill="#ffa300" />
+            <circle cx="162" cy="152" r="6" fill="#29adff" />
+            <circle cx="38" cy="152" r="6" fill="#ff77a8" />
+          </svg>
         </div>
       </div>
     </section>
 
-    <!-- Gate 3: Archipelago Luminary -->
-    <section class="gate gate-luminary" id="gate-luminary">
+    <!-- Gate 3 · Archipelago Luminary -->
+    <section class="gate g-luminary" id="luminary">
+      <span class="ghost" aria-hidden="true">03</span>
       <div class="gate-inner">
-        <div class="gate-visual reveal">
-          <div class="battlefield">
-            <div class="lane"></div>
-            <div class="lane"></div>
-            <div class="lane"></div>
-            <div class="turret" style="top:20%;left:15%;"></div>
-            <div class="turret" style="top:45%;left:30%;"></div>
-            <div class="turret" style="top:70%;left:20%;"></div>
-            <div class="turret" style="top:35%;left:55%;"></div>
-            <div class="enemy" style="top:22%;animation-delay:0s;"></div>
-            <div class="enemy" style="top:47%;animation-delay:1.5s;"></div>
-            <div class="enemy" style="top:72%;animation-delay:3s;"></div>
-            <div class="gold-spark" style="top:30%;left:40%;animation-delay:.5s;"></div>
-            <div class="gold-spark" style="top:60%;left:65%;animation-delay:1.2s;"></div>
-            <div class="gold-spark" style="top:40%;left:75%;animation-delay:2s;"></div>
+        <div class="stage reveal">
+          <div class="cover">
+            <img src="games/archipelago-luminary/cover.jpg" alt="ARCHIPELAGO LUMINARY 游戏封面" loading="lazy" />
+          </div>
+          <div class="micro tape" aria-hidden="true">
+            <span class="tur" style="left:14%"></span>
+            <span class="tur" style="left:38%"></span>
+            <span class="tur" style="left:62%"></span>
+            <span class="en" style="animation-delay:0s"></span>
+            <span class="en" style="animation-delay:1.6s"></span>
+            <span class="en" style="animation-delay:3.1s"></span>
+            <span class="sp" style="left:26%;animation-delay:.4s"></span>
+            <span class="sp" style="left:52%;animation-delay:1.3s"></span>
+            <span class="sp" style="left:76%;animation-delay:2s"></span>
           </div>
         </div>
-        <div class="gate-info">
-          <p class="gate-num reveal reveal-delay-1">03 / 2025.05 · Steam · ¥11</p>
-          <h2 class="reveal reveal-delay-1">ARCHIPELAGO LUMINARY</h2>
-          <p class="gate-tagline reveal reveal-delay-2">极简 2D 塔防。黑白战场中，颜色是稀世珍宝。</p>
-          <p class="gate-desc reveal reveal-delay-2">一夜，一束光落入北海，无尽怪物从深处涌出。北方王国一步步撤退，直到最后庇护所——直到人类建造第一座炮塔。14 关反攻，14+ 炮塔，10+ 敌人，碎片叙事拼凑被遗忘的真相。</p>
-          <div class="gate-tags reveal reveal-delay-3">
-            <span class="gate-tag">塔防策略</span>
-            <span class="gate-tag">黑白美学</span>
-            <span class="gate-tag">碎片叙事</span>
-            <span class="gate-tag">14 成就</span>
+        <div class="info">
+          <p class="kicker reveal d1">03 / 2025.05 · Steam · ¥11 · 塔防策略</p>
+          <h2 class="reveal d1">ARCHIPELAGO LUMINARY<span class="cn">阿奇佩拉戈：北落之光</span></h2>
+          <p class="tagline reveal d2">极简 2D 塔防。黑白战场中，颜色是稀世珍宝。</p>
+          <p class="desc reveal d2">一夜，一束光落入北海，无尽怪物从深处涌出。北方王国一步步撤退到最后庇护所，直到人类建造第一座炮塔。14 关反攻，14+ 炮塔，10+ 敌人。</p>
+          <div class="tags reveal d3">
+            <span class="tag">塔防策略</span>
+            <span class="tag">黑白战场</span>
+            <span class="tag">14 关反攻</span>
           </div>
-          <a href="games/archipelago-luminary/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+          <a class="cta reveal d3" href="games/archipelago-luminary/index.html">进入详情 <span class="ar">→</span></a>
         </div>
       </div>
     </section>
 
-    <!-- Gate 4: Bug Universe God -->
-    <section class="gate gate-bug" id="gate-bug">
+    <!-- Gate 4 · Bug Universe God -->
+    <section class="gate g-bug flip" id="bug">
+      <span class="ghost" aria-hidden="true">04</span>
       <div class="gate-inner">
-        <div class="gate-info">
-          <p class="gate-num reveal reveal-delay-1">04 / 2025.10 · TapTap</p>
-          <h2 class="reveal reveal-delay-1">Bug Universe God</h2>
-          <p class="gate-tagline reveal reveal-delay-2">操控概念本身，从基本元素合成一个世界。</p>
-          <p class="gate-desc reveal reveal-delay-2">你相信世界是被创造出来的吗？作为潜在未来的造物者，你的工作并非挥舞刀剑，而是用"原型的雏形"从光与影开始，定义神学、哲学、文学、物理、天文……最终创造整个世界。</p>
-          <div class="gate-tags reveal reveal-delay-3">
-            <span class="gate-tag">概念合成</span>
-            <span class="gate-tag">不完美美学</span>
-            <span class="gate-tag">涂鸦实验</span>
-            <span class="gate-tag">评分 9.0</span>
+        <div class="info">
+          <p class="kicker reveal d1">04 / 2025.10 · TapTap · 概念合成</p>
+          <h2 class="reveal d1">Bug Universe God</h2>
+          <p class="tagline reveal d2">你相信，世界是被创造出来的吗？</p>
+          <p class="desc reveal d2">作为潜在未来的造物者，你的工作不是挥舞刀剑，而是用「原型的雏形」从光与影开始，定义神学、哲学、物理、天文……最终合成整个世界。</p>
+          <div class="tags reveal d3">
+            <span class="tag">概念合成</span>
+            <span class="tag">涂鸦实验</span>
+            <span class="tag">评分 9.0</span>
           </div>
-          <a href="games/bug-universe-god/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+          <a class="cta reveal d3" href="games/bug-universe-god/index.html">进入详情 <span class="ar">→</span></a>
         </div>
-        <div class="gate-visual reveal">
-          <div class="bug-visual">
-            <div class="bug-circle c1" style="--r:-8deg">光</div>
-            <div class="bug-circle c2" style="--r:6deg">影</div>
-            <div class="bug-circle c3" style="--r:-4deg">界</div>
-            <span class="bug-plus" style="top:25%;left:45%;">+</span>
-            <span class="bug-plus" style="top:55%;left:55%;">+</span>
-            <span class="bug-plus" style="top:40%;left:25%;font-size:24px;">→</span>
+        <div class="stage reveal">
+          <div class="cover">
+            <img src="games/bug-universe-god/cover.jpg" alt="Bug Universe God 游戏封面" loading="lazy" />
+          </div>
+          <div class="micro" aria-hidden="true">
+            <span class="d-cir d1">光</span>
+            <span class="d-cir d2">影</span>
+            <span class="d-cir d3">界</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Gate 5: 第九张史莱姆牌 -->
-    <section class="gate gate-slime" id="gate-slime">
+    <!-- Gate 5 · 第九张史莱姆牌 -->
+    <section class="gate g-slime" id="slime">
+      <span class="ghost" aria-hidden="true">05</span>
       <div class="gate-inner">
-        <div class="gate-visual reveal">
-          <div class="card-fan">
-            <div class="game-card">
-              <div class="card-cost">1</div>
-              <div class="card-icon">🗡️</div>
-              <div class="card-name">初始</div>
-            </div>
-            <div class="game-card">
-              <div class="card-cost">2</div>
-              <div class="card-icon">🩸</div>
-              <div class="card-name">血族</div>
-            </div>
-            <div class="game-card">
-              <div class="card-cost">3</div>
-              <div class="card-icon">🛡️</div>
-              <div class="card-name">坚固</div>
-            </div>
-            <div class="game-card">
-              <div class="card-cost">2</div>
-              <div class="card-icon">⚙️</div>
-              <div class="card-name">科技</div>
-            </div>
-            <div class="game-card">
-              <div class="card-cost">1</div>
-              <div class="card-icon">🌱</div>
-              <div class="card-name">种子</div>
-            </div>
+        <div class="stage reveal">
+          <div class="cover">
+            <img src="games/ninth-slime-card/cover.jpg" alt="第九张史莱姆牌 游戏封面" loading="lazy" />
           </div>
+          <div class="micro fan" aria-hidden="true"><i></i><i></i><i></i></div>
         </div>
-        <div class="gate-info">
-          <p class="gate-num reveal reveal-delay-1">05 / 2026.02 · TapTap</p>
-          <h2 class="reveal reveal-delay-1">第九张史莱姆牌</h2>
-          <p class="gate-tagline reveal reveal-delay-2">轻量 Roguelike 卡牌。8 大系列，战败归零，重新出发。</p>
-          <p class="gate-desc reveal reveal-delay-2">每局从 Lv.1 开始，用手中的卡牌击败层层递进的敌人。胜利后从丰富牌库扩充卡组，战败则一切归零。初始、七罪、血族、坚固、科技、种子、暗影、时序——8 大系列，构筑属于你的最强牌组。</p>
-          <div class="gate-tags reveal reveal-delay-3">
-            <span class="gate-tag">Roguelike</span>
-            <span class="gate-tag">卡牌构筑</span>
-            <span class="gate-tag">爬层冒险</span>
-            <span class="gate-tag">评分 8.5</span>
+        <div class="info">
+          <p class="kicker reveal d1">05 / 2026.02 · TapTap · Roguelike 卡牌</p>
+          <h2 class="reveal d1">第九张史莱姆牌</h2>
+          <p class="tagline reveal d2">轻量 Roguelike 卡牌。8 大系列，战败归零，重新出发。</p>
+          <p class="desc reveal d2">每局从 Lv.1 开始，用手中卡牌击败层层递进的敌人。胜利扩充卡组，战败一切归零。初始、七罪、血族、坚固、科技、种子、暗影、时序——8 大系列。</p>
+          <div class="tags reveal d3">
+            <span class="tag">Roguelike 卡牌</span>
+            <span class="tag">8 大系列</span>
+            <span class="tag">战败归零</span>
+            <span class="tag">评分 8.5</span>
           </div>
-          <a href="games/ninth-slime-card/index.html" class="gate-cta reveal reveal-delay-3">进入详情 <span class="arrow">→</span></a>
+          <a class="cta reveal d3" href="games/ninth-slime-card/index.html">进入详情 <span class="ar">→</span></a>
         </div>
       </div>
     </section>
 
   </main>
 
+  <!-- 侧栏目录 -->
+  <aside class="rail" aria-label="游戏目录">
+    <a href="#lighting" style="--rc:#ffd76b"><i>01</i><span>LightingForYou</span></a>
+    <a href="#unreal" style="--rc:#9b8cff"><i>02</i><span>Unreal Objects</span></a>
+    <a href="#luminary" style="--rc:#f0c674"><i>03</i><span>Archipelago</span></a>
+    <a href="#bug" style="--rc:#fb923c"><i>04</i><span>Bug God</span></a>
+    <a href="#slime" style="--rc:#2ee6ff"><i>05</i><span>史莱姆牌</span></a>
+  </aside>
+
   <!-- 关于 -->
   <section class="about" id="about">
     <div class="about-inner">
       <p class="about-kicker">About the Creator</p>
       <h2>关于 Gove</h2>
-      <p>独立游戏开发者，横跨叙事、塔防、解谜、概念合成与卡牌。从 2024 年的 LightingForYou 开始，每一款游戏都是一次新的造物实验——不重复模板，不回避不完美。</p>
-      <p>页面本身即游戏体验的延伸：黑暗中的光晕、黑白战场、CRT 扫描线、涂鸦合成台、绒布卡牌桌——每款游戏的详情页都用贴合其本身的视觉语言。</p>
+      <p>独立开发者，横跨叙事、塔防、解谜、概念合成与卡牌。从 2024 年的一束光开始，每一款游戏都是一次新的造物实验——不重复模板，不回避不完美。</p>
+      <p>首页的五扇门即五种气质：黑暗中的光晕、旋转的不可能几何、黑白战场上穿行的敌人、光与影的涂鸦合成、扇面展开的卡牌——每一扇门后，都是一整个世界。</p>
       <div class="about-links">
         <a href="https://www.taptap.cn/developer/275988" target="_blank" rel="noreferrer">TapTap 开发者主页</a>
         <a href="https://gove.itch.io/" target="_blank" rel="noreferrer">itch.io</a>
@@ -1033,9 +657,9 @@
     </div>
   </section>
 
-  <!-- 底部 -->
+  <!-- 页脚 -->
   <footer class="footer">
-    <div class="footer-copy">© 2024—2026 Gove. All games reserved.</div>
+    <div class="footer-copy">© 2024—2026 Gove</div>
     <div class="footer-links">
       <a href="#top">回到顶部</a>
       <a href="https://gamepages.evog.top" target="_blank" rel="noreferrer">gamepages.evog.top</a>
@@ -1045,42 +669,48 @@
   <script>
     (function () {
       // 滚动浮现
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) {
-            en.target.classList.add('in');
-            io.unobserve(en.target);
-          }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
         });
       }, { threshold: 0.15 });
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
-      // 移动端导航
-      const toggle = document.getElementById('navToggle');
-      const links = document.getElementById('navLinks');
+      // 移动端汉堡菜单
+      var toggle = document.getElementById('navToggle');
+      var links = document.getElementById('navLinks');
       if (toggle && links) {
-        toggle.addEventListener('click', () => {
-          links.classList.toggle('open');
+        toggle.addEventListener('click', function () {
+          var open = links.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          toggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
         });
-        links.querySelectorAll('a').forEach((a) => {
-          a.addEventListener('click', () => links.classList.remove('open'));
+        links.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            links.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+          });
         });
       }
 
-      // 导航高亮当前区域
-      const sections = document.querySelectorAll('.gate, .hero, .about');
-      const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
-      const navObserver = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
+      // 顶栏 + 侧栏当前区块高亮
+      var sections = ['lighting', 'unreal', 'luminary', 'bug', 'slime'].map(function (id) { return document.getElementById(id); });
+      var navAnchors = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+      var railAnchors = Array.prototype.slice.call(document.querySelectorAll('.rail a[href^="#"]'));
+      var map = {};
+      navAnchors.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+      railAnchors.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+
+      var sio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
           if (en.isIntersecting) {
-            const id = en.target.id;
-            navAnchors.forEach((a) => {
-              a.style.color = a.getAttribute('href') === '#' + id ? 'var(--text)' : '';
-            });
+            var id = en.target.id;
+            navAnchors.forEach(function (a) { a.classList.toggle('cur', a.getAttribute('href') === '#' + id); });
+            railAnchors.forEach(function (a) { a.classList.toggle('cur', a.getAttribute('href') === '#' + id); });
           }
         });
       }, { threshold: 0.4 });
-      sections.forEach((s) => { if (s.id) navObserver.observe(s); });
+      sections.forEach(function (s) { if (s) sio.observe(s); });
     })();
   </script>
 </body>

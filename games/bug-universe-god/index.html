@@ -4,20 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bug Universe God | Gove</title>
-  <meta name="description" content="Bug Universe God：操控概念本身，用原型的雏形从基本元素合成一个世界。" />
+  <meta name="description" content="Bug Universe God：类涂鸦上帝的收集合成游戏。作为潜在未来的造物者，用「原型的雏形」从光与影开始，合成神学、哲学、物理与天文。" />
   <style>
     :root {
-      --bg: #140a0c;
-      --bg-soft: #1f1012;
-      --magenta: #ef4444;
-      --lime: #fb923c;
-      --purple: #a78bfa;
-      --amber: #fbbf24;
+      --bg: #0e0a0b;
+      --bg-soft: #1a1214;
+      --bg-card: #221618;
+      --red: #ff5a5a;
+      --orange: #fb923c;
       --ink: #f5e9ea;
-      --dim: #b08f93;
-      --faint: #6b4a4d;
-      --line: rgba(239, 68, 68, 0.18);
-      --hand: "Bradley Hand", "Comic Sans MS", "Marker Felt", "Segoe Print", cursive, "Microsoft YaHei", sans-serif;
+      --dim: #b89499;
+      --faint: #6e4a4f;
+      --line: rgba(255, 90, 90, 0.22);
+      --line-soft: rgba(255, 90, 90, 0.12);
+      --hand: "Bradley Hand", "Segoe Print", "Comic Sans MS", "Marker Felt", cursive, "Microsoft YaHei", sans-serif;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -27,28 +28,32 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 18% 16%, rgba(239, 68, 68, .12), transparent 28rem),
-        radial-gradient(circle at 82% 24%, rgba(251, 146, 60, .09), transparent 24rem),
-        radial-gradient(circle at 50% 100%, rgba(167, 139, 250, .09), transparent 28rem),
+        radial-gradient(circle at 15% 12%, rgba(255, 90, 90, .14), transparent 30rem),
+        radial-gradient(circle at 85% 20%, rgba(251, 146, 60, .10), transparent 26rem),
+        radial-gradient(circle at 50% 110%, rgba(255, 90, 90, .08), transparent 30rem),
         var(--bg);
       color: var(--ink);
       font-family: var(--hand);
-      line-height: 1.7;
+      line-height: 1.75;
       overflow-x: hidden;
     }
 
-    /* 涂鸦网格底纹 */
-    body::before {
-      content: "";
+    /* 漂浮空心三角底纹（呼应游戏标题屏） */
+    .tri-field {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.35;
-      background-image:
-        radial-gradient(circle, rgba(239, 68, 68, 0.07) 1px, transparent 1px);
-      background-size: 26px 26px;
-      mask-image: linear-gradient(to bottom, black, transparent 85%);
+      overflow: hidden;
+    }
+    .tri-field svg {
+      position: absolute;
+      opacity: .18;
+      animation: drift linear infinite;
+    }
+    @keyframes drift {
+      from { transform: translateY(10vh) rotate(0deg); }
+      to   { transform: translateY(-110vh) rotate(360deg); }
     }
 
     a { color: inherit; text-decoration: none; }
@@ -57,81 +62,97 @@
     .wrap {
       position: relative;
       z-index: 1;
-      width: min(1040px, calc(100% - 48px));
+      width: min(1060px, calc(100% - 44px));
       margin: 0 auto;
     }
 
-    .sans {
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-    }
-
-    /* ---------- 顶部 ---------- */
+    /* ---------- 顶部导航 ---------- */
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 0;
-      background: linear-gradient(180deg, rgba(20, 10, 12, 0.92), rgba(20, 10, 12, 0));
-      font-family: var(--hand);
+      gap: 12px;
+      padding: 16px 0;
+      background: linear-gradient(180deg, rgba(14, 10, 11, .94), rgba(14, 10, 11, 0));
+      backdrop-filter: blur(2px);
     }
     .topbar a {
       color: var(--dim);
       font-size: 15px;
-      transition: color 0.3s ease;
+      transition: color .25s ease;
     }
-    .topbar a:hover { color: var(--magenta); }
+    .topbar a:hover, .topbar a:focus-visible { color: var(--red); }
     .topbar .back::before { content: "← "; }
     .topbar .tag {
       color: var(--faint);
       font-size: 13px;
-      letter-spacing: 0.05em;
+      letter-spacing: .06em;
+      font-family: var(--sans);
     }
 
     /* ---------- Hero ---------- */
     .hero {
-      padding: 70px 0 50px;
-      text-align: center;
+      padding: 56px 0 40px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 44px;
+      align-items: center;
     }
-    .hero .kicker {
-      color: var(--lime);
-      font-size: 15px;
-      letter-spacing: 0.1em;
-      margin: 0 0 28px;
+    .cover-card {
+      width: 220px;
+      height: 220px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,.08);
+      box-shadow:
+        0 24px 60px rgba(255, 90, 90, .18),
+        0 8px 24px rgba(0,0,0,.5);
+      transform: rotate(-4deg);
+      transition: transform .4s ease;
+    }
+    .cover-card:hover { transform: rotate(-2deg) scale(1.03); }
+    .cover-card img { width: 100%; height: 100%; object-fit: cover; }
+
+    .hero-text .kicker {
+      color: var(--orange);
+      font-size: 14px;
+      letter-spacing: .14em;
+      margin: 0 0 18px;
       transform: rotate(-1deg);
       display: inline-block;
+      font-family: var(--sans);
     }
-    h1 {
+    .hero-text h1 {
       margin: 0;
-      font-size: clamp(40px, 9vw, 84px);
+      font-size: clamp(38px, 7vw, 72px);
       font-weight: 700;
-      line-height: 1;
-      transform: rotate(-2deg);
-      display: inline-block;
+      line-height: 1.02;
+      letter-spacing: -.01em;
     }
-    h1 .b1 { color: var(--magenta); }
-    h1 .b2 { color: var(--lime); }
-    h1 .b3 { color: var(--purple); }
-    .hero .sub {
-      margin: 30px auto 0;
-      max-width: 600px;
-      color: var(--dim);
-      font-size: clamp(15px, 2.2vw, 19px);
-      line-height: 1.8;
+    .hero-text h1 .red { color: var(--red); }
+    .hero-text h1 .line2 { display: block; }
+    .hero-text .slogan {
+      margin: 22px 0 0;
+      font-size: clamp(17px, 2.4vw, 22px);
+      color: var(--ink);
+      line-height: 1.6;
     }
-    .hero .sub em {
+    .hero-text .slogan em {
       font-style: normal;
-      color: var(--amber);
+      color: var(--orange);
+      border-bottom: 2px dashed var(--orange);
+      padding-bottom: 1px;
     }
 
     /* 信息条 */
     .meta-bar {
-      margin: 36px auto 0;
+      margin: 30px 0 0;
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
+      gap: 0;
       border: 2px dashed var(--line);
       border-radius: 999px;
       overflow: hidden;
@@ -139,79 +160,101 @@
       max-width: 100%;
     }
     .meta-bar .item {
-      padding: 10px 22px;
+      padding: 9px 20px;
       font-size: 14px;
       color: var(--dim);
       border-right: 1px dashed var(--line);
       white-space: nowrap;
+      font-family: var(--sans);
     }
     .meta-bar .item:last-child { border-right: none; }
-    .meta-bar .item b { color: var(--lime); font-weight: 700; }
+    .meta-bar .item b { color: var(--orange); font-weight: 700; }
 
-    /* ---------- 滚动浮现 ---------- */
-    .reveal {
-      opacity: 0;
-      transform: translateY(26px);
-      transition: opacity 0.9s ease, transform 0.9s ease;
-    }
-    .reveal.in { opacity: 1; transform: none; }
-
-    /* ---------- 章节标题 ---------- */
+    /* ---------- 章节通用 ---------- */
+    .section { padding: 56px 0; }
     .section-head {
-      text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
     .section-head .kicker {
-      font-size: 13px;
-      letter-spacing: 0.15em;
+      font-size: 12px;
+      letter-spacing: .2em;
       text-transform: uppercase;
       color: var(--faint);
-      margin: 0 0 10px;
+      margin: 0 0 8px;
+      font-family: var(--sans);
     }
     .section-head h2 {
       margin: 0;
-      font-size: clamp(26px, 5vw, 42px);
+      font-size: clamp(26px, 4.6vw, 40px);
       color: var(--ink);
       transform: rotate(-1deg);
       display: inline-block;
     }
-    .section-head p {
-      margin: 12px 0 0;
+    .section-head p.lead {
+      margin: 10px 0 0;
       color: var(--dim);
       font-size: 15px;
-      font-family: var(--hand);
+      max-width: 640px;
+    }
+
+    /* ---------- 世界观文案 ---------- */
+    .story-body {
+      max-width: 720px;
+      font-size: clamp(15px, 2.1vw, 17.5px);
+      line-height: 2;
+      color: var(--ink);
+    }
+    .story-body p { margin: 0 0 18px; }
+    .story-body .hl { color: var(--red); font-weight: 700; }
+    .story-body .hl2 { color: var(--orange); }
+    .story-body .tail {
+      color: var(--faint);
+      font-size: 14px;
+      font-style: italic;
     }
 
     /* ---------- 造物合成台 ---------- */
-    .lab {
-      padding: 60px 0;
-    }
     .lab-board {
-      padding: 36px 30px;
+      position: relative;
+      padding: 36px 28px 30px;
       border: 2px dashed var(--line);
-      border-radius: 24px;
-      background: rgba(239, 68, 68, 0.03);
-      transform: rotate(0.3deg);
+      border-radius: 22px;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 27px, rgba(255,255,255,.018) 27px 28px),
+        rgba(255, 90, 90, 0.04);
+      transform: rotate(.25deg);
+    }
+    .lab-board::before {
+      content: "✱";
+      position: absolute;
+      top: -14px;
+      left: 28px;
+      font-size: 26px;
+      color: var(--orange);
+      background: var(--bg);
+      padding: 0 8px;
     }
     .lab-hint {
       text-align: center;
       color: var(--faint);
       font-size: 15px;
-      margin: 0 0 24px;
+      margin: 0 0 26px;
     }
     .elements {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
+      gap: 16px;
       justify-content: center;
-      margin-bottom: 28px;
+      margin-bottom: 10px;
     }
     .el {
-      width: 88px;
-      height: 88px;
+      width: 92px;
+      height: 92px;
       border-radius: 50%;
       border: 2px solid var(--line);
-      background: var(--bg-soft);
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.12), transparent 60%),
+        var(--bg-card);
       color: var(--ink);
       font-size: 16px;
       font-weight: 700;
@@ -219,133 +262,138 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
+      transition: transform .25s ease, border-color .25s, box-shadow .25s, background .25s;
       font-family: var(--hand);
     }
-    .el:nth-child(3n) { transform: rotate(-3deg); }
-    .el:nth-child(3n+1) { transform: rotate(2deg); }
+    .el:nth-child(3n)   { transform: rotate(-4deg); }
+    .el:nth-child(3n+1) { transform: rotate(3deg); }
     .el:nth-child(3n+2) { transform: rotate(-1deg); }
-    .el:hover {
-      border-color: var(--magenta);
-      transform: scale(1.1) rotate(-4deg);
+    .el:hover, .el:focus-visible {
+      border-color: var(--red);
+      transform: scale(1.08) rotate(-5deg);
+      outline: none;
     }
     .el.sel {
-      border-color: var(--lime);
-      background: rgba(251, 146, 60, .15);
-      color: var(--lime);
-      box-shadow: 0 0 28px rgba(251, 146, 60, .35);
+      border-color: var(--orange);
+      background:
+        radial-gradient(circle at 35% 30%, rgba(251,146,60,.25), transparent 60%),
+        rgba(251, 146, 60, .12);
+      color: var(--orange);
+      box-shadow: 0 0 32px rgba(251, 146, 60, .4);
+    }
+
+    /* 合成箭头与结果 */
+    .brew {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding-top: 18px;
+    }
+    .arrow-down {
+      color: var(--red);
+      font-size: 26px;
+      line-height: 1;
+      transform: rotate(90deg);
+      opacity: .7;
     }
     .result {
-      min-height: 110px;
+      min-height: 120px;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
     }
     .result-card {
-      padding: 20px 32px;
+      padding: 22px 36px;
       border-radius: 18px;
-      border: 2px solid var(--lime);
+      border: 2px solid var(--orange);
       background: rgba(251, 146, 60, .08);
-      animation: pop 0.5s ease;
-      max-width: 420px;
+      animation: pop .45s ease;
+      max-width: 460px;
     }
     @keyframes pop {
-      from { transform: scale(0.7) rotate(-6deg); opacity: 0; }
-      to { transform: scale(1) rotate(-1deg); opacity: 1; }
+      from { transform: scale(.7) rotate(-6deg); opacity: 0; }
+      to   { transform: scale(1) rotate(-1deg); opacity: 1; }
     }
     .result-card .label {
       color: var(--faint);
-      font-size: 12px;
-      letter-spacing: 0.15em;
+      font-size: 11px;
+      letter-spacing: .2em;
       text-transform: uppercase;
+      font-family: var(--sans);
     }
     .result-card .name {
-      color: var(--lime);
-      font-size: 28px;
+      color: var(--orange);
+      font-size: 30px;
       font-weight: 700;
-      margin-top: 6px;
+      margin-top: 4px;
     }
     .result-card .desc {
       color: var(--ink);
       font-size: 14px;
-      margin-top: 12px;
-      line-height: 1.6;
-      font-family: ui-sans-serif, system-ui, sans-serif;
+      margin-top: 10px;
+      line-height: 1.7;
+      font-family: var(--sans);
     }
     .result-empty {
       color: var(--faint);
       font-size: 16px;
     }
 
-    /* ---------- 概念图谱 ---------- */
-    .concepts {
-      padding: 60px 0;
-    }
-    .concept-cloud {
+    /* ---------- 概念领域云 ---------- */
+    .domain-cloud {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      justify-content: center;
-      max-width: 760px;
-      margin: 0 auto;
+      max-width: 820px;
     }
-    .concept-chip {
+    .chip {
       padding: 10px 20px;
       border-radius: 999px;
-      border: 1.5px solid var(--line);
+      border: 1.5px solid var(--line-soft);
       background: var(--bg-soft);
       color: var(--dim);
       font-size: 16px;
-      transition: all 0.3s ease;
-      cursor: default;
+      transition: transform .25s ease, border-color .25s, color .25s;
     }
-    .concept-chip:nth-child(4n) { color: var(--magenta); border-color: rgba(239,68,68,.35); transform: rotate(-1deg); }
-    .concept-chip:nth-child(4n+1) { color: var(--lime); border-color: rgba(251,146,60,.3); transform: rotate(1deg); }
-    .concept-chip:nth-child(4n+2) { color: var(--purple); border-color: rgba(167,139,250,.3); transform: rotate(-0.5deg); }
-    .concept-chip:nth-child(4n+3) { color: var(--amber); border-color: rgba(251,191,36,.3); transform: rotate(0.5deg); }
-    .concept-chip:hover {
-      transform: translateY(-4px) rotate(-2deg) scale(1.05);
-    }
+    .chip:nth-child(4n)   { color: var(--red);    border-color: rgba(255,90,90,.35);    transform: rotate(-1.2deg); }
+    .chip:nth-child(4n+1) { color: var(--orange); border-color: rgba(251,146,60,.32);  transform: rotate(1deg); }
+    .chip:nth-child(4n+2) { color: var(--ink);    border-color: var(--line-soft);         transform: rotate(-.5deg); }
+    .chip:nth-child(4n+3) { color: var(--orange); border-color: rgba(251,146,60,.28);  transform: rotate(.6deg); }
+    .chip:hover { transform: translateY(-3px) rotate(-2deg) scale(1.05); }
 
     /* ---------- 开发者的话 ---------- */
-    .devnote {
-      padding: 70px 0;
-    }
     .devnote blockquote {
-      margin: 0 auto;
-      max-width: 720px;
-      padding: 36px 40px;
-      border: 2px dashed rgba(239, 68, 68, .25);
+      margin: 0;
+      padding: 34px 38px;
+      border: 2px dashed rgba(255, 90, 90, .28);
       border-radius: 20px;
-      background: rgba(239, 68, 68, .04);
-      transform: rotate(-0.5deg);
+      background: rgba(255, 90, 90, .04);
+      transform: rotate(-.4deg);
     }
     .devnote blockquote p {
-      margin: 0 0 18px;
-      font-size: clamp(15px, 2vw, 18px);
-      line-height: 2;
+      margin: 0 0 16px;
+      font-size: clamp(14.5px, 2vw, 17px);
+      line-height: 1.95;
       color: var(--ink);
     }
     .devnote blockquote p:last-child { margin-bottom: 0; }
-    .devnote blockquote .hl { color: var(--magenta); font-weight: 700; }
-    .devnote blockquote .hl2 { color: var(--lime); }
-    .devnote blockquote .sig {
-      margin-top: 28px;
-      padding-top: 20px;
+    .devnote .hl { color: var(--red); font-weight: 700; }
+    .devnote .hl2 { color: var(--orange); }
+    .devnote .sig {
+      margin-top: 24px;
+      padding-top: 18px;
       border-top: 1px dashed var(--line);
       color: var(--dim);
-      font-size: 15px;
+      font-size: 14px;
       text-align: right;
+      font-family: var(--sans);
     }
-    .devnote blockquote .sig b {
-      color: var(--magenta);
-    }
+    .devnote .sig b { color: var(--red); }
 
     /* ---------- 截图 ---------- */
-    .media {
-      padding: 60px 0;
-    }
     .media-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -355,33 +403,32 @@
       position: relative;
       overflow: hidden;
       border: 1.5px solid var(--line);
-      border-radius: 16px;
+      border-radius: 14px;
       cursor: pointer;
       background: var(--bg-soft);
       padding: 0;
-      transform: rotate(-0.5deg);
-      transition: transform 0.3s ease, border-color 0.3s;
+      transform: rotate(-.6deg);
+      transition: transform .3s ease, border-color .3s;
     }
-    .shot:nth-child(even) { transform: rotate(0.6deg); }
-    .shot:hover,
-    .shot:focus-visible {
+    .shot:nth-child(even) { transform: rotate(.7deg); }
+    .shot:nth-child(3n)   { transform: rotate(.3deg); }
+    .shot:hover, .shot:focus-visible {
       transform: rotate(0) scale(1.03);
-      border-color: var(--magenta);
+      border-color: var(--red);
       outline: none;
     }
     .shot img {
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      filter: saturate(1.1);
-      transition: filter 0.4s ease;
+      transition: transform .4s ease;
     }
+    .shot:hover img { transform: scale(1.04); }
 
-    /* ---------- 信息栏 ---------- */
+    /* ---------- 信息格 ---------- */
     .info-grid {
-      padding: 60px 0;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 1px;
       background: var(--line);
       border: 2px dashed var(--line);
@@ -390,37 +437,39 @@
     }
     .info-cell {
       background: var(--bg);
-      padding: 24px;
+      padding: 22px 16px;
       text-align: center;
     }
     .info-cell .label {
       font-size: 11px;
-      letter-spacing: 0.15em;
+      letter-spacing: .15em;
       text-transform: uppercase;
       color: var(--faint);
-      margin: 0 0 8px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
+      margin: 0 0 6px;
+      font-family: var(--sans);
     }
     .info-cell .value {
       font-size: 16px;
       color: var(--ink);
       font-weight: 700;
+      font-family: var(--sans);
     }
+    .info-cell .value.accent { color: var(--orange); }
 
-    /* ---------- 底部 ---------- */
+    /* ---------- 底部 CTA ---------- */
     .bottom {
-      padding: 70px 0 60px;
+      padding: 64px 0 56px;
       text-align: center;
     }
     .bottom h2 {
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       font-size: clamp(26px, 5vw, 40px);
       color: var(--ink);
       transform: rotate(-1deg);
       display: inline-block;
     }
     .bottom p {
-      margin: 0 0 32px;
+      margin: 0 0 28px;
       color: var(--dim);
       font-size: 16px;
     }
@@ -434,47 +483,95 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 14px 28px;
+      padding: 13px 28px;
       border: 2px solid var(--line);
       border-radius: 999px;
       color: var(--ink);
       font-size: 16px;
-      transition: all 0.3s ease;
+      transition: all .25s ease;
     }
-    .bottom .links a:hover {
-      border-color: var(--magenta);
-      color: var(--magenta);
-      background: rgba(239,68,68,.06);
+    .bottom .links a:hover, .bottom .links a:focus-visible {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(255,90,90,.06);
+      outline: none;
     }
     .bottom .links a.primary {
-      border-color: var(--lime);
-      color: var(--lime);
+      border-color: var(--orange);
+      color: var(--orange);
       background: rgba(251,146,60,.08);
       font-weight: 700;
     }
-    .bottom .links a.primary:hover {
-      box-shadow: 0 0 40px rgba(251,146,60,.2);
+    .bottom .links a.primary:hover, .bottom .links a.primary:focus-visible {
+      box-shadow: 0 0 40px rgba(251,146,60,.22);
     }
     .bottom .sign {
-      margin-top: 44px;
+      margin-top: 40px;
       color: var(--faint);
       font-size: 13px;
       transform: rotate(-1deg);
       display: inline-block;
+      font-family: var(--sans);
     }
 
+    /* ---------- Lightbox ---------- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, .93);
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: min(1040px, 96vw);
+      max-height: 88vh;
+      border-radius: 14px;
+      box-shadow: 0 30px 100px rgba(0,0,0,.7);
+    }
+
+    /* ---------- 滚动浮现 ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
     /* ---------- 响应式 ---------- */
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        text-align: center;
+      }
+      .cover-card { margin: 0 auto; }
+      .meta-bar { margin-left: auto; margin-right: auto; }
+      .section-head { text-align: center; }
+      .section-head p.lead { margin-left: auto; margin-right: auto; }
+    }
     @media (max-width: 720px) {
       .media-grid { grid-template-columns: 1fr 1fr; }
       .meta-bar .item { padding: 8px 14px; font-size: 13px; }
-      .el { width: 76px; height: 76px; font-size: 14px; }
+      .el { width: 78px; height: 78px; font-size: 14px; }
       .devnote blockquote { padding: 24px 20px; }
+      .lab-board { padding: 28px 18px 24px; }
     }
     @media (max-width: 480px) {
       .media-grid { grid-template-columns: 1fr; }
-      .meta-bar { border-radius: 16px; }
-      .meta-bar .item { border-right: none; border-bottom: 1px dashed var(--line); width: 100%; text-align: center; }
+      .meta-bar { border-radius: 16px; flex-direction: column; width: 100%; }
+      .meta-bar .item {
+        border-right: none;
+        border-bottom: 1px dashed var(--line);
+        width: 100%;
+        text-align: center;
+      }
       .meta-bar .item:last-child { border-bottom: none; }
+      .topbar .tag { display: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -484,107 +581,117 @@
         animation: none !important;
       }
       .reveal { opacity: 1; transform: none; }
-      h1, .section-head h2, .bottom h2, .bottom .sign, .lab-board, .devnote blockquote { transform: none; }
+      h1, .section-head h2, .bottom h2, .bottom .sign,
+      .lab-board, .devnote blockquote, .cover-card { transform: none !important; }
+      .tri-field svg { animation: none !important; }
     }
   </style>
 </head>
 <body>
+  <!-- 漂浮空心三角（纯装饰） -->
+  <div class="tri-field" aria-hidden="true">
+    <svg width="60" height="52" style="top:12%;left:6%;animation-duration:26s;"><polygon points="30,4 56,48 4,48" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
+    <svg width="34" height="30" style="top:30%;left:18%;animation-duration:34s;"><polygon points="17,3 32,27 2,27" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
+    <svg width="80" height="70" style="top:55%;left:3%;animation-duration:40s;"><polygon points="40,6 74,64 6,64" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
+    <svg width="46" height="40" style="top:20%;right:10%;animation-duration:30s;"><polygon points="23,4 42,36 4,36" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
+    <svg width="28" height="24" style="top:68%;right:16%;animation-duration:24s;"><polygon points="14,2 26,22 2,22" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
+    <svg width="56" height="48" style="top:82%;left:22%;animation-duration:36s;"><polygon points="28,5 52,44 4,44" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
+  </div>
+
   <div class="wrap">
-    <div class="topbar">
+    <!-- 顶部导航 -->
+    <nav class="topbar">
       <a class="back" href="../../index.html">返回作品集</a>
-      <span class="tag">概念合成 / 不完美美学</span>
-      <a href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">TapTap 页面</a>
-    </div>
+      <span class="tag">概念合成 · 不完美美学</span>
+      <a href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">TapTap 商店 ↗</a>
+    </nav>
 
     <!-- Hero -->
-    <section class="hero">
-      <p class="kicker reveal">TapTap 聚光灯 2025 · 21 天游戏创作挑战</p>
-      <h1 class="reveal"><span class="b1">Bug</span> <span class="b2">Universe</span> <span class="b3">God</span></h1>
-      <p class="sub reveal">你相信世界是被创造出来的吗？作为潜在未来的造物者，你的工作并非挥舞刀剑，而是<em>操控概念本身</em>。</p>
-      <div class="meta-bar reveal">
-        <div class="item"><b>TapTap</b> · 安卓 / iOS / PC</div>
-        <div class="item">上线 <b>2025.10.27</b></div>
-        <div class="item">评分 <b>9.0</b></div>
-        <div class="item">关注 <b>3492</b></div>
+    <header class="hero">
+      <div class="cover-card reveal">
+        <img src="cover.jpg" alt="Bug Universe God 应用图标：红色八边形染色玻璃窗，同心圆从中心向外扩散" />
       </div>
-    </section>
+      <div class="hero-text">
+        <p class="kicker reveal">TapTap 聚光灯 2025 · 21 天游戏创作挑战</p>
+        <h1 class="reveal">
+          <span class="red">B</span>ug
+          <span class="line2"><span class="red">U</span>niverse</span>
+          <span class="line2"><span class="red">G</span>od</span>
+        </h1>
+        <p class="slogan reveal">你相信，世界是被创造出来的吗？<br />作为<em>潜在未来的造物者</em>，你的工作并非挥舞刀剑，而是操控概念本身。</p>
+        <div class="meta-bar reveal">
+          <div class="item">类型 <b>类涂鸦上帝 · 收集合成</b></div>
+          <div class="item">上线 <b>2025.10.27</b></div>
+          <div class="item">评分 <b>9.0</b></div>
+          <div class="item">关注 <b>3510</b></div>
+        </div>
+      </div>
+    </header>
 
-    <!-- 官方介绍 -->
-    <section class="story" style="padding:50px 0;">
+    <!-- 世界观 -->
+    <section class="section">
       <div class="section-head reveal">
-        <p class="kicker">// About</p>
+        <p class="kicker">// World</p>
         <h2>欢迎来到 God Universe Bug</h2>
+        <p class="lead">公司致力于理解并塑造世界本征——造物主的伟业，如今由造物者继承。</p>
       </div>
-      <div style="max-width:680px;margin:0 auto;">
-        <p class="reveal" style="font-size:clamp(15px,2.2vw,18px);line-height:2;color:var(--ink);margin:0 0 20px;">公司致力于理解并塑造世界本征。在这里，我们相信世界源于虚无，而造物主的伟业，如今将由我们造物者来继承。</p>
-        <p class="reveal" style="font-size:clamp(15px,2.2vw,18px);line-height:2;color:var(--ink);margin:0 0 20px;">你将使用公司最核心的技术<span style="color:var(--amber);">"原型的雏形"</span>，从最基本的元素，逐渐开始定义万物，最终创造整个世界。</p>
-        <p class="reveal" style="font-size:clamp(15px,2.2vw,18px);line-height:2;color:var(--ink);margin:0;">神学，哲学，文学，物理学，天文学，航海学，经济学，政治学，甚至是神秘学，魔法还有科技。你的每一次组合，都将影响一个世界的演化。</p>
+      <div class="story-body reveal">
+        <p>欢迎来到 <span class="hl">God Universe Bug</span>，公司致力于理解并塑造世界本征。在这里，我们相信世界源于虚无，而造物主的伟业，如今将由我们造物者来继承。</p>
+        <p>你将使用公司最核心的技术<span class="hl2">「原型的雏形」</span>，从最基本的元素，逐渐开始定义万物，最终创造整个世界。</p>
+        <p>神学，哲学，文学，物理学，天文学，航海学，经济学，政治学，甚至是神秘学，魔法还有科技。你的每一次组合，都将影响一个世界的演化——进一步影响公司的运转，最终改变……</p>
+        <p class="tail">—— 游戏延续 Archipelago 的世界观，为玩家讲述 GoderBye 的往事。</p>
       </div>
     </section>
 
     <!-- 造物合成台 -->
-    <section class="lab">
+    <section class="section">
       <div class="section-head reveal">
-        <p class="kicker">// Alchemy</p>
+        <p class="kicker">// Alchemy Table</p>
         <h2>造物合成台</h2>
-        <p>选两个元素，看它们合成什么——万物始于光与影</p>
+        <p class="lead">点选两个概念元素，看它们在「原型的雏形」下合成什么——万物始于光与影。</p>
       </div>
       <div class="lab-board reveal">
-        <p class="lab-hint">点击选择两个元素 ↓</p>
+        <p class="lab-hint">点击选择两个元素 ↓（再点一次取消）</p>
         <div class="elements" id="elements">
           <button class="el" type="button" data-el="光">光</button>
           <button class="el" type="button" data-el="影">影</button>
-          <button class="el" type="button" data-el="无上圣光">无上圣光</button>
           <button class="el" type="button" data-el="界">界</button>
-          <button class="el" type="button" data-el="暗面">暗面</button>
           <button class="el" type="button" data-el="世界">世界</button>
-          <button class="el" type="button" data-el="神话传说">神话</button>
+          <button class="el" type="button" data-el="神话">神话</button>
           <button class="el" type="button" data-el="科学">科学</button>
         </div>
-        <div class="result" id="result">
-          <p class="result-empty">等待合成…</p>
+        <div class="brew">
+          <div class="arrow-down" aria-hidden="true">→</div>
+          <div class="result" id="result">
+            <p class="result-empty">等待合成…</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 概念图谱 -->
-    <section class="concepts">
+    <!-- 概念领域 -->
+    <section class="section">
       <div class="section-head reveal">
-        <p class="kicker">// Concept Map</p>
-        <h2>概念图谱</h2>
-        <p>从光与影开始，定义一个世界的全部维度</p>
+        <p class="kicker">// Domains</p>
+        <h2>从光与影开始，定义一个世界的全部维度</h2>
       </div>
-      <div class="concept-cloud reveal">
-        <span class="concept-chip">光</span>
-        <span class="concept-chip">影</span>
-        <span class="concept-chip">界</span>
-        <span class="concept-chip">世界</span>
-        <span class="concept-chip">神话传说</span>
-        <span class="concept-chip">第一推动力</span>
-        <span class="concept-chip">洞壁</span>
-        <span class="concept-chip">奇迹</span>
-        <span class="concept-chip">篝火</span>
-        <span class="concept-chip">科学</span>
-        <span class="concept-chip">语素</span>
-        <span class="concept-chip">韵律</span>
-        <span class="concept-chip">诗歌</span>
-        <span class="concept-chip">修辞</span>
-        <span class="concept-chip">艺术</span>
-        <span class="concept-chip">能量</span>
-        <span class="concept-chip">空间</span>
-        <span class="concept-chip">时间</span>
-        <span class="concept-chip">物质</span>
-        <span class="concept-chip">量子</span>
-        <span class="concept-chip">水</span>
-        <span class="concept-chip">海洋</span>
-        <span class="concept-chip">星星</span>
-        <span class="concept-chip">天文学</span>
-        <span class="concept-chip">极光</span>
+      <div class="domain-cloud reveal">
+        <span class="chip">神学</span>
+        <span class="chip">哲学</span>
+        <span class="chip">文学</span>
+        <span class="chip">物理学</span>
+        <span class="chip">天文学</span>
+        <span class="chip">航海学</span>
+        <span class="chip">经济学</span>
+        <span class="chip">政治学</span>
+        <span class="chip">神秘学</span>
+        <span class="chip">魔法</span>
+        <span class="chip">科技</span>
       </div>
     </section>
 
     <!-- 开发者的话 -->
-    <section class="devnote">
+    <section class="section devnote">
       <div class="section-head reveal">
         <p class="kicker">// Developer's Note</p>
         <h2>开发者的话</h2>
@@ -593,44 +700,52 @@
         <p>我很抱歉，虫虫宇宙神真的<span class="hl">不是一款好玩的游戏</span>。（开发者都这样说）</p>
         <p>其中最大的一个错误就是，<span class="hl">追求设计性而抛弃了游戏性</span>。另一个同样致命的错误就是，<span class="hl">追求内容量而失去内容质</span>。</p>
         <p>具体点，犯了什么错误？</p>
-        <p>1. 强硬结合原本的 Archipelago Pale 的故事和 Bug 的主题。<br>
-        2. 无引导，无提示，自己无从得知的负反馈和无的正反馈。<br>
+        <p>1. 强硬结合原本的 Archipelago Pale 的故事和 Bug 的主题。<br />
+        2. 无引导，无提示，自己无从得知的负反馈和无的正反馈。<br />
         3. 合成逻辑毫无规律，不可预测，只能穷举。</p>
-        <p>既然知道这么多错误，为什么还要犯？为什么不改？</p>
         <p>游戏在设计阶段未能预测到后续的计划崩坏。并且目前游戏表现远超原型以至于我觉得还行。我接下来只会修复小 bug，做好小引导，但改变不了这<span class="hl2">艺术大粪</span>的本质。</p>
-        <p>作为玩家，你能做什么？</p>
         <p>遗憾的是，作为玩家，你什么都做不了。没有人能受得了它恶心人，包括我。</p>
         <p class="sig">— <b>Gove</b>，策划 / 程序 / 剧情文案 / 制作人</p>
       </blockquote>
     </section>
 
-    <!-- 截图 -->
-    <section class="media">
+    <!-- 实机画面 -->
+    <section class="section media">
       <div class="section-head reveal">
         <p class="kicker">// Screenshots</p>
         <h2>实机画面</h2>
       </div>
       <div class="media-grid">
-        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="Bug Universe God 截图 1" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="Bug Universe God 截图 2" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="Bug Universe God 截图 3" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="Bug Universe God 截图 4" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="Bug Universe God 截图 5" loading="lazy"></button>
+        <button class="shot reveal" type="button" aria-label="放大截图：标题界面，漂浮的空心三角与「开始游戏」">
+          <img src="screenshot-01.jpg" alt="Bug Universe God 标题界面：深色背景上漂浮空心三角轮廓，左侧竖排 Bug Universe God 字样（B/U/G 为红色），右侧发光的开始游戏按钮" loading="lazy" />
+        </button>
+        <button class="shot reveal" type="button" aria-label="放大截图：设置面板与游戏简介">
+          <img src="screenshot-02.jpg" alt="Bug Universe God 设置界面：音效与音乐滑杆，以及关于 Gove 制作、ComfyUI 美术、Suno 音乐、Kenney 音效的说明" loading="lazy" />
+        </button>
+        <button class="shot reveal" type="button" aria-label="放大截图：图书馆中的光影造物">
+          <img src="screenshot-03.jpg" alt="Bug Universe God 收集库界面：中央圆形画框展示光影造物，左右红色箭头切换条目，四角分布返回、图书馆、开始按钮" loading="lazy" />
+        </button>
+        <button class="shot reveal" type="button" aria-label="放大截图：首次开始的欢迎独白">
+          <img src="screenshot-04.jpg" alt="Bug Universe God 故事记录界面：左侧记录其一至其五菜单，右侧显示首次开始时对潜在未来造物者的欢迎独白" loading="lazy" />
+        </button>
+        <button class="shot reveal" type="button" aria-label="放大截图：涂鸦合成台，光与影开始造物">
+          <img src="screenshot-05.jpg" alt="Bug Universe God 合成玩法界面：黑板风涂鸦铺满屏幕，中央发光球体通过箭头连向四周方框，底部可选光与影两个元素" loading="lazy" />
+        </button>
       </div>
     </section>
 
-    <!-- 信息栏 -->
+    <!-- 信息格 -->
     <section class="info-grid reveal">
       <div class="info-cell">
         <p class="label">平台</p>
-        <p class="value">TapTap · 安卓 / iOS / PC</p>
+        <p class="value">安卓 / iOS / PC</p>
       </div>
       <div class="info-cell">
         <p class="label">上线日期</p>
         <p class="value">2025.10.27</p>
       </div>
       <div class="info-cell">
-        <p class="label">当前版本</p>
+        <p class="label">最近版本</p>
         <p class="value">1.1.0</p>
       </div>
       <div class="info-cell">
@@ -638,99 +753,111 @@
         <p class="value">概念合成 / 休闲</p>
       </div>
       <div class="info-cell">
-        <p class="label">评分</p>
-        <p class="value">9.0</p>
+        <p class="label">TapTap 评分</p>
+        <p class="value accent">9.0</p>
       </div>
       <div class="info-cell">
-        <p class="label">开发</p>
-        <p class="value">Gove</p>
+        <p class="label">开发者</p>
+        <p class="value">Gove · 神之倒三角</p>
       </div>
     </section>
 
-    <!-- 底部 -->
+    <!-- 底部 CTA -->
     <section class="bottom">
       <h2 class="reveal">成为造物者</h2>
-      <p class="reveal">在 TapTap 免费下载，用原型的雏形定义你的世界。</p>
+      <p class="reveal">在 TapTap 免费下载，用「原型的雏形」定义你的世界。</p>
       <div class="links reveal">
         <a class="primary" href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">在 TapTap 下载 →</a>
         <a href="../../index.html">返回作品集 →</a>
       </div>
-      <p class="sign">Bug Universe God — Gove · 2025 · TapTap 聚光灯</p>
+      <p class="sign">Bug Universe God — Gove · 2025 · TapTap 聚光灯 GameJam</p>
     </section>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="截图放大预览">
+    <img id="lightbox-img" src="" alt="" />
   </div>
 
   <script>
     (function () {
       // 滚动浮现
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
           if (en.isIntersecting) {
             en.target.classList.add('in');
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.15 });
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
-      // 合成台
-      const recipes = {
-        '光|光': { name: '无上圣光', desc: '纠缠着一切从虚空中闪烁而出的光芒' },
-        '影|影': { name: '暗面', desc: '事与物皆有黑暗面，它们并非如我们通常所想' },
-        '光|影': { name: '界', desc: '轻清的东西缓缓上升，重浊的东西慢慢下降' },
-        '界|光': { name: '视界', desc: '光锥之内就是命运，视界之外便是虚无' },
-        '界|影': { name: '势界', desc: '一个动态的、正在被争夺和塑造的领域' },
-        '界|界': { name: '世界', desc: '古往今来曰世，上下四方曰界' },
-        '暗面|无上圣光': { name: '对立面', desc: '有无相生，难易相成，长短相形' },
-        '世界|神话传说': { name: '文明', desc: '神话是文明的童年，文明是神话的衰老' },
-        '世界|科学': { name: '理性', desc: '以可证伪的方式，逼近世界的本征' },
-        '光|神话传说': { name: '奇迹', desc: '超越自然法则的显现，信仰的具象化' },
-        '影|科学': { name: '未知', desc: '已知的边界之外，永远存在的阴影' }
+      // 造物合成台
+      var recipes = {
+        '光|影':     { name: '界',       desc: '轻清者上升，重浊者下降——光与影划出第一条边界。' },
+        '光|光':     { name: '无上圣光', desc: '两束光交缠，从虚空中闪烁而出的至亮之物。' },
+        '影|影':     { name: '暗面',     desc: '事物皆有黑暗面，它们并非如我们通常所想。' },
+        '界|界':     { name: '世界',     desc: '古往今来曰世，上下四方曰界。' },
+        '界|光':     { name: '视界',     desc: '光锥之内就是命运，视界之外便是虚无。' },
+        '界|影':     { name: '势界',     desc: '一个动态的、正在被争夺与塑造的领域。' },
+        '世界|神话': { name: '文明',     desc: '神话是文明的童年，文明是神话的衰老。' },
+        '世界|科学': { name: '理性',     desc: '以可证伪的方式，逼近世界的本征。' },
+        '光|神话':   { name: '奇迹',     desc: '超越自然法则的显现，信仰的具象化。' },
+        '影|科学':   { name: '未知',     desc: '已知的边界之外，永远存在的阴影。' }
       };
-      const els = document.querySelectorAll('.el');
-      const result = document.getElementById('result');
-      let selected = [];
-      els.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const name = btn.dataset.el;
-          if (btn.classList.contains('sel')) {
+      var els = document.querySelectorAll('.el');
+      var result = document.getElementById('result');
+      var selected = [];
+
+      function renderEmpty(msg) {
+        result.innerHTML = '<p class="result-empty">' + msg + '</p>';
+      }
+
+      els.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var name = btn.dataset.el;
+          var idx = selected.indexOf(name);
+          if (idx >= 0) {
             btn.classList.remove('sel');
-            selected = selected.filter((s) => s !== name);
+            selected.splice(idx, 1);
           } else {
             if (selected.length >= 2) {
-              els.forEach((e) => e.classList.remove('sel'));
+              els.forEach(function (e) { e.classList.remove('sel'); });
               selected = [];
             }
             btn.classList.add('sel');
             selected.push(name);
           }
           if (selected.length === 2) {
-            const key = selected.slice().sort().join('|');
-            const out = recipes[key];
+            var key = selected.slice().sort().join('|');
+            var out = recipes[key];
             result.innerHTML = out
-              ? `<div class="result-card"><div class="label">合成结果</div><div class="name">${out.name}</div><div class="desc">${out.desc}</div></div>`
-              : `<p class="result-empty">故障：这对组合超出了表达范围</p>`;
+              ? '<div class="result-card"><div class="label">合成结果</div><div class="name">' + out.name + '</div><div class="desc">' + out.desc + '</div></div>'
+              : '<p class="result-empty">故障：这对组合超出了「原型的雏形」的表达范围</p>';
           } else {
-            result.innerHTML = `<p class="result-empty">${selected.length === 0 ? '等待合成…' : '再选一个…'}</p>`;
+            renderEmpty(selected.length === 0 ? '等待合成…' : '再选一个元素…');
           }
         });
       });
 
-      // 截图放大
-      const shots = document.querySelectorAll('.shot');
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.92);cursor:zoom-out;';
-      const big = document.createElement('img');
-      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:16px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
-      overlay.appendChild(big);
-      document.body.appendChild(overlay);
-      shots.forEach((s) => {
-        s.addEventListener('click', () => {
-          big.src = s.querySelector('img').src;
-          overlay.style.display = 'flex';
+      // Lightbox
+      var lightbox = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+      var shots = document.querySelectorAll('.shot');
+
+      shots.forEach(function (s) {
+        s.addEventListener('click', function () {
+          var img = s.querySelector('img');
+          lbImg.src = img.src;
+          lbImg.alt = img.alt;
+          lightbox.classList.add('open');
         });
       });
-      overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.style.display = 'none'; });
+      function closeLb() { lightbox.classList.remove('open'); }
+      lightbox.addEventListener('click', closeLb);
+      window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeLb();
+      });
     })();
   </script>
 </body>

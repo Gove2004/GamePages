@@ -1,961 +1,690 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>第九张史莱姆牌 | Gove</title>
-  <meta name="description" content="第九张史莱姆牌：轻量 Roguelike 卡牌对战，8 大系列、归零重来的爬层冒险。" />
-  <style>
-    :root {
-      --felt: #0a1a24;
-      --felt-deep: #06121a;
-      --felt-light: #133645;
-      --slime: #22d3ee;
-      --slime-deep: #0891b2;
-      --slime-dim: rgba(34, 211, 238, .25);
-      --gold: #fbbf24;
-      --gold-dim: rgba(251, 191, 36, .3);
-      --cream: #fef3c7;
-      --ink: #e6fbfd;
-      --dim: #8fb3c0;
-      --faint: #4a6b78;
-      --line: rgba(34, 211, 238, 0.16);
-      --serif: Georgia, "Times New Roman", "Songti SC", serif;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>第九张史莱姆牌 | Gove</title>
+<meta name="description" content="第九张史莱姆牌：轻量 Roguelike 卡牌对战。每局从 Lv.1 开始，胜利扩牌库，战败归零重来。8 大系列卡牌构筑你的最强牌组。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='50' cy='58' rx='38' ry='34' fill='%232ee6ff'/%3E%3Ccircle cx='38' cy='54' r='5' fill='%230b1a1c'/%3E%3Ccircle cx='62' cy='54' r='5' fill='%230b1a1c'/%3E%3C/svg%3E" />
+<style>
+:root{
+  --felt:#172a2c;
+  --felt-deep:#0e1c1e;
+  --felt-light:#22393c;
+  --felt-line:#2f4a4d;
+  --cyan:#2ee6ff;
+  --cyan-deep:#0fb8d4;
+  --cyan-dim:rgba(46,230,255,.22);
+  --mint:#b9f2e6;
+  --mint-deep:#7fd8c6;
+  --blood:#ff5566;
+  --mana:#8b7bff;
+  --gold:#f6c453;
+  --gold-dim:rgba(246,196,83,.28);
+  --ink:#e8fbf7;
+  --dim:#9cc0bd;
+  --faint:#5f8381;
+  --line:rgba(46,230,255,.14);
+  --card-stroke:#0b1a1c;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--ink);
+  font-family:var(--sans);line-height:1.7;overflow-x:hidden;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(46,230,255,.10), transparent 46vh),
+    radial-gradient(ellipse at 50% 108%, rgba(246,196,83,.05), transparent 40vh),
+    var(--felt-deep);
+}
+/* 绒布桌面颗粒 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(circle, rgba(185,242,230,.045) 1px, transparent 1.4px);
+  background-size:16px 16px;
+}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.wrap{position:relative;z-index:1;width:min(1080px,calc(100% - 40px));margin:0 auto}
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+/* ===== 顶栏 ===== */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+  padding:16px 0;background:linear-gradient(180deg,rgba(14,28,30,.96),rgba(14,28,30,0));
+}
+.topbar a{font-size:14px;color:var(--dim);transition:color .25s}
+.topbar a:hover{color:var(--cyan)}
+.topbar .back::before{content:"‹ ";font-weight:700}
+.topbar .store{display:inline-flex;align-items:center;gap:6px}
+.topbar .store::after{content:"↗";font-size:12px}
+.topbar .brand{font-size:12px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% 0%, rgba(34, 211, 238, .10), transparent 40vh),
-        radial-gradient(ellipse at 50% 100%, rgba(251, 191, 36, .06), transparent 40vh),
-        var(--felt-deep);
-      color: var(--ink);
-      font-family: var(--serif);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
+/* ===== Hero ===== */
+.hero{position:relative;padding:48px 0 30px;text-align:center;overflow:hidden}
+.hero .moon{
+  position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  width:230px;height:230px;border-radius:50%;
+  background:radial-gradient(circle at 38% 35%, #dffaf3, #a9d8d0 70%, #7fb3ad);
+  opacity:.18;filter:blur(.5px);pointer-events:none;
+}
+.hero .castle{
+  position:absolute;bottom:-6px;left:0;right:0;width:100%;height:90px;
+  opacity:.14;pointer-events:none;
+}
+.kicker{
+  position:relative;margin:0 0 22px;font-size:12px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--cyan);
+}
+/* 封面卡牌 */
+.cover-card{
+  position:relative;width:clamp(210px,30vw,280px);margin:0 auto 26px;
+  transform:rotate(-3deg);transition:transform .5s cubic-bezier(.2,.8,.3,1);
+}
+.cover-card:hover{transform:rotate(0deg) translateY(-6px)}
+.cover-card .frame{
+  border:4px solid var(--card-stroke);border-radius:16px;overflow:hidden;
+  background:var(--felt);box-shadow:0 18px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(46,230,255,.15);
+}
+.cover-card .frame img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.cover-card .cost{
+  position:absolute;top:-14px;left:-14px;width:40px;height:40px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #b9aaff, var(--mana) 70%);
+  border:3px solid var(--card-stroke);color:#fff;font-weight:800;font-size:16px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.4);
+}
+.cover-card .tagchip{
+  position:absolute;bottom:-14px;right:-10px;
+  background:var(--mint);color:var(--card-stroke);border:3px solid var(--card-stroke);
+  border-radius:999px;padding:4px 14px;font-size:12px;font-weight:800;letter-spacing:.05em;
+}
+h1{position:relative;margin:0;font-size:clamp(34px,7vw,62px);font-weight:900;line-height:1.15;letter-spacing:.02em}
+h1 .cyan{color:var(--cyan);text-shadow:0 0 24px var(--cyan-dim)}
+.hero .sub{
+  position:relative;margin:20px auto 0;max-width:640px;color:var(--dim);
+  font-size:clamp(15px,2.2vw,17px);
+}
+.hero .sub b{color:var(--mint);font-weight:700}
+/* meta chips */
+.meta{position:relative;margin:26px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(46,230,255,.05);font-size:13px;color:var(--dim);
+}
+.chip .star{color:var(--gold);font-weight:800}
+.chip b{color:var(--ink);font-weight:700}
+.chip .num{color:var(--cyan);font-weight:800}
 
-    /* 绒布纹理 */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.4;
-      background:
-        radial-gradient(circle, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
-      background-size: 18px 18px;
-    }
+/* 手牌（Hero 底部扇形） */
+.hand{position:relative;margin:34px auto 0;width:min(420px,90%);height:120px}
+.hand .hcard{
+  position:absolute;bottom:0;left:50%;width:86px;height:118px;border-radius:10px;
+  border:3px solid var(--card-stroke);
+  background:linear-gradient(160deg,#d7f7ef,var(--mint-deep));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 18px rgba(0,0,0,.45);
+  transition:transform .35s cubic-bezier(.2,.8,.3,1);
+}
+.hand .hcard svg{width:44px;height:44px}
+.hand .hcard:nth-child(1){transform:translateX(-118px) rotate(-14deg)}
+.hand .hcard:nth-child(2){transform:translateX(-43px) rotate(-5deg)}
+.hand .hcard:nth-child(3){transform:translateX(32px) rotate(5deg)}
+.hand .hcard:nth-child(4){transform:translateX(107px) rotate(14deg)}
+.hand .hcard:hover{transform:translateX(var(--x,0)) translateY(-22px) rotate(0deg);z-index:5}
+.hand .hcard:nth-child(1):hover{--x:-118px}
+.hand .hcard:nth-child(2):hover{--x:-43px}
+.hand .hcard:nth-child(3):hover{--x:32px}
+.hand .hcard:nth-child(4):hover{--x:107px}
 
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
+/* ===== 章节标题 ===== */
+.section{padding:64px 0}
+.section-head{text-align:center;margin-bottom:40px}
+.section-head .kicker{margin-bottom:10px;font-size:11px}
+.section-head h2{margin:0;font-size:clamp(24px,4.5vw,36px);font-weight:900;letter-spacing:.02em}
+.section-head p{margin:12px auto 0;color:var(--dim);font-size:14px;max-width:560px}
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      width: min(1040px, calc(100% - 48px));
-      margin: 0 auto;
-    }
+/* 滚动浮现 */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
 
-    .sans {
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-    }
+/* ===== 玩法循环 ===== */
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.loop .step{padding:26px 18px;text-align:center;background:rgba(46,230,255,.03);position:relative}
+.loop .step + .step{border-left:1px solid var(--line)}
+.loop .step .n{
+  width:38px;height:38px;margin:0 auto 14px;border-radius:50%;
+  background:var(--felt-deep);border:2px solid var(--cyan-dim);color:var(--cyan);
+  font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+.loop .step h3{margin:0 0 6px;font-size:16px;font-weight:800}
+.loop .step p{margin:0;font-size:12.5px;color:var(--dim);line-height:1.65}
+.loop .step.boom{background:rgba(255,85,102,.07)}
+.loop .step.boom .n{border-color:rgba(255,85,102,.4);color:var(--blood)}
+.loop-note{text-align:center;margin-top:26px;color:var(--gold);font-size:15px;font-style:italic}
 
-    /* ---------- 顶部 ---------- */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 0;
-      background: linear-gradient(180deg, rgba(6, 18, 26, 0.94), rgba(6, 18, 26, 0));
-      font-family: var(--serif);
-    }
-    .topbar a {
-      color: var(--dim);
-      font-size: 14px;
-      transition: color 0.3s ease;
-    }
-    .topbar a:hover { color: var(--slime); }
-    .topbar .back::before { content: "← "; }
-    .topbar .tag {
-      color: var(--faint);
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
+/* ===== 8 大系列 ===== */
+.series-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.scard{perspective:1100px;height:230px;cursor:pointer;outline:none}
+.scard:focus-visible .scard-inner{box-shadow:0 0 0 3px var(--cyan)}
+.scard-inner{
+  position:relative;width:100%;height:100%;
+  transition:transform .7s cubic-bezier(.2,.7,.3,1);transform-style:preserve-3d;
+}
+.scard.flipped .scard-inner{transform:rotateY(180deg)}
+.sface{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:12px;overflow:hidden;
+  transition:opacity .38s ease,visibility .38s ease;
+}
+.scard.flipped .sfront{opacity:0;visibility:hidden}
+.sfront{
+  border:3px solid var(--card-stroke);
+  background:linear-gradient(160deg,#dcf8f0,var(--mint-deep) 90%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:18px;box-shadow:0 10px 24px rgba(0,0,0,.35);
+}
+.sfront .ico{width:56px;height:56px}
+.sfront .name{font-size:18px;font-weight:900;color:var(--card-stroke)}
+.sfront .en{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#3a6a63}
+.sfront .cost{
+  position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#b9aaff,var(--mana) 75%);
+  border:2px solid var(--card-stroke);color:#fff;font-size:12px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+}
+.sback{
+  transform:rotateY(180deg);
+  background:linear-gradient(160deg,var(--felt-light),var(--felt-deep));
+  border:1px solid var(--line);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:20px;text-align:center;
+  opacity:0;visibility:hidden;
+}
+.scard.flipped .sback{opacity:1;visibility:visible}
+.sback .d{font-size:12.5px;color:var(--dim);line-height:1.65}
+.sback .tags{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.sback .tags span{
+  font-size:11px;padding:3px 10px;border-radius:999px;
+  border:1px solid var(--cyan-dim);color:var(--cyan);
+}
+.series-hint{text-align:center;margin-top:22px;color:var(--faint);font-size:13px}
 
-    /* ---------- Hero ---------- */
-    .hero {
-      padding: 70px 0 50px;
-      text-align: center;
-    }
-    .hero .kicker {
-      color: var(--gold);
-      font-size: 13px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin: 0 0 32px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .card-fan-hero {
-      position: relative;
-      width: clamp(260px, 36vw, 380px);
-      height: clamp(280px, 38vw, 380px);
-      margin: 0 auto 36px;
-    }
-    .fan-card {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 130px;
-      height: 190px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: linear-gradient(160deg, var(--felt-light), var(--felt-deep));
-      box-shadow: 0 8px 30px rgba(0,0,0,.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.4s cubic-bezier(.2,.7,.3,1), box-shadow 0.4s;
-      cursor: pointer;
-    }
-    .fan-card:hover {
-      transform: translateY(-16px) scale(1.06) !important;
-      box-shadow: 0 20px 50px rgba(34,211,238,.3);
-      z-index: 10 !important;
-    }
-    .fan-card .card-icon {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-    .fan-card .card-name {
-      font-size: 13px;
-      color: var(--ink);
-      text-align: center;
-    }
-    .fan-card .card-cost {
-      position: absolute;
-      top: 8px; left: 8px;
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: rgba(34,211,238,.15);
-      border: 1px solid var(--slime-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--slime);
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .card-fan-hero .fan-card:nth-child(1) { transform: translateX(-50%) rotate(-20deg); z-index: 1; }
-    .card-fan-hero .fan-card:nth-child(2) { transform: translateX(-50%) rotate(-10deg) translateX(-55px); z-index: 2; }
-    .card-fan-hero .fan-card:nth-child(3) { transform: translateX(-50%); z-index: 3; }
-    .card-fan-hero .fan-card:nth-child(4) { transform: translateX(-50%) rotate(10deg) translateX(55px); z-index: 2; }
-    .card-fan-hero .fan-card:nth-child(5) { transform: translateX(-50%) rotate(20deg); z-index: 1; }
+/* ===== 爬层 ===== */
+.climb{
+  max-width:560px;margin:0 auto;border:1px solid var(--line);border-radius:16px;
+  background:rgba(14,28,30,.6);overflow:hidden;
+}
+.climb .row{
+  display:flex;align-items:center;gap:14px;padding:14px 20px;
+  border-bottom:1px solid var(--line);transition:background .35s;
+}
+.climb .row:last-child{border-bottom:none}
+.climb .row .lv{width:46px;font-weight:800;font-size:13px;color:var(--faint);flex-shrink:0}
+.climb .row .dot{
+  width:14px;height:14px;border-radius:50%;border:2px solid var(--faint);
+  background:transparent;flex-shrink:0;transition:all .5s;
+}
+.climb .row .lab{flex:1;font-size:14px;color:var(--dim)}
+.climb .row .kind{font-size:11px;color:var(--faint);letter-spacing:.1em}
+.climb .row.lit .dot{border-color:var(--cyan);background:var(--cyan);box-shadow:0 0 12px var(--cyan-dim)}
+.climb .row.lit .lv{color:var(--cyan)}
+.climb .row.lit .lab{color:var(--ink)}
+.climb .row.boss .dot{
+  width:18px;height:18px;border-color:var(--gold);background:var(--gold);
+  box-shadow:0 0 16px var(--gold-dim);
+}
+.climb .row.boss{background:rgba(246,196,83,.05)}
+.climb .row.boss .lv{color:var(--gold)}
+.climb .row.boss .lab{color:var(--gold);font-weight:800}
+.climb-q{text-align:center;margin-top:28px;font-size:clamp(18px,3vw,24px);color:var(--gold);font-style:italic}
 
-    h1 {
-      margin: 0;
-      font-size: clamp(32px, 6vw, 58px);
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1.2;
-    }
-    h1 .slime { color: var(--slime); }
-    .hero .sub {
-      margin: 22px auto 0;
-      max-width: 600px;
-      color: var(--dim);
-      font-size: clamp(15px, 2.2vw, 18px);
-      line-height: 1.8;
-    }
-    .hero .sub em {
-      font-style: normal;
-      color: var(--gold);
-    }
+/* ===== 开发者的话 ===== */
+.dev{max-width:640px;margin:0 auto;text-align:center}
+.dev blockquote{
+  margin:0;padding:36px 30px;border-left:3px solid var(--gold-dim);
+  background:rgba(246,196,83,.05);border-radius:0 14px 14px 0;
+}
+.dev blockquote p{margin:0;font-size:clamp(20px,3.4vw,28px);font-style:italic;color:var(--ink);line-height:1.5}
+.dev .sig{margin-top:18px;font-size:13px;color:var(--dim)}
+.dev .sig b{color:var(--gold)}
 
-    /* 信息条 */
-    .meta-bar {
-      margin: 36px auto 0;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      overflow: hidden;
-      width: fit-content;
-      max-width: 100%;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .meta-bar .item {
-      padding: 10px 22px;
-      font-size: 13px;
-      color: var(--dim);
-      border-right: 1px solid var(--line);
-      white-space: nowrap;
-    }
-    .meta-bar .item:last-child { border-right: none; }
-    .meta-bar .item b { color: var(--slime); font-weight: 600; }
+/* ===== 截图 ===== */
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shot{
+  position:relative;overflow:hidden;padding:0;cursor:pointer;
+  border:2px solid var(--card-stroke);border-radius:10px;background:var(--felt);
+  transition:transform .3s,box-shadow .3s;
+}
+.shot:hover,.shot:focus-visible{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.5);outline:none}
+.shot img{width:100%;aspect-ratio:16/9;object-fit:cover;transition:transform .5s}
+.shot:hover img,.shot:focus-visible img{transform:scale(1.05)}
 
-    /* ---------- 滚动浮现 ---------- */
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.9s ease, transform 0.9s ease;
-    }
-    .reveal.in { opacity: 1; transform: none; }
+/* ===== 信息条 ===== */
+.info{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+}
+.info .cell{background:var(--felt-deep);padding:20px;text-align:center}
+.info .cell .l{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.info .cell .v{font-size:14px;font-weight:700;color:var(--ink)}
+.info .cell .v.cy{color:var(--cyan)}
+.info .cell .v.gd{color:var(--gold)}
 
-    /* ---------- 章节标题 ---------- */
-    .section-head {
-      text-align: center;
-      margin-bottom: 44px;
-    }
-    .section-head .kicker {
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 10px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .section-head h2 {
-      margin: 0;
-      font-size: clamp(24px, 4vw, 38px);
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .section-head p {
-      margin: 12px 0 0;
-      color: var(--dim);
-      font-size: 15px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
+/* ===== 底部 CTA ===== */
+.bottom{padding:64px 0 60px;text-align:center}
+.bottom h2{margin:0 0 12px;font-size:clamp(24px,4.5vw,36px);font-weight:900}
+.bottom p{margin:0 0 28px;color:var(--dim);font-size:15px}
+.bottom .links{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.bottom .links a{
+  display:inline-flex;align-items:center;gap:8px;padding:14px 30px;
+  border:1px solid var(--line);border-radius:999px;color:var(--ink);font-size:15px;font-weight:600;
+  transition:all .3s;
+}
+.bottom .links a:hover{border-color:var(--cyan);color:var(--cyan)}
+.bottom .links a.primary{
+  border-color:var(--card-stroke);background:var(--mint);color:var(--card-stroke);font-weight:800;
+  box-shadow:0 6px 0 var(--card-stroke);
+}
+.bottom .links a.primary:hover{background:var(--cyan);transform:translateY(2px);box-shadow:0 4px 0 var(--card-stroke)}
+.bottom .sign{margin-top:40px;color:var(--faint);font-size:11px;letter-spacing:.25em;text-transform:uppercase}
 
-    /* ---------- 8大系列卡牌 ---------- */
-    .series {
-      padding: 70px 0;
-    }
-    .series-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-    }
-    .series-card {
-      perspective: 1000px;
-      cursor: pointer;
-      height: 220px;
-    }
-    .series-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.7s cubic-bezier(.2,.7,.3,1);
-      transform-style: preserve-3d;
-    }
-    .series-card.flipped .series-inner {
-      transform: rotateY(180deg);
-    }
-    .series-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .series-front {
-      background: linear-gradient(160deg, var(--felt-light), var(--felt-deep));
-    }
-    .series-back {
-      background: linear-gradient(160deg, var(--felt-deep), var(--felt-light));
-      transform: rotateY(180deg);
-      text-align: center;
-    }
-    .series-face .icon {
-      font-size: 36px;
-      margin-bottom: 14px;
-    }
-    .series-face .name {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
-    .series-face .en {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--faint);
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .series-back .desc {
-      font-size: 13px;
-      color: var(--dim);
-      line-height: 1.7;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .series-back .mechanics {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-    }
-    .series-back .mech {
-      padding: 3px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      font-size: 11px;
-      color: var(--slime);
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .series-hint {
-      text-align: center;
-      margin-top: 24px;
-      color: var(--faint);
-      font-size: 13px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
+/* ===== Lightbox ===== */
+.lb{
+  position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  padding:24px;background:rgba(5,12,13,.94);cursor:zoom-out;
+}
+.lb.open{display:flex}
+.lb img{max-width:min(1040px,96vw);max-height:88vh;border-radius:10px;border:2px solid var(--line);box-shadow:0 30px 100px rgba(0,0,0,.7)}
+.lb .close{
+  position:absolute;top:20px;right:24px;color:var(--dim);font-size:30px;cursor:pointer;
+  background:none;border:none;line-height:1;
+}
+.lb .close:hover{color:var(--cyan)}
 
-    /* ---------- 玩法循环 ---------- */
-    .gameplay {
-      padding: 70px 0;
-    }
-    .loop {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    .loop-step {
-      flex: 1;
-      min-width: 140px;
-      padding: 28px 20px;
-      text-align: center;
-      border: 1px solid var(--line);
-      background: rgba(34,211,238,.03);
-    }
-    .loop-step:first-child { border-radius: 12px 0 0 12px; }
-    .loop-step:last-child { border-radius: 0 12px 12px 0; }
-    .loop-step .num {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: 1px solid var(--slime-dim);
-      background: rgba(34,211,238,.1);
-      color: var(--slime);
-      font-size: 16px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 14px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .loop-step h3 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .loop-step p {
-      margin: 0;
-      font-size: 12px;
-      color: var(--dim);
-      line-height: 1.6;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .loop-arrow {
-      color: var(--slime);
-      font-size: 20px;
-      padding: 0 4px;
-    }
-    .gameplay-note {
-      text-align: center;
-      margin-top: 32px;
-      color: var(--gold);
-      font-size: 16px;
-      font-style: italic;
-    }
-
-    /* ---------- 爬层进度 ---------- */
-    .climb {
-      padding: 70px 0;
-    }
-    .climb-track {
-      max-width: 500px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .climb-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--line);
-      transition: background 0.3s;
-    }
-    .climb-row:hover { background: rgba(34,211,238,.04); }
-    .climb-row .floor {
-      width: 44px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--faint);
-    }
-    .climb-row .node {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      border: 2px solid var(--faint);
-      background: transparent;
-      flex-shrink: 0;
-      transition: all 0.4s;
-    }
-    .climb-row.lit .node {
-      border-color: var(--slime);
-      background: var(--slime);
-      box-shadow: 0 0 12px var(--slime-dim);
-    }
-    .climb-row.boss .node {
-      border-color: var(--gold);
-      background: var(--gold);
-      box-shadow: 0 0 16px var(--gold-dim);
-      width: 18px; height: 18px;
-    }
-    .climb-row .label {
-      font-size: 14px;
-      color: var(--dim);
-      flex: 1;
-    }
-    .climb-row.lit .label { color: var(--ink); }
-    .climb-row.boss .label { color: var(--gold); font-weight: 700; }
-    .climb-row .enemy {
-      font-size: 18px;
-      opacity: .6;
-    }
-    .climb-question {
-      text-align: center;
-      margin-top: 36px;
-      font-size: clamp(18px, 3vw, 24px);
-      color: var(--gold);
-      font-style: italic;
-    }
-
-    /* ---------- 开发者的话 ---------- */
-    .devnote {
-      padding: 60px 0;
-    }
-    .devnote blockquote {
-      margin: 0 auto;
-      max-width: 600px;
-      padding: 36px 40px;
-      border-left: 3px solid var(--gold-dim);
-      background: rgba(251,191,36,.04);
-      border-radius: 0 12px 12px 0;
-      text-align: center;
-    }
-    .devnote blockquote p {
-      margin: 0;
-      font-size: clamp(20px, 3vw, 28px);
-      line-height: 1.6;
-      color: var(--ink);
-      font-style: italic;
-    }
-    .devnote blockquote .sig {
-      margin-top: 20px;
-      font-size: 13px;
-      color: var(--dim);
-      font-style: normal;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .devnote blockquote .sig b { color: var(--gold); }
-
-    /* ---------- 截图 ---------- */
-    .media {
-      padding: 60px 0;
-    }
-    .media-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    .shot {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      cursor: pointer;
-      background: var(--felt);
-      padding: 0;
-      transition: border-color 0.3s, transform 0.3s;
-    }
-    .shot:hover,
-    .shot:focus-visible {
-      border-color: var(--slime-dim);
-      transform: translateY(-3px);
-      outline: none;
-    }
-    .shot img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      transition: transform 0.5s;
-    }
-    .shot:hover img,
-    .shot:focus-visible img {
-      transform: scale(1.05);
-    }
-
-    /* ---------- 信息栏 ---------- */
-    .info-grid {
-      padding: 60px 0;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .info-cell {
-      background: var(--felt-deep);
-      padding: 22px;
-      text-align: center;
-    }
-    .info-cell .label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 8px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .info-cell .value {
-      font-size: 14px;
-      color: var(--ink);
-      font-weight: 600;
-    }
-    .info-cell .value.gold { color: var(--gold); }
-    .info-cell .value.slime { color: var(--slime); }
-
-    /* ---------- 底部 ---------- */
-    .bottom {
-      padding: 70px 0 60px;
-      text-align: center;
-    }
-    .bottom h2 {
-      margin: 0 0 14px;
-      font-size: clamp(24px, 4vw, 36px);
-      color: var(--ink);
-    }
-    .bottom p {
-      margin: 0 0 30px;
-      color: var(--dim);
-      font-size: 15px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-    .bottom .links {
-      display: inline-flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .bottom .links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 30px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--ink);
-      font-size: 15px;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      transition: all 0.3s;
-    }
-    .bottom .links a:hover {
-      border-color: var(--slime);
-      color: var(--slime);
-      background: rgba(34,211,238,.06);
-    }
-    .bottom .links a.primary {
-      border-color: var(--slime);
-      color: var(--felt-deep);
-      background: var(--slime);
-      font-weight: 700;
-    }
-    .bottom .links a.primary:hover {
-      background: #67e8f9;
-      box-shadow: 0 0 40px rgba(34,211,238,.3);
-    }
-    .bottom .sign {
-      margin-top: 44px;
-      color: var(--faint);
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-    }
-
-    /* ---------- 响应式 ---------- */
-    @media (max-width: 860px) {
-      .series-grid { grid-template-columns: repeat(2, 1fr); }
-      .media-grid { grid-template-columns: 1fr 1fr; }
-      .loop { flex-direction: column; }
-      .loop-step { width: 100%; border-radius: 0 !important; border-bottom: none; }
-      .loop-step:last-child { border-bottom: 1px solid var(--line); }
-      .loop-arrow { transform: rotate(90deg); padding: 8px 0; }
-    }
-    @media (max-width: 520px) {
-      .series-grid { grid-template-columns: 1fr; }
-      .media-grid { grid-template-columns: 1fr; }
-      .meta-bar { border-radius: 12px; }
-      .meta-bar .item { border-right: none; border-bottom: 1px solid var(--line); width: 100%; text-align: center; }
-      .meta-bar .item:last-child { border-bottom: none; }
-      .card-fan-hero { transform: scale(.85); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        animation: none !important;
-      }
-      .reveal { opacity: 1; transform: none; }
-      .series-inner { transition: none; }
-    }
-  </style>
+/* ===== 响应式 ===== */
+@media (max-width:860px){
+  .series-grid{grid-template-columns:repeat(2,1fr)}
+  .media-grid{grid-template-columns:1fr 1fr}
+  .loop{grid-template-columns:1fr 1fr}
+  .loop .step:nth-child(3){border-left:none}
+  .loop .step:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .loop .step:nth-child(odd){border-left:none}
+  .loop .step:nth-child(even){border-left:1px solid var(--line)}
+}
+@media (max-width:560px){
+  .series-grid{grid-template-columns:1fr}
+  .media-grid{grid-template-columns:1fr}
+  .loop{grid-template-columns:1fr}
+  .loop .step{border-left:none!important;border-bottom:1px solid var(--line)!important}
+  .loop .step:last-child{border-bottom:none!important}
+  .hand{transform:scale(.85);height:110px}
+  .topbar .brand{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .reveal{opacity:1;transform:none}
+  .cover-card,.hand .hcard,.scard-inner{transition:none}
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <a class="back" href="../../index.html">返回作品集</a>
-      <span class="tag">ROGUELIKE · 8 SERIES</span>
-      <a href="https://www.taptap.cn/app/818915" target="_blank" rel="noreferrer">TapTap</a>
-    </div>
+<div class="wrap">
 
-    <!-- Hero -->
-    <section class="hero">
-      <p class="kicker reveal">LIGHTWEIGHT ROGUELIKE CARD BATTLE · 2026</p>
-      <div class="card-fan-hero reveal">
-        <div class="fan-card"><div class="card-cost">1</div><div class="card-icon">🗡️</div><div class="card-name">初始</div></div>
-        <div class="fan-card"><div class="card-cost">2</div><div class="card-icon">🩸</div><div class="card-name">血族</div></div>
-        <div class="fan-card"><div class="card-cost">3</div><div class="card-icon">🛡️</div><div class="card-name">坚固</div></div>
-        <div class="fan-card"><div class="card-cost">2</div><div class="card-icon">⚙️</div><div class="card-name">科技</div></div>
-        <div class="fan-card"><div class="card-cost">1</div><div class="card-icon">🌱</div><div class="card-name">种子</div></div>
-      </div>
-      <h1 class="reveal">第九张<span class="slime">史莱姆牌</span></h1>
-      <p class="sub reveal">轻量 Roguelike 卡牌对战。每局从 Lv.1 开始，<em>击败层层递进的敌人</em>。胜利后扩充卡组，战败则一切归零、重新出发。</p>
-      <div class="meta-bar reveal">
-        <div class="item"><b>TapTap</b> · 安卓 / iOS / PC</div>
-        <div class="item">上线 <b>2026.02.17</b></div>
-        <div class="item">评分 <b>8.5</b></div>
-        <div class="item"><b>199</b> 条评价</div>
-      </div>
-    </section>
-
-    <!-- 8大系列卡牌 -->
-    <section class="series">
-      <div class="section-head reveal">
-        <p class="kicker">// Card Series</p>
-        <h2>8 大系列卡牌</h2>
-        <p>点击卡牌翻转，查看每个系列的机制</p>
-      </div>
-      <div class="series-grid">
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">🗡️</div>
-              <div class="name">初始</div>
-              <div class="en">Starter</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">每局冒险的起点，基础攻击与防御卡牌，构成卡组的核心骨架。</div>
-              <div class="mechanics"><span class="mech">攻击</span><span class="mech">防御</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">😈</div>
-              <div class="name">七罪</div>
-              <div class="en">Seven Sins</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">以七宗罪为主题的高风险高回报卡牌，效果强力但伴随代价。</div>
-              <div class="mechanics"><span class="mech">高伤</span><span class="mech">代价</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">🩸</div>
-              <div class="name">血族</div>
-              <div class="en">Vampire</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">吸血与生命转化机制，以血量为资源，越战越勇。</div>
-              <div class="mechanics"><span class="mech">吸血</span><span class="mech">生命转化</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">🛡️</div>
-              <div class="name">坚固</div>
-              <div class="en">Fortify</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">护甲与格挡系列，以防御化解攻势，在持久战中建立优势。</div>
-              <div class="mechanics"><span class="mech">护甲</span><span class="mech">格挡</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">⚙️</div>
-              <div class="name">科技</div>
-              <div class="en">Tech</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">机械与装置卡牌，通过连击与协同效应产生指数级增长。</div>
-              <div class="mechanics"><span class="mech">连击</span><span class="mech">协同</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">🌱</div>
-              <div class="name">种子</div>
-              <div class="en">Seed</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">成长与衍生机制，播下种子在后续回合收获强大效果。</div>
-              <div class="mechanics"><span class="mech">成长</span><span class="mech">衍生</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">🌑</div>
-              <div class="name">暗影</div>
-              <div class="en">Shadow</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">隐匿与爆发系列，在阴影中积蓄力量，一击致命。</div>
-              <div class="mechanics"><span class="mech">隐匿</span><span class="mech">爆发</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="series-card reveal" tabindex="0">
-          <div class="series-inner">
-            <div class="series-face series-front">
-              <div class="icon">⏳</div>
-              <div class="name">时序</div>
-              <div class="en">Chronos</div>
-            </div>
-            <div class="series-face series-back">
-              <div class="desc">操控时间与回合的稀有系列，抽牌、回手、额外行动。</div>
-              <div class="mechanics"><span class="mech">抽牌</span><span class="mech">额外行动</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p class="series-hint reveal">合理搭配费用与效果，构筑属于你的最强牌组</p>
-    </section>
-
-    <!-- 玩法循环 -->
-    <section class="gameplay">
-      <div class="section-head reveal">
-        <p class="kicker">// Game Loop</p>
-        <h2>每局的循环</h2>
-        <p>从 Lv.1 开始，一切归零后重新出发</p>
-      </div>
-      <div class="loop reveal">
-        <div class="loop-step">
-          <div class="num">1</div>
-          <h3>开始冒险</h3>
-          <p>从 Lv.1 起步，手持初始卡组</p>
-        </div>
-        <div class="loop-arrow">→</div>
-        <div class="loop-step">
-          <div class="num">2</div>
-          <h3>击败敌人</h3>
-          <p>用卡牌击败层层递进的敌人</p>
-        </div>
-        <div class="loop-arrow">→</div>
-        <div class="loop-step">
-          <div class="num">3</div>
-          <h3>扩充卡组</h3>
-          <p>胜利后从丰富牌库中选择新卡</p>
-        </div>
-        <div class="loop-arrow">→</div>
-        <div class="loop-step">
-          <div class="num">4</div>
-          <h3>战败归零</h3>
-          <p>失败则一切清零，重新出发</p>
-        </div>
-      </div>
-      <p class="gameplay-note reveal">涵盖攻击、防御、治疗、法力回复等多种机制</p>
-    </section>
-
-    <!-- 爬层进度 -->
-    <section class="climb">
-      <div class="section-head reveal">
-        <p class="kicker">// Climb</p>
-        <h2>爬层冒险</h2>
-        <p>你能闯到第几层？</p>
-      </div>
-      <div class="climb-track reveal">
-        <div class="climb-row lit"><span class="floor">Lv.1</span><div class="node"></div><span class="label">起点 · 小史莱姆</span><span class="enemy">🟢</span></div>
-        <div class="climb-row lit"><span class="floor">Lv.2</span><div class="node"></div><span class="label">森林边缘</span><span class="enemy">🟢</span></div>
-        <div class="climb-row lit"><span class="floor">Lv.3</span><div class="node"></div><span class="label">深入洞穴</span><span class="enemy">🔵</span></div>
-        <div class="climb-row"><span class="floor">Lv.4</span><div class="node"></div><span class="label">精英怪物</span><span class="enemy">🟣</span></div>
-        <div class="climb-row"><span class="floor">Lv.5</span><div class="node"></div><span class="label">黑暗沼泽</span><span class="enemy">🟣</span></div>
-        <div class="climb-row"><span class="floor">Lv.6</span><div class="node"></div><span class="label">熔岩地带</span><span class="enemy">🔴</span></div>
-        <div class="climb-row"><span class="floor">Lv.7</span><div class="node"></div><span class="label">精英 · 强化</span><span class="enemy">🔴</span></div>
-        <div class="climb-row boss"><span class="floor">BOSS</span><div class="node"></div><span class="label">巨大史莱姆怪物</span><span class="enemy">👑</span></div>
-      </div>
-      <p class="climb-question reveal">你击败了巨大的史莱姆怪物了吗？</p>
-    </section>
-
-    <!-- 开发者的话 -->
-    <section class="devnote">
-      <div class="section-head reveal">
-        <p class="kicker">// Developer's Note</p>
-        <h2>开发者的话</h2>
-      </div>
-      <blockquote class="reveal">
-        <p>"你击败了巨大的史莱姆怪物了吗？"</p>
-        <p class="sig">— <b>Gove</b>，制作人 / 策划 / 程序<br>耳听怒，策划 / 程序 / 音乐音效 · 希干希纳，美术</p>
-      </blockquote>
-    </section>
-
-    <!-- 截图 -->
-    <section class="media">
-      <div class="section-head reveal">
-        <p class="kicker">// Screenshots</p>
-        <h2>实机画面</h2>
-      </div>
-      <div class="media-grid">
-        <button class="shot reveal" type="button" aria-label="放大截图 1"><img src="screenshot-01.jpg" alt="第九张史莱姆牌 截图 1" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 2"><img src="screenshot-02.jpg" alt="第九张史莱姆牌 截图 2" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 3"><img src="screenshot-03.jpg" alt="第九张史莱姆牌 截图 3" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 4"><img src="screenshot-04.jpg" alt="第九张史莱姆牌 截图 4" loading="lazy"></button>
-        <button class="shot reveal" type="button" aria-label="放大截图 5"><img src="screenshot-05.jpg" alt="第九张史莱姆牌 截图 5" loading="lazy"></button>
-      </div>
-    </section>
-
-    <!-- 信息栏 -->
-    <section class="info-grid reveal">
-      <div class="info-cell">
-        <p class="label">平台</p>
-        <p class="value">TapTap · 安卓 / iOS / PC</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">上线日期</p>
-        <p class="value">2026.02.17</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">当前版本</p>
-        <p class="value gold">6.1.1（活跃更新中）</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">类型</p>
-        <p class="value">Roguelike 卡牌</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">评分</p>
-        <p class="value slime">8.5</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">系列</p>
-        <p class="value">8 大系列</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">制作人</p>
-        <p class="value">Gove</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">美术</p>
-        <p class="value">希干希纳</p>
-      </div>
-    </section>
-
-    <!-- 底部 -->
-    <section class="bottom">
-      <h2 class="reveal">开始你的爬层冒险</h2>
-      <p class="reveal">在 TapTap 免费下载，构筑你的最强牌组。</p>
-      <div class="links reveal">
-        <a class="primary" href="https://www.taptap.cn/app/818915" target="_blank" rel="noreferrer">在 TapTap 下载 →</a>
-        <a href="../../index.html">返回作品集 →</a>
-      </div>
-      <p class="sign">第九张史莱姆牌 — GOVE · 2026 · TapTap</p>
-    </section>
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <a class="back" href="../../index.html">返回作品集</a>
+    <span class="brand">Roguelike · Card · 2026</span>
+    <a class="store" href="https://www.taptap.cn/app/818915" target="_blank" rel="noreferrer">TapTap 商店</a>
   </div>
 
-  <script>
-    (function () {
-      // 滚动浮现
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) {
-            en.target.classList.add('in');
-            io.unobserve(en.target);
-          }
-        });
-      }, { threshold: 0.15 });
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  <!-- Hero -->
+  <section class="hero">
+    <div class="moon"></div>
+    <svg class="castle" viewBox="0 0 1200 90" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <g fill="#dfeee9">
+        <path d="M0 90V50h40V30h8v-18h6v18h20v20h40V40h30V20h6v-14h6V20h28v20h40V45h30V25h8v-16h6V25h24v20h60V40h35V18h7V8h7V18h30v22h50V45h30V28h8V14h6V28h26v17h55V40h35V20h7V10h7V20h30v20h50V45h30V25h8v-15h6V25h26v20h60V40h35V18h7V8h7V18h30v22h50V45h30V28h8V14h6V28h26v17h60V50h40V90z"/>
+      </g>
+    </svg>
 
-      // 卡牌翻转
-      document.querySelectorAll('.series-card').forEach((card) => {
-        const flip = () => card.classList.toggle('flipped');
-        card.addEventListener('click', flip);
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
-        });
-      });
+    <p class="kicker reveal">Lightweight Roguelike Card Battle</p>
 
-      // 截图放大
-      const shots = document.querySelectorAll('.shot');
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.92);cursor:zoom-out;';
-      const big = document.createElement('img');
-      big.style.cssText = 'max-width:min(1000px,96vw);max-height:88vh;border-radius:10px;box-shadow:0 30px 100px rgba(0,0,0,0.6);';
-      overlay.appendChild(big);
-      document.body.appendChild(overlay);
-      shots.forEach((s) => {
-        s.addEventListener('click', () => {
-          big.src = s.querySelector('img').src;
-          overlay.style.display = 'flex';
-        });
-      });
-      overlay.addEventListener('click', () => { overlay.style.display = 'none'; });
-      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.style.display = 'none'; });
-    })();
-  </script>
+    <div class="cover-card reveal">
+      <div class="cost">9</div>
+      <div class="frame">
+        <img src="cover.jpg" alt="第九张史莱姆牌 封面：持剑的青色史莱姆站在城堡剪影前" />
+      </div>
+      <div class="tagchip">TAPTAP · 8.5</div>
+    </div>
+
+    <h1 class="reveal">第九张<span class="cyan">史莱姆牌</span></h1>
+    <p class="sub reveal">
+      一款轻量 Roguelike 卡牌对战游戏。每局冒险从 <b>Lv.1</b> 开始，用手中的卡牌击败层层递进的敌人。
+      胜利后从丰富牌库扩充卡组，战败则一切归零、重新出发。
+    </p>
+
+    <div class="meta reveal">
+      <span class="chip"><span class="star">★ 8.5</span><b>TapTap</b> · 199 条评价</span>
+      <span class="chip">上线 <b>2026.02.17</b></span>
+      <span class="chip">类型 <b>策略 · Roguelike</b></span>
+      <span class="chip">平台 <b>安卓 / iOS / PC</b></span>
+      <span class="chip">版本 <span class="num">6.1.1</span></span>
+    </div>
+
+    <!-- 扇形手牌 -->
+    <div class="hand reveal" aria-hidden="true">
+      <div class="hcard">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 40L30 18"/><path d="M26 14l8 8"/><path d="M22 10l4 4"/></svg>
+      </div>
+      <div class="hcard">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M24 8C14 16 14 30 24 40c10-10 10-24 0-32z"/><path d="M24 16v16"/></svg>
+      </div>
+      <div class="hcard">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6l14 6v12c0 9-6 16-14 18-8-2-14-9-14-18V12z"/><path d="M24 16v16"/></svg>
+      </div>
+      <div class="hcard">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M24 10c-6 0-10 4-10 9 0 4 2 7 5 9-3 2-5 5-5 9 0 5 4 8 10 8s10-3 10-8c0-4-2-7-5-9 3-2 5-5 5-9 0-5-4-9-10-9z"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 玩法循环 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Game Loop</p>
+      <h2>每一局的循环</h2>
+      <p>从 Lv.1 起步，在归零与扩张之间反复构筑</p>
+    </div>
+    <div class="loop reveal">
+      <div class="step">
+        <div class="n">1</div>
+        <h3>Lv.1 开局</h3>
+        <p>每局冒险从最低等级开始，手持最朴素的初始卡组。</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h3>击败敌人</h3>
+        <p>出牌与费用管理，战胜层层递进的敌人与精英。</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h3>扩充卡组</h3>
+        <p>胜利后从丰富牌库中挑选新卡，构筑越来越强的牌组。</p>
+      </div>
+      <div class="step boom">
+        <div class="n">4</div>
+        <h3>战败归零</h3>
+        <p>一旦倒下，本局一切清零，带着新的理解重新出发。</p>
+      </div>
+    </div>
+    <p class="loop-note reveal">涵盖攻击、防御、治疗、法力回复等多种机制</p>
+  </section>
+
+  <!-- 8 大系列 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Card Series</p>
+      <h2>8 大系列卡牌</h2>
+      <p>点击（或 Tab 后回车）翻转卡牌，查看每个系列的方向</p>
+    </div>
+    <div class="series-grid">
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="初始系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">1</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 40L30 18"/><path d="M26 14l8 8"/><path d="M22 10l4 4"/><circle cx="14" cy="34" r="2.5"/></svg>
+            <div class="name">初始</div>
+            <div class="en">Starter</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">每局冒险的起点，最基础的攻击与防御，构成卡组的骨架。</div>
+            <div class="tags"><span>攻击</span><span>防御</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="七罪系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">2</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10c-2 6 0 12 4 15"/><path d="M34 10c2 6 0 12-4 15"/><circle cx="19" cy="28" r="1.6" fill="#0b1a1c"/><circle cx="29" cy="28" r="1.6" fill="#0b1a1c"/><path d="M20 36c2-2 6-2 8 0"/></svg>
+            <div class="name">七罪</div>
+            <div class="en">Seven Sins</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">以七宗罪为灵感的高风险高回报卡牌，效果强力却伴随代价。</div>
+            <div class="tags"><span>高伤</span><span>代价</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="血族系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">2</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 8C14 18 14 30 24 40c10-10 10-22 0-32z"/><path d="M19 28c0 4 2 6 5 7"/></svg>
+            <div class="name">血族</div>
+            <div class="en">Vampire</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">以血量为资源的吸血与生命转化，越线血战越勇。</div>
+            <div class="tags"><span>吸血</span><span>生命转化</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="坚固系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">1</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6l14 6v12c0 9-6 16-14 18-8-2-14-9-14-18V12z"/><path d="M24 16v14"/></svg>
+            <div class="name">坚固</div>
+            <div class="en">Fortify</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">护甲与格挡体系，稳稳化解攻势，在持久战中积累优势。</div>
+            <div class="tags"><span>护甲</span><span>格挡</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="科技系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">3</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="8"/><path d="M24 6v6M24 36v6M6 24h6M36 24h6M11 11l4 4M33 33l4 4M37 11l-4 4M15 33l-4 4"/></svg>
+            <div class="name">科技</div>
+            <div class="en">Tech</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">机械与装置卡牌，通过连击与协同效应滚出指数级收益。</div>
+            <div class="tags"><span>连击</span><span>协同</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="种子系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">1</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 42V24"/><path d="M24 26c0-8 6-12 14-12 0 8-6 12-14 12z"/><path d="M24 30c0-6-5-9-12-9 0 6 5 9 12 9z"/></svg>
+            <div class="name">种子</div>
+            <div class="en">Seed</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">先播下种子，在后续回合收获成长与衍生的强大效果。</div>
+            <div class="tags"><span>成长</span><span>衍生</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="暗影系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">2</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M30 8c-10 4-14 16-8 26 2 4 6 6 10 6C22 38 18 26 24 14c2-2 4-4 6-6z"/></svg>
+            <div class="name">暗影</div>
+            <div class="en">Shadow</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">隐匿中积蓄力量，在阴影里等待时机，一击致命。</div>
+            <div class="tags"><span>隐匿</span><span>爆发</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scard reveal" tabindex="0" role="button" aria-label="时序系列卡牌，点击翻转查看详情">
+        <div class="scard-inner">
+          <div class="sface sfront">
+            <span class="cost">3</span>
+            <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#0b1a1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6h20M14 42h20"/><path d="M16 6c0 8 4 10 8 12-4 2-8 4-8 12M32 6c0 8-4 10-8 12 4 2 8 4 8 12"/></svg>
+            <div class="name">时序</div>
+            <div class="en">Chronos</div>
+          </div>
+          <div class="sface sback">
+            <div class="d">操控时间与回合的稀有系列：抽牌、回手、额外行动。</div>
+            <div class="tags"><span>抽牌</span><span>额外行动</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <p class="series-hint reveal">合理搭配费用与效果，构筑属于你的最强牌组</p>
+  </section>
+
+  <!-- 爬层 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Climb</p>
+      <h2>你能闯到第几层？</h2>
+      <p>随着滚动，已点亮的楼层会依次亮起</p>
+    </div>
+    <div class="climb reveal">
+      <div class="row"><span class="lv">Lv.1</span><span class="dot"></span><span class="lab">起点 · 普通战斗</span><span class="kind">NORMAL</span></div>
+      <div class="row"><span class="lv">Lv.2</span><span class="dot"></span><span class="lab">普通战斗</span><span class="kind">NORMAL</span></div>
+      <div class="row"><span class="lv">Lv.3</span><span class="dot"></span><span class="lab">普通战斗</span><span class="kind">NORMAL</span></div>
+      <div class="row"><span class="lv">Lv.4</span><span class="dot"></span><span class="lab">精英遭遇</span><span class="kind">ELITE</span></div>
+      <div class="row"><span class="lv">Lv.5</span><span class="dot"></span><span class="lab">普通战斗</span><span class="kind">NORMAL</span></div>
+      <div class="row"><span class="lv">Lv.6</span><span class="dot"></span><span class="lab">精英遭遇</span><span class="kind">ELITE</span></div>
+      <div class="row"><span class="lv">Lv.7</span><span class="dot"></span><span class="lab">精英 · 强化</span><span class="kind">ELITE+</span></div>
+      <div class="row boss"><span class="lv">BOSS</span><span class="dot"></span><span class="lab">巨大史莱姆怪物</span><span class="kind">FINAL</span></div>
+    </div>
+    <p class="climb-q reveal">"你击败了巨大的史莱姆怪物了吗？"</p>
+  </section>
+
+  <!-- 开发者的话 -->
+  <section class="section dev">
+    <div class="section-head reveal">
+      <p class="kicker">// Developer's Note</p>
+      <h2>开发者的话</h2>
+    </div>
+    <blockquote class="reveal">
+      <p>"你击败了巨大的史莱姆怪物了吗？"</p>
+      <p class="sig">
+        — <b>Gove</b> 制作人 / 策划 / 程序<br>
+        耳听怒 · 策划 / 程序 / 音乐音效　|　希干希纳 · 美术
+      </p>
+    </blockquote>
+  </section>
+
+  <!-- 截图 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Screenshots</p>
+      <h2>实机画面</h2>
+      <p>点击任意截图放大查看，Esc 或点击遮罩关闭</p>
+    </div>
+    <div class="media-grid">
+      <button class="shot reveal" type="button" aria-label="放大截图：登录界面"><img src="screenshot-01.jpg" alt="第九张史莱姆牌 登录界面：青色史莱姆标题与城堡剪影" loading="lazy"></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：主菜单"><img src="screenshot-02.jpg" alt="第九张史莱姆牌 主菜单：关于、设置、图鉴、成就与开始按钮" loading="lazy"></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：成就面板"><img src="screenshot-03.jpg" alt="第九张史莱姆牌 成就面板：毁灭节拍、卡海漫游等成就进度" loading="lazy"></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：开始游戏卡片"><img src="screenshot-04.jpg" alt="第九张史莱姆牌 开始游戏卡片：城堡剪影插画" loading="lazy"></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：战斗手牌"><img src="screenshot-05.jpg" alt="第九张史莱姆牌 战斗画面：史莱姆英雄、敌方巨大史莱姆与三张手牌" loading="lazy"></button>
+    </div>
+  </section>
+
+  <!-- 信息条 -->
+  <section class="info reveal">
+    <div class="cell"><div class="l">平台</div><div class="v">安卓 / iOS / PC</div></div>
+    <div class="cell"><div class="l">上线日期</div><div class="v">2026.02.17</div></div>
+    <div class="cell"><div class="l">最近更新</div><div class="v">2026.08.27</div></div>
+    <div class="cell"><div class="l">当前版本</div><div class="v gd">6.1.1</div></div>
+    <div class="cell"><div class="l">类型</div><div class="v">策略 · Roguelike 卡牌</div></div>
+    <div class="cell"><div class="l">TapTap 评分</div><div class="v cy">8.5 / 10</div></div>
+    <div class="cell"><div class="l">系列</div><div class="v">8 大系列卡牌</div></div>
+    <div class="cell"><div class="l">适龄</div><div class="v">8+</div></div>
+  </section>
+
+  <!-- 底部 CTA -->
+  <section class="bottom">
+    <h2 class="reveal">开始你的爬层冒险</h2>
+    <p class="reveal">在 TapTap 免费下载，构筑你的最强牌组。</p>
+    <div class="links reveal">
+      <a class="primary" href="https://www.taptap.cn/app/818915" target="_blank" rel="noreferrer">前往 TapTap 下载</a>
+      <a href="../../index.html">返回作品集</a>
+    </div>
+    <p class="sign">第九张史莱姆牌 — GOVE · 2026 · TAPTAP</p>
+  </section>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="截图放大预览">
+  <button class="close" id="lbClose" aria-label="关闭">×</button>
+  <img id="lbImg" src="" alt="放大的游戏截图" />
+</div>
+
+<script>
+(function(){
+  // 滚动浮现
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  // 爬层逐行点亮（进入视口后按顺序点亮）
+  var rows = document.querySelectorAll('.climb .row');
+  var rowIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        var row = en.target;
+        setTimeout(function(){ row.classList.add('lit'); }, Array.prototype.indexOf.call(rows,row)*120);
+        rowIO.unobserve(row);
+      }
+    });
+  },{threshold:0.4});
+  rows.forEach(function(r){ rowIO.observe(r); });
+
+  // 卡牌翻转
+  document.querySelectorAll('.scard').forEach(function(card){
+    var flip = function(){ card.classList.toggle('flipped'); };
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(); }
+    });
+  });
+
+  // Lightbox
+  var lb = document.getElementById('lb');
+  var lbImg = document.getElementById('lbImg');
+  var lbClose = document.getElementById('lbClose');
+  function openLB(src, alt){ lbImg.src = src; lbImg.alt = alt || '放大的游戏截图'; lb.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeLB(){ lb.classList.remove('open'); lbImg.src=''; document.body.style.overflow=''; }
+  document.querySelectorAll('.shot').forEach(function(s){
+    s.addEventListener('click', function(){
+      var img = s.querySelector('img');
+      openLB(img.currentSrc || img.src, img.alt);
+    });
+  });
+  lb.addEventListener('click', function(e){ if(e.target === lb || e.target === lbImg){ closeLB(); } });
+  lbClose.addEventListener('click', closeLB);
+  window.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && lb.classList.contains('open')){ closeLB(); }
+  });
+})();
+</script>
 </body>
 </html>
