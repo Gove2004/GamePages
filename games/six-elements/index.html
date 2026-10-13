@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>瑟克斯遗纪 | Gove</title>
+<meta name="description" content="瑟克斯遗纪：11×11 棋盘上的六元素反应塔防。每回合只落一子，21 条反应彼此连锁，守住棋盘正中的水晶。六关教学、无限模式、自定义模式。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,8 86,30 86,70 50,92 14,70 14,30' fill='%23e2483c'/%3E%3Cpolygon points='50,26 70,38 70,62 50,74 30,62 30,38' fill='%23ffd9b8'/%3E%3C/svg%3E" />
+<style>
+:root{
+  --bg:#141009;
+  --bg2:#1c150c;
+  --panel:#211a11;
+  --panel2:#282017;
+  --ink:#f3e9d6;
+  --dim:#bdae94;
+  --faint:#877a63;
+  --line:rgba(231,194,122,.16);
+  --line2:rgba(231,194,122,.34);
+  --gold:#e7c27a;
+  --gold-dim:rgba(231,194,122,.22);
+  --ember:#e2483c;
+  --fire:#e2483c; --water:#4a9be8; --grass:#5fc24e; --thunder:#b48af2; --wind:#3fd0c0; --rock:#d9b83f;
+  --mono:ui-monospace,"Cascadia Code","SF Mono",Consolas,"Courier New",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;color:var(--ink);
+  font-family:var(--sans);line-height:1.75;overflow-x:hidden;
+  background:
+    radial-gradient(1100px 560px at 50% -12%, rgba(226,72,60,.13), transparent 60%),
+    radial-gradient(900px 500px at 88% 30%, rgba(217,184,63,.06), transparent 55%),
+    var(--bg);
+}
+/* 石板颗粒 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(circle, rgba(231,194,122,.035) 1px, transparent 1.3px);
+  background-size:15px 15px;
+}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.wrap{position:relative;z-index:1;width:min(1120px,calc(100% - 40px));margin:0 auto}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+
+/* ===== 顶栏 ===== */
+.topbar{
+  position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+  padding:15px 0;background:linear-gradient(180deg,rgba(20,16,9,.97) 55%,rgba(20,16,9,0));
+}
+.topbar a{font-size:14px;color:var(--dim);transition:color .25s}
+.topbar a:hover{color:var(--gold)}
+.topbar .back::before{content:"‹ ";font-weight:700}
+.topbar .store::after{content:" ↗";font-size:11px}
+.topbar .brand{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--faint);text-transform:uppercase}
+
+/* ===== Hero ===== */
+.hero{position:relative;padding:34px 0 26px;text-align:center}
+.hero .promo{
+  position:relative;margin:0 auto 8px;border:1px solid var(--line2);border-radius:10px;overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.5), 0 0 60px rgba(226,72,60,.12);
+}
+.hero .promo img{width:100%}
+.hero .promo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px);
+  opacity:.5;
+}
+.kicker{margin:34px 0 14px;font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+h1{margin:0;font-size:clamp(38px,7.5vw,68px);font-weight:900;letter-spacing:.08em;line-height:1.1}
+h1 .glow{color:var(--gold);text-shadow:0 0 34px rgba(231,194,122,.35)}
+.hero .sub{margin:18px auto 0;max-width:660px;color:var(--dim);font-size:clamp(15px,2.2vw,17px)}
+.hero .sub b{color:var(--ink);font-weight:700}
+.meta{margin:24px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 15px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(231,194,122,.05);font-size:13px;color:var(--dim);
+}
+.chip b{color:var(--ink);font-weight:700}
+.chip .n{color:var(--gold);font-weight:800}
+.chip img{width:16px;height:16px}
+
+/* ===== 章节骨架 ===== */
+.section{padding:66px 0 8px}
+.section-head{text-align:center;margin-bottom:38px}
+.section-head .kicker{margin-bottom:10px;font-size:11px;letter-spacing:.28em}
+.section-head h2{margin:0;font-size:clamp(25px,4.4vw,38px);font-weight:900;letter-spacing:.04em}
+.section-head p{margin:12px auto 0;color:var(--dim);font-size:14px;max-width:620px}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ===== 一句话介绍 / 循环 ===== */
+.intro{max-width:780px;margin:0 auto;text-align:center;color:var(--dim);font-size:15.5px}
+.intro b{color:var(--ink)}
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:36px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.loop .step{padding:26px 18px;text-align:center;background:rgba(231,194,122,.03);position:relative}
+.loop .step + .step{border-left:1px solid var(--line)}
+.loop .step .n{
+  width:38px;height:38px;margin:0 auto 14px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--gold-dim);color:var(--gold);
+  font-family:var(--mono);font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+.loop .step h3{margin:0 0 6px;font-size:16px;font-weight:800}
+.loop .step p{margin:0;font-size:12.5px;color:var(--dim);line-height:1.65}
+.loop-note{text-align:center;margin-top:24px;color:var(--faint);font-size:13.5px}
+
+/* ===== 六种元素 ===== */
+.el-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.el{
+  text-align:center;padding:24px 10px 20px;border-radius:12px;
+  border:1px solid var(--line);background:var(--panel);
+  border-top:3px solid var(--ec,#888);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.el:hover{transform:translateY(-5px);border-color:var(--ec);box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 24px -6px var(--ec)}
+.el img{width:64px;height:64px;margin:0 auto 12px;filter:drop-shadow(0 4px 10px var(--ec-glow,rgba(0,0,0,.4)))}
+.el h3{margin:0;font-size:19px;font-weight:900;color:var(--ec)}
+.el .kw{margin:8px 0 0;font-size:12.5px;color:var(--dim);letter-spacing:.06em}
+.el .en{margin:6px 0 0;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
+
+/* ===== 反应矩阵 ===== */
+.mx-zone{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start}
+.matrix{
+  display:grid;grid-template-columns:repeat(7,minmax(74px,86px));gap:6px;
+  padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(28,21,12,.7);
+}
+.mx-h{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0}
+.mx-h img{width:30px;height:30px}
+.mx-h span{font-size:12px;font-weight:800;color:var(--hc,#aaa)}
+.mx-cell{
+  height:52px;border-radius:8px;border:1px solid rgba(0,0,0,.35);cursor:pointer;
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#1c150c;
+  background:var(--rc,#666);transition:transform .18s,box-shadow .18s,filter .18s;
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+.mx-cell:hover{transform:translateY(-2px);filter:brightness(1.12);box-shadow:0 6px 16px rgba(0,0,0,.5)}
+.mx-cell.cur{outline:2px solid var(--ink);outline-offset:1px;filter:brightness(1.15)}
+.mx-cell.empty{background:transparent;border:1px dashed rgba(231,194,122,.10);cursor:default}
+.mx-cell.empty:hover{transform:none;box-shadow:none;filter:none}
+.mx-tip{grid-column:1 / -1;text-align:center;font-size:12px;color:var(--faint)}
+
+/* 反应详情面板 */
+.rx-panel{
+  border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  padding:26px 28px;min-height:230px;position:sticky;top:70px;
+}
+.rx-panel .pair{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rx-panel .pair img{width:44px;height:44px}
+.rx-panel .pair .plus{font-family:var(--mono);color:var(--faint);font-size:18px}
+.rx-panel .pair .arrow{color:var(--faint);font-size:15px;margin:0 2px}
+.rx-panel h3{margin:0 0 4px;font-size:30px;font-weight:900;letter-spacing:.06em;color:var(--rc,var(--gold))}
+.rx-panel .id{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--faint);margin-bottom:16px}
+.rx-panel .eff{font-size:15.5px;color:var(--ink);line-height:2}
+.rx-panel .hint{margin-top:18px;font-size:12.5px;color:var(--faint)}
+
+/* ===== 21 条反应清单 ===== */
+.rx-group{margin-bottom:26px}
+.rx-group legend,.rx-group .legend{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--dim);
+}
+.rx-group .legend img{width:22px;height:22px}
+.rx-group .legend b{color:var(--gc,var(--ink));font-size:14px;letter-spacing:.1em}
+.rx-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rx{
+  border:1px solid var(--line);border-left:3px solid var(--rc,#888);border-radius:10px;
+  background:var(--panel);padding:16px 18px;transition:transform .25s,box-shadow .25s,border-color .25s;
+}
+.rx:hover{transform:translateY(-3px);border-color:var(--rc);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+.rx.hit{border-color:var(--rc);box-shadow:0 0 0 1px var(--rc),0 10px 26px rgba(0,0,0,.4)}
+.rx .head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.rx .head img{width:24px;height:24px}
+.rx .head .plus{color:var(--faint);font-family:var(--mono);font-size:13px}
+.rx .head h3{margin:0 auto 0 8px;font-size:17px;font-weight:900;color:var(--rc)}
+.rx .eff{margin:0;font-size:13px;color:var(--dim);line-height:1.8}
+.rx .tag{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+
+/* ===== 敌人 ===== */
+.foe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.foe{
+  border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.foe:hover{transform:translateY(-5px);border-color:var(--fc,#888);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.foe .vis{
+  display:flex;align-items:center;gap:16px;padding:20px 20px 14px;
+  background:linear-gradient(160deg,var(--panel2),var(--panel));
+  border-bottom:1px solid var(--line);
+}
+.foe .vis img{width:72px;height:72px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.foe h3{margin:0;font-size:20px;font-weight:900;color:var(--fc,#eee)}
+.foe .en{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;margin-top:3px}
+.foe .traits{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.foe .traits span{font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid var(--fc-dim,rgba(255,255,255,.2));color:var(--fc,#ccc)}
+.foe .stats{padding:14px 20px 18px}
+.stat{display:grid;grid-template-columns:34px 1fr 44px;align-items:center;gap:10px;margin-bottom:8px}
+.stat .l{font-size:11px;color:var(--faint)}
+.stat .bar{height:7px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden}
+.stat .bar i{display:block;height:100%;border-radius:4px;background:var(--fc,#888)}
+.stat .v{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right}
+.foe .desc{margin:10px 0 0;font-size:12.5px;color:var(--dim);line-height:1.7}
+
+/* ===== 建筑 ===== */
+.bd-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.bd{
+  text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  padding:22px 12px 18px;transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.bd:hover{transform:translateY(-5px);border-color:var(--bc,#888);box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.bd img{width:62px;height:62px;margin:0 auto 10px;filter:drop-shadow(0 5px 12px rgba(0,0,0,.5))}
+.bd h3{margin:0;font-size:17px;font-weight:900;color:var(--bc,#ddd)}
+.bd p{margin:9px 0 0;font-size:12px;color:var(--dim);line-height:1.7}
+.bd .where{margin-top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--faint)}
+.bd-note{text-align:center;margin-top:22px;font-size:13px;color:var(--faint)}
+
+/* ===== 关卡旅程 ===== */
+.path{
+  display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 0;
+  margin-bottom:34px;padding:20px 12px;border:1px solid var(--line);border-radius:14px;
+  background:rgba(28,21,12,.6);
+}
+.path .node{
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 18px;position:relative;
+}
+.path .node + .node::before{
+  content:"";position:absolute;left:-24px;top:26px;width:30px;height:2px;
+  background:repeating-linear-gradient(90deg, var(--line2) 0 4px, transparent 4px 9px);
+}
+.path .node .box{
+  width:54px;height:54px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--nc,#888);color:var(--nc);font-family:var(--mono);font-weight:800;font-size:15px;
+  background:var(--panel2);box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+.path .node .box img{width:34px;height:34px}
+.path .node .lab{font-size:11px;color:var(--faint)}
+.lv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.lv{
+  border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px;
+  border-top:3px solid var(--lc,#888);transition:transform .3s,box-shadow .3s;
+}
+.lv:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.lv .no{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--lc);margin-bottom:8px}
+.lv h3{margin:0 0 12px;font-size:19px;font-weight:900}
+.lv ul{margin:0;padding:0;list-style:none;font-size:13px;color:var(--dim)}
+.lv ul li{display:flex;gap:8px;padding:3px 0;align-items:baseline}
+.lv ul li b{color:var(--ink);font-weight:700;flex-shrink:0}
+.lv ul li img{width:18px;height:18px;vertical-align:-3px}
+.lv .aim{margin:12px 0 0;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--dim)}
+.lv .aim b{color:var(--lc)}
+.lv.wide{grid-column:1 / -1;display:grid;grid-template-columns:1.1fr 1fr;gap:24px;border-top-color:var(--gold)}
+.lv.wide .aim{border-top:none;margin:0;padding:0}
+
+/* ===== 规则数字 ===== */
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.rules .cell{background:var(--panel);padding:20px 16px;text-align:center}
+.rules .cell .v{font-family:var(--mono);font-size:22px;font-weight:800;color:var(--gold)}
+.rules .cell .v small{font-size:12px;color:var(--dim);font-weight:400}
+.rules .cell .l{margin-top:6px;font-size:12px;color:var(--dim)}
+.rules-note{margin:20px auto 0;max-width:720px;text-align:center;font-size:13px;color:var(--faint);line-height:1.9}
+.score{
+  margin-top:26px;border:1px solid var(--line2);border-radius:14px;padding:24px 28px;
+  background:linear-gradient(160deg, rgba(231,194,122,.07), rgba(231,194,122,.02));
+  display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;text-align:center;
+}
+.score .s-item .v{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--gold)}
+.score .s-item .l{font-size:12.5px;color:var(--dim)}
+.score .s-plus{font-size:24px;color:var(--faint)}
+.score .s-no .v{color:var(--faint)}
+
+/* ===== 自定义模式 ===== */
+.custom{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:34px clamp(20px,4vw,44px)}
+.custom .cols{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:8px}
+.custom p.lead{margin:0;color:var(--dim);font-size:14.5px}
+.custom p.lead b{color:var(--ink)}
+.fx-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fx-list li{
+  display:flex;align-items:baseline;gap:9px;font-size:13px;color:var(--dim);
+  border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:rgba(231,194,122,.03);
+}
+.fx-list li b{color:var(--gold);font-weight:800;flex-shrink:0}
+.fx-list li .rng{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint)}
+.custom .mrow{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+.custom .mrow span{font-size:12.5px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+.custom .mrow span b{color:var(--gold)}
+
+/* ===== 叙事 ===== */
+.story-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.scroll{
+  border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  padding:24px 26px;position:relative;overflow:hidden;
+}
+.scroll::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg, var(--sc1,#888), var(--sc2,var(--sc1,#888)));
+}
+.scroll h3{margin:0 0 14px;font-size:15px;font-weight:800;color:var(--sc1,#ddd);letter-spacing:.1em}
+.scroll p{margin:0;font-size:16.5px;line-height:2.15;letter-spacing:.05em}
+.scroll p span{display:block}
+.scroll .multi span:nth-child(1){color:var(--fire)}
+.scroll .multi span:nth-child(2){color:var(--water)}
+.scroll .multi span:nth-child(3){color:var(--grass)}
+.scroll .multi span:nth-child(4){color:var(--thunder)}
+.scroll .multi span:nth-child(5){color:var(--wind)}
+.scroll .multi span:nth-child(6){color:var(--rock)}
+.scroll.opening{grid-column:1 / -1;text-align:center;padding:30px}
+.scroll.opening p{font-size:19px;color:var(--gold)}
+
+/* ===== 截图 ===== */
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shot{
+  position:relative;overflow:hidden;padding:0;cursor:pointer;
+  border:1px solid var(--line);border-radius:10px;background:var(--panel);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.shot:hover,.shot:focus-visible{transform:translateY(-4px);border-color:var(--line2);box-shadow:0 14px 30px rgba(0,0,0,.5);outline:none}
+.shot img{width:100%;aspect-ratio:16/9;object-fit:cover;transition:transform .5s}
+.shot:hover img,.shot:focus-visible img{transform:scale(1.04)}
+.shot figcaption{
+  position:absolute;left:0;right:0;bottom:0;padding:26px 12px 8px;font-size:12px;color:var(--ink);
+  background:linear-gradient(transparent, rgba(10,8,5,.85));text-align:left;opacity:0;transition:opacity .3s;
+}
+.shot:hover figcaption{opacity:1}
+
+/* ===== 信息条 ===== */
+.info{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+}
+.info .cell{background:var(--panel);padding:20px;text-align:center}
+.info .cell .l{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.info .cell .v{font-size:14px;font-weight:700;color:var(--ink)}
+.info .cell .v.gd{color:var(--gold)}
+
+/* ===== 底部 ===== */
+.bottom{padding:70px 0 60px;text-align:center}
+.bottom h2{margin:0 0 12px;font-size:clamp(24px,4.5vw,36px);font-weight:900;letter-spacing:.06em}
+.bottom p{margin:0 0 28px;color:var(--dim);font-size:15px}
+.bottom .links{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.bottom .links a{
+  display:inline-flex;align-items:center;gap:8px;padding:14px 30px;
+  border:1px solid var(--line);border-radius:999px;color:var(--ink);font-size:15px;font-weight:600;
+  transition:all .3s;
+}
+.bottom .links a:hover{border-color:var(--gold);color:var(--gold)}
+.bottom .links a.primary{
+  border-color:var(--gold);background:var(--gold);color:#241a0c;font-weight:800;
+  box-shadow:0 6px 24px -6px rgba(231,194,122,.5);
+}
+.bottom .links a.primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px -6px rgba(231,194,122,.6)}
+.bottom .sign{margin-top:40px;color:var(--faint);font-size:11px;letter-spacing:.25em;text-transform:uppercase}
+
+/* ===== Lightbox ===== */
+.lb{
+  position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  padding:24px;background:rgba(10,7,4,.95);cursor:zoom-out;
+}
+.lb.open{display:flex}
+.lb img{max-width:min(1060px,96vw);max-height:88vh;border-radius:8px;border:1px solid var(--line2);box-shadow:0 30px 100px rgba(0,0,0,.8)}
+.lb .close{
+  position:absolute;top:20px;right:24px;color:var(--dim);font-size:30px;cursor:pointer;
+  background:none;border:none;line-height:1;
+}
+.lb .close:hover{color:var(--gold)}
+
+/* ===== 响应式 ===== */
+@media (max-width:960px){
+  .el-grid{grid-template-columns:repeat(3,1fr)}
+  .foe-grid{grid-template-columns:1fr 1fr}
+  .bd-grid{grid-template-columns:repeat(3,1fr)}
+  .lv-grid{grid-template-columns:1fr 1fr}
+  .rules{grid-template-columns:repeat(2,1fr)}
+  .mx-zone{grid-template-columns:1fr}
+  .rx-panel{position:static}
+  .matrix{overflow-x:auto;grid-template-columns:repeat(7,minmax(64px,72px));max-width:100%}
+  .rx-list{grid-template-columns:1fr 1fr}
+  .custom .cols{grid-template-columns:1fr}
+  .story-grid{grid-template-columns:1fr}
+  .lv.wide{grid-template-columns:1fr;gap:12px}
+}
+@media (max-width:600px){
+  .el-grid{grid-template-columns:repeat(2,1fr)}
+  .foe-grid{grid-template-columns:1fr}
+  .bd-grid{grid-template-columns:repeat(2,1fr)}
+  .lv-grid{grid-template-columns:1fr}
+  .rx-list{grid-template-columns:1fr}
+  .media-grid{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr 1fr}
+  .loop{grid-template-columns:1fr 1fr}
+  .loop .step:nth-child(3){border-left:none}
+  .loop .step:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .loop .step:nth-child(odd){border-left:none}
+  .loop .step:nth-child(even){border-left:1px solid var(--line)}
+  .matrix{grid-template-columns:repeat(7,minmax(52px,60px));gap:4px;padding:10px}
+  .mx-cell{height:42px;font-size:11px}
+  .mx-h img{width:22px;height:22px}
+  .mx-h span{font-size:10px}
+  .path .node{padding:0 10px}
+  .path .node + .node::before{left:-16px;width:14px}
+  .topbar .brand{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <a class="back" href="../../index.html">返回作品集</a>
+    <span class="brand">Puzzle · Elements · 2026</span>
+    <a class="store" href="https://www.taptap.cn/app/966377" target="_blank" rel="noreferrer">TapTap 商店</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="promo reveal">
+      <img src="promo.jpg" alt="瑟克斯遗纪 宣传图：地下图书馆大厅中央，橙红色水晶棱柱被六种元素结晶环绕" />
+    </div>
+    <p class="kicker reveal">Six-Element Chain Reaction · Board Defense</p>
+    <h1 class="reveal">瑟克斯<span class="glow">遗纪</span></h1>
+    <p class="sub reveal">
+      在一座经历数百次焚毁的图书馆里，我们找到了瑟克斯先生留下的一本材料——
+      那是最完整的<b>元素使前时期</b>的文本记录。为了表达敬意，我们把这个时代称为：瑟克斯遗纪。
+      这是一本可以在 11×11 的棋盘上亲手翻阅的书：<b>六种元素、21 条反应、每回合只落一子</b>。
+    </p>
+    <div class="meta reveal">
+      <span class="chip">类型 <b>益智 · 棋盘策略</b></span>
+      <span class="chip">平台 <b>Android</b></span>
+      <span class="chip"><img class="px" src="art/el-fire.png" alt="">六种元素</span>
+      <span class="chip"><span class="n">21</span> 条反应</span>
+      <span class="chip"><span class="n">11×11</span> 棋盘</span>
+      <span class="chip"><span class="n">6</span> 关 + 无限 + 自定义</span>
+    </div>
+  </section>
+
+  <!-- 玩法 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// How It Plays</p>
+      <h2>每回合，只落一子</h2>
+      <p>元素不会听你指挥开火——你只负责把它们放到正确的位置上</p>
+    </div>
+    <p class="intro reveal">
+      棋盘正中的<b>水晶核心</b>有 100 点生命。怪物从棋盘四边成波涌来，沿着格子向核心走。
+      你每回合只能在任意空格上放下<b>一枚元素</b>，放下即结算：如果它与四周的元素凑成一对，
+      <b>反应就地触发</b>，而被反应生成、推开、点燃的元素又会去撞别的元素——
+      <b>连锁</b>就是这么一层层炸开的。怪物踩到元素同样会引爆它们，所以路面本身就是埋好的引信。
+    </p>
+    <div class="loop reveal">
+      <div class="step">
+        <div class="n">1</div>
+        <h3>观察波次</h3>
+        <p>怪物从四边同时刷出，沿格推进。清完立刻开下一波，拖过 10 回合也会强制开。</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h3>落下一子</h3>
+        <p>每回合只放一枚元素。放下的一刻，与相邻元素的反应立即结算。</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h3>连锁引爆</h3>
+        <p>反应生成、留下的元素继续去撞别的元素，一段接一段地烧过整片棋盘。</p>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <h3>守住核心</h3>
+        <p>核心被怪物攻击就掉血。归零即失败——但你可以撤回，最多 7 步。</p>
+      </div>
+    </div>
+    <p class="loop-note reveal">点一下格子是选中，再点一下是放下。选错了还能撤回。</p>
+  </section>
+
+  <!-- 六种元素 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Six Elements</p>
+      <h2>世间便有了六种元素</h2>
+      <p>同种元素相遇也有反应——21 条反应里，有 6 条是元素和自己的对话</p>
+    </div>
+    <div class="el-grid">
+      <div class="el reveal" style="--ec:var(--fire);--ec-glow:rgba(226,72,60,.4)">
+        <img class="px" src="art/el-fire.png" alt="火元素图标" />
+        <h3>火</h3>
+        <p class="kw">文明，燃素，攻伐</p>
+        <p class="en">Fire</p>
+      </div>
+      <div class="el reveal" style="--ec:var(--water);--ec-glow:rgba(74,155,232,.4)">
+        <img class="px" src="art/el-water.png" alt="水元素图标" />
+        <h3>水</h3>
+        <p class="kw">渊源，流动，推力</p>
+        <p class="en">Water</p>
+      </div>
+      <div class="el reveal" style="--ec:var(--grass);--ec-glow:rgba(95,194,78,.4)">
+        <img class="px" src="art/el-grass.png" alt="草元素图标" />
+        <h3>草</h3>
+        <p class="kw">生命，智慧，发展</p>
+        <p class="en">Grass</p>
+      </div>
+      <div class="el reveal" style="--ec:var(--thunder);--ec-glow:rgba(180,138,242,.4)">
+        <img class="px" src="art/el-thunder.png" alt="雷元素图标" />
+        <h3>雷</h3>
+        <p class="kw">机械，极点，爆发</p>
+        <p class="en">Thunder</p>
+      </div>
+      <div class="el reveal" style="--ec:var(--wind);--ec-glow:rgba(63,208,192,.4)">
+        <img class="px" src="art/el-wind.png" alt="风元素图标" />
+        <h3>风</h3>
+        <p class="kw">静止，漩涡，扩散</p>
+        <p class="en">Wind</p>
+      </div>
+      <div class="el reveal" style="--ec:var(--rock);--ec-glow:rgba(217,184,63,.4)">
+        <img class="px" src="art/el-rock.png" alt="岩元素图标" />
+        <h3>岩</h3>
+        <p class="kw">基础，真相，固化</p>
+        <p class="en">Rock</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 反应矩阵 + 详情 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Reaction Matrix</p>
+      <h2>21 条反应</h2>
+      <p>点击矩阵里任意一格，看这条反应到底做什么。所有数值都是游戏内的真实数值。</p>
+    </div>
+    <div class="mx-zone">
+      <div class="matrix reveal" id="matrix" aria-label="元素两两反应矩阵"></div>
+      <div class="rx-panel reveal" id="rxPanel" aria-live="polite">
+        <div class="pair" id="rxPair"></div>
+        <h3 id="rxName">—</h3>
+        <p class="id" id="rxId"></p>
+        <p class="eff" id="rxEff"></p>
+        <p class="hint">同样的组合在图鉴、局内右栏与这里，永远说同一句话。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 21 条反应清单 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Full List</p>
+      <h2>反应总表</h2>
+      <p>按主导元素分组，共 21 条。「四周」指上下左右四格，「四角」指四个对角格，「全场」指全盘随机落点</p>
+    </div>
+
+    <div class="rx-group reveal" style="--gc:var(--fire)">
+      <div class="legend"><img class="px" src="art/el-fire.png" alt=""><b>火</b><span>×6</span></div>
+      <div class="rx-list">
+        <article class="rx" data-key="f+f" style="--rc:#ffcf7a">
+          <div class="head"><img class="px" src="art/el-fire.png" alt="火"><span class="plus">+</span><img class="px" src="art/el-fire.png" alt="火"><h3>燃烧</h3></div>
+          <p class="eff">本格 5 伤害、四周生成 1 枚火（尝试）、原地保留 火</p>
+          <span class="tag">Ignite · 引信</span>
+        </article>
+        <article class="rx" data-key="f+w" style="--rc:#ffd9b8">
+          <div class="head"><img class="px" src="art/el-fire.png" alt="火"><span class="plus">+</span><img class="px" src="art/el-water.png" alt="水"><h3>蒸发</h3></div>
+          <p class="eff">本格 3 伤害、相邻八格 2 伤害、四周生成 1 枚水（尝试）、原地保留 火</p>
+          <span class="tag">Evaporate · 范围</span>
+        </article>
+        <article class="rx" data-key="f+g" style="--rc:#ffb15e">
+          <div class="head"><img class="px" src="art/el-fire.png" alt="火"><span class="plus">+</span><img class="px" src="art/el-grass.png" alt="草"><h3>燎原</h3></div>
+          <p class="eff">本格 4 伤害、四周生成 1 枚火（尝试）、原地保留 火</p>
+          <span class="tag">Wildfire · 蔓延</span>
+        </article>
+        <article class="rx" data-key="f+t" style="--rc:#fff0c0">
+          <div class="head"><img class="px" src="art/el-fire.png" alt="火"><span class="plus">+</span><img class="px" src="art/el-thunder.png" alt="雷"><h3>爆破</h3></div>
+          <p class="eff">本格 5 伤害、四周生成 1 枚雷</p>
+          <span class="tag">Blast · 起爆</span>
+        </article>
+        <article class="rx" data-key="f+a" style="--rc:#ff9a4a">
+          <div class="head"><img class="px" src="art/el-fire.png" alt="火"><span class="plus">+</span><img class="px" src="art/el-wind.png" alt="风"><h3>煽动</h3></div>
+          <p class="eff">本格 3 伤害、四周生成 3 枚火</p>
+          <span class="tag">Fanning · 播火</span>
+        </article>
+        <article class="rx" data-key="f+r" style="--rc:#ff6a1e">
+          <div class="head"><img class="px" src="art/el-fire.png" alt="火"><span class="plus">+</span><img class="px" src="art/el-rock.png" alt="岩"><h3>熔岩</h3></div>
+          <p class="eff">本格 1 伤害、全场生成 3 枚火、本格变「渊眼」(随机元素)　10 回合</p>
+          <span class="tag">Lava · 造地形</span>
+        </article>
+      </div>
+    </div>
+
+    <div class="rx-group reveal" style="--gc:var(--water)">
+      <div class="legend"><img class="px" src="art/el-water.png" alt=""><b>水</b><span>×5</span></div>
+      <div class="rx-list">
+        <article class="rx" data-key="w+w" style="--rc:#bfe8ff">
+          <div class="head"><img class="px" src="art/el-water.png" alt="水"><span class="plus">+</span><img class="px" src="art/el-water.png" alt="水"><h3>川流</h3></div>
+          <p class="eff">本格 2 伤害、本格眩晕、击退 1 格、四周生成 1 枚水、原地保留 水</p>
+          <span class="tag">Stream · 控制</span>
+        </article>
+        <article class="rx" data-key="w+g" style="--rc:#a8e88a">
+          <div class="head"><img class="px" src="art/el-water.png" alt="水"><span class="plus">+</span><img class="px" src="art/el-grass.png" alt="草"><h3>生长</h3></div>
+          <p class="eff">本格 1 伤害、核心回复 1、四周生成 1 枚草、原地保留 草</p>
+          <span class="tag">Grow · 回血</span>
+        </article>
+        <article class="rx" data-key="w+t" style="--rc:#d9f4ff">
+          <div class="head"><img class="px" src="art/el-water.png" alt="水"><span class="plus">+</span><img class="px" src="art/el-thunder.png" alt="雷"><h3>引导</h3></div>
+          <p class="eff">本格 5 伤害、四周生成 1 枚雷、原地保留 水</p>
+          <span class="tag">Conduct · 导电</span>
+        </article>
+        <article class="rx" data-key="w+a" style="--rc:#bfe6ff">
+          <div class="head"><img class="px" src="art/el-water.png" alt="水"><span class="plus">+</span><img class="px" src="art/el-wind.png" alt="风"><h3>浪潮</h3></div>
+          <p class="eff">本格 3 伤害、四周生成 3 枚水</p>
+          <span class="tag">Tide · 播水</span>
+        </article>
+        <article class="rx" data-key="w+r" style="--rc:#9fd8ea">
+          <div class="head"><img class="px" src="art/el-water.png" alt="水"><span class="plus">+</span><img class="px" src="art/el-rock.png" alt="岩"><h3>侵蚀</h3></div>
+          <p class="eff">本格 25 伤害、全场生成 3 枚水、本格变「虚色」(不含元素)　10 回合</p>
+          <span class="tag">Erode · 最重一击</span>
+        </article>
+      </div>
+    </div>
+
+    <div class="rx-group reveal" style="--gc:var(--grass)">
+      <div class="legend"><img class="px" src="art/el-grass.png" alt=""><b>草</b><span>×4</span></div>
+      <div class="rx-list">
+        <article class="rx" data-key="g+g" style="--rc:#a8e88a">
+          <div class="head"><img class="px" src="art/el-grass.png" alt="草"><span class="plus">+</span><img class="px" src="art/el-grass.png" alt="草"><h3>繁荣</h3></div>
+          <p class="eff">本格 2 伤害、本格眩晕、四角生成 2 枚草、原地保留 草</p>
+          <span class="tag">Bloom · 铺场</span>
+        </article>
+        <article class="rx" data-key="g+t" style="--rc:#e6d0ff">
+          <div class="head"><img class="px" src="art/el-grass.png" alt="草"><span class="plus">+</span><img class="px" src="art/el-thunder.png" alt="雷"><h3>激化</h3></div>
+          <p class="eff">本格 5 伤害、本格眩晕、四角生成 2 枚雷</p>
+          <span class="tag">Excite · 激活</span>
+        </article>
+        <article class="rx" data-key="g+a" style="--rc:#cdf0b8">
+          <div class="head"><img class="px" src="art/el-grass.png" alt="草"><span class="plus">+</span><img class="px" src="art/el-wind.png" alt="风"><h3>弥漫</h3></div>
+          <p class="eff">本格 3 伤害、四周生成 3 枚草</p>
+          <span class="tag">Spores · 播草</span>
+        </article>
+        <article class="rx" data-key="g+r" style="--rc:#d8e0a0">
+          <div class="head"><img class="px" src="art/el-grass.png" alt="草"><span class="plus">+</span><img class="px" src="art/el-rock.png" alt="岩"><h3>脉动</h3></div>
+          <p class="eff">本格 1 伤害、全场生成 3 枚草、本格变「石碑」(随机元素)　10 回合</p>
+          <span class="tag">Pulse · 造地形</span>
+        </article>
+      </div>
+    </div>
+
+    <div class="rx-group reveal" style="--gc:var(--thunder)">
+      <div class="legend"><img class="px" src="art/el-thunder.png" alt=""><b>雷</b><span>×3</span></div>
+      <div class="rx-list">
+        <article class="rx" data-key="t+t" style="--rc:#e2d4ff">
+          <div class="head"><img class="px" src="art/el-thunder.png" alt="雷"><span class="plus">+</span><img class="px" src="art/el-thunder.png" alt="雷"><h3>浩劫</h3></div>
+          <p class="eff">本格 10 伤害、敌人所在格生成 3 枚雷</p>
+          <span class="tag">Havoc · 指名</span>
+        </article>
+        <article class="rx" data-key="t+a" style="--rc:#efe4ff">
+          <div class="head"><img class="px" src="art/el-thunder.png" alt="雷"><span class="plus">+</span><img class="px" src="art/el-wind.png" alt="风"><h3>游雷</h3></div>
+          <p class="eff">本格 3 伤害、四周生成 3 枚雷</p>
+          <span class="tag">Wandering · 布雷</span>
+        </article>
+        <article class="rx" data-key="t+r" style="--rc:#e8d8ff">
+          <div class="head"><img class="px" src="art/el-thunder.png" alt="雷"><span class="plus">+</span><img class="px" src="art/el-rock.png" alt="岩"><h3>贯穿</h3></div>
+          <p class="eff">本格 1 伤害、整行整列 5 伤害、全场生成 3 枚雷</p>
+          <span class="tag">Pierce · 直线</span>
+        </article>
+      </div>
+    </div>
+
+    <div class="rx-group reveal" style="--gc:var(--wind)">
+      <div class="legend"><img class="px" src="art/el-wind.png" alt=""><b>风</b><span>×2</span></div>
+      <div class="rx-list">
+        <article class="rx" data-key="a+a" style="--rc:#d6f5e8">
+          <div class="head"><img class="px" src="art/el-wind.png" alt="风"><span class="plus">+</span><img class="px" src="art/el-wind.png" alt="风"><h3>散旋</h3></div>
+          <p class="eff">本格 3 伤害、四周生成 3 枚风</p>
+          <span class="tag">Gyro · 播风</span>
+        </article>
+        <article class="rx" data-key="a+r" style="--rc:#d8cdb8">
+          <div class="head"><img class="px" src="art/el-wind.png" alt="风"><span class="plus">+</span><img class="px" src="art/el-rock.png" alt="岩"><h3>飞沙</h3></div>
+          <p class="eff">本格 1 伤害、全场生成 3 枚风、本格变「涡心」(不含元素)　10 回合</p>
+          <span class="tag">Sandstorm · 造地形</span>
+        </article>
+      </div>
+    </div>
+
+    <div class="rx-group reveal" style="--gc:var(--rock)">
+      <div class="legend"><img class="px" src="art/el-rock.png" alt=""><b>岩</b><span>×1</span></div>
+      <div class="rx-list">
+        <article class="rx" data-key="r+r" style="--rc:#c8c0aa">
+          <div class="head"><img class="px" src="art/el-rock.png" alt="岩"><span class="plus">+</span><img class="px" src="art/el-rock.png" alt="岩"><h3>结晶</h3></div>
+          <p class="eff">本格 1 伤害、全场生成 3 枚岩、本格变「高墙」(不含元素)　10 回合</p>
+          <span class="tag">Crystal · 筑墙</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 敌人 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Bestiary</p>
+      <h2>六种敌人</h2>
+      <p>它们都朝着核心走。有的飞、有的远程、有的会把你的布置一口吃掉</p>
+    </div>
+    <div class="foe-grid">
+
+      <div class="foe reveal" style="--fc:#c8b8a2;--fc-dim:rgba(200,184,162,.35)">
+        <div class="vis">
+          <img class="px" src="art/foe-spider.png" alt="蜘蛛立绘" />
+          <div>
+            <h3>蜘蛛</h3>
+            <p class="en">Spider</p>
+            <div class="traits"><span>常见</span><span>成群</span></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="l">生命</span><span class="bar"><i style="width:31%"></i></span><span class="v">5</span></div>
+          <div class="stat"><span class="l">攻击</span><span class="bar"><i style="width:100%"></i></span><span class="v">5</span></div>
+          <div class="stat"><span class="l">速度</span><span class="bar"><i style="width:50%"></i></span><span class="v">1 格/回合</span></div>
+          <p class="desc">常见敌人，数量众多。第一课的对手，也是此后每一波的人头。</p>
+        </div>
+      </div>
+
+      <div class="foe reveal" style="--fc:#d8c8ff;--fc-dim:rgba(216,200,255,.35)">
+        <div class="vis">
+          <img class="px" src="art/foe-bat.png" alt="蝙蝠鸟立绘" />
+          <div>
+            <h3>蝙蝠鸟</h3>
+            <p class="en">Bat</p>
+            <div class="traits"><span>飞行</span><span>无视地形</span></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="l">生命</span><span class="bar"><i style="width:25%"></i></span><span class="v">4</span></div>
+          <div class="stat"><span class="l">攻击</span><span class="bar"><i style="width:80%"></i></span><span class="v">4</span></div>
+          <div class="stat"><span class="l">速度</span><span class="bar"><i style="width:50%"></i></span><span class="v">1 格/回合</span></div>
+          <p class="desc">飞行敌人，无视地形，直奔核心。高墙拦不住它，只有反应拦得住。</p>
+        </div>
+      </div>
+
+      <div class="foe reveal" style="--fc:#b7d34a;--fc-dim:rgba(183,211,74,.35)">
+        <div class="vis">
+          <img class="px" src="art/foe-goblin.png" alt="哥布林立绘" />
+          <div>
+            <h3>哥布林</h3>
+            <p class="en">Goblin</p>
+            <div class="traits"><span>远程</span><span>射程 2</span></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="l">生命</span><span class="bar"><i style="width:50%"></i></span><span class="v">8</span></div>
+          <div class="stat"><span class="l">攻击</span><span class="bar"><i style="width:60%"></i></span><span class="v">3</span></div>
+          <div class="stat"><span class="l">速度</span><span class="bar"><i style="width:50%"></i></span><span class="v">1 格/回合</span></div>
+          <p class="desc">远程敌人，隔着两格就能攻击核心。别指望把它放到射程之外。</p>
+        </div>
+      </div>
+
+      <div class="foe reveal" style="--fc:#c86bd0;--fc-dim:rgba(200,107,208,.35)">
+        <div class="vis">
+          <img class="px" src="art/foe-slime.png" alt="史莱姆立绘" />
+          <div>
+            <h3>史莱姆</h3>
+            <p class="en">Slime</p>
+            <div class="traits"><span>吞噬元素</span><span>迟缓</span></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="l">生命</span><span class="bar"><i style="width:100%"></i></span><span class="v">16</span></div>
+          <div class="stat"><span class="l">攻击</span><span class="bar"><i style="width:100%"></i></span><span class="v">5</span></div>
+          <div class="stat"><span class="l">速度</span><span class="bar"><i style="width:25%"></i></span><span class="v">1 格/2 回合</span></div>
+          <p class="desc">基础生命丰厚，行动迟缓，并吞噬沿途的元素——你的布置是它的口粮。</p>
+        </div>
+      </div>
+
+      <div class="foe reveal" style="--fc:#ffb27a;--fc-dim:rgba(255,178,122,.35)">
+        <div class="vis">
+          <img class="px" src="art/foe-deer.png" alt="小鹿立绘" />
+          <div>
+            <h3>小鹿</h3>
+            <p class="en">Deer</p>
+            <div class="traits"><span>治疗同伴</span><span>迅捷</span></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="l">生命</span><span class="bar"><i style="width:50%"></i></span><span class="v">8</span></div>
+          <div class="stat"><span class="l">攻击</span><span class="bar"><i style="width:80%"></i></span><span class="v">4</span></div>
+          <div class="stat"><span class="l">速度</span><span class="bar"><i style="width:100%"></i></span><span class="v">2 格/回合</span></div>
+          <p class="desc">移动迅速，每回合为相邻八格的同伴回复 10% 基础生命。优先处理它。</p>
+        </div>
+      </div>
+
+      <div class="foe reveal" style="--fc:#8fd6e8;--fc-dim:rgba(143,214,232,.35)">
+        <div class="vis">
+          <img class="px" src="art/foe-ghost.png" alt="幽灵立绘" />
+          <div>
+            <h3>幽灵</h3>
+            <p class="en">Ghost</p>
+            <div class="traits"><span>免疫控制</span><span>灵体</span></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="l">生命</span><span class="bar"><i style="width:63%"></i></span><span class="v">10</span></div>
+          <div class="stat"><span class="l">攻击</span><span class="bar"><i style="width:100%"></i></span><span class="v">5</span></div>
+          <div class="stat"><span class="l">速度</span><span class="bar"><i style="width:50%"></i></span><span class="v">1 格/回合</span></div>
+          <p class="desc">灵体敌人，免疫眩晕与击退。川流的那一手在它面前不起作用。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 建筑 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Structures</p>
+      <h2>棋盘会自己动</h2>
+      <p>石碑吐元素、涡心吸元素——它们会在场上自己撞出反应。没有任何建筑是永久的</p>
+    </div>
+    <div class="bd-grid">
+      <div class="bd reveal" style="--bc:#b0a493">
+        <img class="px" src="art/bd-wall.png" alt="高墙图标" />
+        <h3>高墙</h3>
+        <p>阻挡非飞行敌人通过，成段生成，把波次逼出形状。</p>
+        <p class="where">第 2 关起</p>
+      </div>
+      <div class="bd reveal" style="--bc:#e7c27a">
+        <img class="px" src="art/bd-stele.png" alt="石碑图标" />
+        <h3>石碑</h3>
+        <p>每回合向相邻八格随机生成元素，站在原地替你铺引信。</p>
+        <p class="where">第 3 关起 · 1→5 座</p>
+      </div>
+      <div class="bd reveal" style="--bc:#4a9be8">
+        <img class="px" src="art/bd-vortex.png" alt="涡心图标" />
+        <h3>涡心</h3>
+        <p>每回合吸取相邻八格的元素并向心触发反应。</p>
+        <p class="where">第 4 关起 · 1→4 座</p>
+      </div>
+      <div class="bd reveal" style="--bc:#b48af2">
+        <img class="px" src="art/bd-abyss.png" alt="渊眼图标" />
+        <h3>渊眼</h3>
+        <p>始终视为指定元素存在；踩入的敌人每回合承受 33% 当前生命的伤害。</p>
+        <p class="where">第 5 关起 · 1→3 座</p>
+      </div>
+      <div class="bd reveal" style="--bc:#8a8070">
+        <img class="px" src="art/bd-voidc.png" alt="虚色图标" />
+        <h3>虚色</h3>
+        <p>始终视为空地，吞噬传入的元素——能掐断连锁，也能故意留白。</p>
+        <p class="where">第 6 关起 · 1→2 座</p>
+      </div>
+    </div>
+    <p class="bd-note reveal">反应也可以就地造出这些建筑（熔岩、侵蚀、脉动、飞沙、结晶），寿命 10 回合；开局摆下的寿命 77 回合。建筑到期即塌，没有例外。</p>
+  </section>
+
+  <!-- 关卡旅程 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// The Journey</p>
+      <h2>六关，六种元素</h2>
+      <p>每一关介绍一种新元素、一只新敌人、一座新建筑——教学融在波次里，不在说明书里</p>
+    </div>
+    <div class="path reveal" aria-hidden="true">
+      <div class="node" style="--nc:var(--fire)"><span class="box">01</span><span class="lab">火</span></div>
+      <div class="node" style="--nc:var(--water)"><span class="box">02</span><span class="lab">水</span></div>
+      <div class="node" style="--nc:var(--grass)"><span class="box">03</span><span class="lab">草</span></div>
+      <div class="node" style="--nc:var(--thunder)"><span class="box">04</span><span class="lab">雷</span></div>
+      <div class="node" style="--nc:var(--wind)"><span class="box">05</span><span class="lab">风</span></div>
+      <div class="node" style="--nc:var(--rock)"><span class="box">06</span><span class="lab">岩</span></div>
+      <div class="node" style="--nc:var(--gold)"><span class="box">无限</span><span class="lab">每日种子</span></div>
+    </div>
+    <div class="lv-grid">
+      <div class="lv reveal" style="--lc:var(--fire)">
+        <p class="no">LEVEL 01 · 3 波</p>
+        <h3>第一个火堆</h3>
+        <ul>
+          <li><b>新元素</b><span style="color:var(--fire)">火 — 攻伐</span></li>
+          <li><b>新敌人</b>蜘蛛</li>
+          <li><b>波次</b>3 波，第一波 1 只</li>
+        </ul>
+        <p class="aim"><b>这一课：</b>掌握单一元素的攻击方式。</p>
+      </div>
+      <div class="lv reveal" style="--lc:var(--water)">
+        <p class="no">LEVEL 02 · 4 波</p>
+        <h3>水道与高墙</h3>
+        <ul>
+          <li><b>新元素</b><span style="color:var(--water)">水 — 推力</span></li>
+          <li><b>新敌人</b>蝙蝠鸟（飞行）</li>
+          <li><b>新建筑</b>高墙</li>
+        </ul>
+        <p class="aim"><b>这一课：</b>掌握法术反应的触发方式。</p>
+      </div>
+      <div class="lv reveal" style="--lc:var(--grass)">
+        <p class="no">LEVEL 03 · 5 波</p>
+        <h3>草芽与石碑</h3>
+        <ul>
+          <li><b>新元素</b><span style="color:var(--grass)">草 — 发展</span></li>
+          <li><b>新敌人</b>哥布林（远程）</li>
+          <li><b>新建筑</b>石碑</li>
+        </ul>
+        <p class="aim"><b>这一课：</b>掌握元素的提前布置。</p>
+      </div>
+      <div class="lv reveal" style="--lc:var(--thunder)">
+        <p class="no">LEVEL 04 · 6 波</p>
+        <h3>雷鸣与涡心</h3>
+        <ul>
+          <li><b>新元素</b><span style="color:var(--thunder)">雷 — 爆发</span></li>
+          <li><b>新敌人</b>史莱姆（吞噬）</li>
+          <li><b>新建筑</b>涡心</li>
+        </ul>
+        <p class="aim"><b>这一课：</b>掌握高级法术攻击。</p>
+      </div>
+      <div class="lv reveal" style="--lc:var(--wind)">
+        <p class="no">LEVEL 05 · 7 波</p>
+        <h3>风与渊眼</h3>
+        <ul>
+          <li><b>新元素</b><span style="color:var(--wind)">风 — 扩散</span></li>
+          <li><b>新敌人</b>小鹿（治疗同伴）</li>
+          <li><b>新建筑</b>渊眼</li>
+        </ul>
+        <p class="aim"><b>这一课：</b>掌握扩散引发连锁反应。</p>
+      </div>
+      <div class="lv reveal" style="--lc:var(--rock)">
+        <p class="no">LEVEL 06 · 14 波</p>
+        <h3>岩轨与虚色</h3>
+        <ul>
+          <li><b>新元素</b><span style="color:var(--rock)">岩 — 固化</span></li>
+          <li><b>新敌人</b>幽灵（免疫控制）</li>
+          <li><b>新建筑</b>虚色</li>
+        </ul>
+        <p class="aim"><b>这一课：</b>掌握创建特殊建筑。十几座建筑在场上同时动起来。</p>
+      </div>
+      <div class="lv wide reveal" style="--lc:var(--gold)">
+        <div>
+          <p class="no">INFINITE · 无限模式</p>
+          <h3>每日种子</h3>
+          <ul>
+            <li><b>波次</b>无穷无尽，每 7 波来一位领主（生命 ×7）</li>
+            <li><b>种子</b>每天全服同一组——同一天，所有人开出的棋盘完全一样</li>
+            <li><b>榜单</b>无限总榜 + 每日榜，各记一份成绩</li>
+          </ul>
+        </div>
+        <p class="aim"><b>解锁：</b>在无限模式坚持到<b>第 21 波</b>，自定义模式的工坊就会打开。输了也记——最好成绩只升不降。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 规则数字 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// By The Numbers</p>
+      <h2>规则的形状</h2>
+      <p>没有隐藏数值。下面这些就是全部</p>
+    </div>
+    <div class="rules reveal">
+      <div class="cell"><div class="v">11×11</div><div class="l">棋盘，核心居中</div></div>
+      <div class="cell"><div class="v">100</div><div class="l">核心生命</div></div>
+      <div class="cell"><div class="v">1<small> 子/回合</small></div><div class="l">放下即结束回合</div></div>
+      <div class="cell"><div class="v">10<small> 枚</small></div><div class="l">开局每种元素撒在场上</div></div>
+      <div class="cell"><div class="v">1+2n</div><div class="l">第 n 波敌人数，上限 30</div></div>
+      <div class="cell"><div class="v">+25%</div><div class="l">每波敌人生命成长，无上限</div></div>
+      <div class="cell"><div class="v">10<small> 回合</small></div><div class="l">拖过强制开下一波</div></div>
+      <div class="cell"><div class="v">×7</div><div class="l">领主生命（攻击不加成）</div></div>
+      <div class="cell"><div class="v">7<small> 步</small></div><div class="l">撤回上限</div></div>
+      <div class="cell"><div class="v">9<small> 次</small></div><div class="l">同一格单次结算的点亮上限</div></div>
+      <div class="cell"><div class="v">77<small> 回合</small></div><div class="l">开局建筑寿命</div></div>
+      <div class="cell"><div class="v">0</div><div class="l">卡关兜底——刷了就是刷了</div></div>
+    </div>
+    <p class="rules-note reveal">
+      连锁没有设计上限：一段结算会一直烧下去，直到没有新的元素被点亮，
+      或同一格被点亮满 9 次（那道保险丝只为防死循环，正常对局烧不到）。
+    </p>
+    <div class="score reveal">
+      <div class="s-item"><div class="v">+1 分</div><div class="l">每 1 点伤害</div></div>
+      <div class="s-plus">+</div>
+      <div class="s-item"><div class="v">+1 分</div><div class="l">每次触发反应</div></div>
+      <div class="s-plus">=</div>
+      <div class="s-item"><div class="v">一局几百到几千</div><div class="l">打得越多，分越高</div></div>
+      <div class="s-item s-no"><div class="v">击破 0 分</div><div class="l">打死不给奖——伤害已经记过了</div></div>
+    </div>
+  </section>
+
+  <!-- 自定义模式 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Workshop</p>
+      <h2>自定义模式</h2>
+      <p>规则既然都写在表里，为什么不让你也改一改</p>
+    </div>
+    <div class="custom reveal">
+      <div class="cols">
+        <div>
+          <p class="lead">
+            自定义模式不是换皮，而是<b>另一张配置表</b>：你可以改每种元素之间反应什么、打多少、留什么、造什么——
+            官方那 21 条只是默认答案。编好一套方案，生成一个<b>分享码</b>发给朋友，他导入就能在你的规则里开一局。
+            历史对账、排行榜、每日挑战用的随机数与结算，和官方模式跑的是同一套内核。
+          </p>
+          <div class="mrow">
+            <span><b>7</b> 个方案位</span>
+            <span><b>≤6</b> 种元素</span>
+            <span><b>≤9</b> 条效果 / 反应</span>
+            <span><b>0</b> 条语法错误（越界自动夹紧）</span>
+          </div>
+        </div>
+        <div>
+          <p class="lead" style="margin-bottom:14px"><b>九种原子效果</b>，一条反应由它们组合而成：</p>
+          <ul class="fx-list">
+            <li><b>本格伤害</b><span class="rng">1–25</span></li>
+            <li><b>八周伤害</b><span class="rng">1–25</span></li>
+            <li><b>行列伤害</b><span class="rng">1–25</span></li>
+            <li><b>本格眩晕</b><span class="rng">开/关</span></li>
+            <li><b>四周击退</b><span class="rng">1–3 格</span></li>
+            <li><b>核心回复</b><span class="rng">1–3</span></li>
+            <li><b>施加元素</b><span class="rng">1–3 份</span></li>
+            <li><b>原地留下</b><span class="rng">六选一</span></li>
+            <li><b>创建建筑</b><span class="rng">1–100 回合</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 叙事 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// The Chronicle</p>
+      <h2>瑟克斯先生的材料</h2>
+      <p>每一关开屏翻过一页。六关各说一种元素的前史，后两段留给无限与自定义</p>
+    </div>
+    <div class="story-grid">
+      <div class="scroll opening reveal">
+        <h3>卷首</h3>
+        <p><span>待到光与影彻底弥散开来</span><span>世间便有了六种元素</span></p>
+      </div>
+      <div class="scroll reveal" style="--sc1:var(--fire)">
+        <h3>第一页 · 火</h3>
+        <p><span>黑夜自创世的开篇起</span><span>始终蒙蔽着蛮荒的双眼</span><span>黑暗中隐隐约约蠕动着</span><span>八条腿的蜘蛛般的怪物</span><span>直到第一个火堆燃起</span></p>
+      </div>
+      <div class="scroll reveal" style="--sc1:var(--water)">
+        <h3>第二页 · 水</h3>
+        <p><span>足迹沿着水道遍历山河</span><span>人们在河边垒筑居所</span><span>表面的影子交替闪烁</span><span>蝙蝠鸟群掠过空中</span><span>乌云便盖过了美梦</span></p>
+      </div>
+      <div class="scroll reveal" style="--sc1:var(--grass)">
+        <h3>第三页 · 草</h3>
+        <p><span>如新生的草芽般茁壮成长</span><span>坏死的茎叶却疏于清理</span><span>于是丑恶开始滋生</span><span>彼此是对方的不是</span><span>一场哥布林大战人类</span></p>
+      </div>
+      <div class="scroll reveal" style="--sc1:var(--thunder)">
+        <h3>第四页 · 雷</h3>
+        <p><span>雷声如机械般轰鸣</span><span>从此不必再等待天亮</span><span>箱中的史莱姆软弱无力</span><span>连光都逃不出它的影子</span></p>
+      </div>
+      <div class="scroll reveal" style="--sc1:var(--wind)">
+        <h3>第五页 · 风</h3>
+        <p><span>风是最自由的信使</span><span>林间的讯息交由它传递</span><span>可是今夜小鹿乱撞</span><span>越过围墙</span><span>风成了最无缝的探子</span></p>
+      </div>
+      <div class="scroll reveal" style="--sc1:var(--rock)">
+        <h3>第六页 · 岩</h3>
+        <p><span>岩轨下该死的幽灵</span><span>谈笑间穷尽的灵愚</span><span>征途上先逝的身躯</span><span>亦或是根本就籍籍无名</span><span>往日种种成为唯一的历史</span></p>
+      </div>
+      <div class="scroll reveal multi">
+        <h3>第七页 · 无限</h3>
+        <p><span>若火的柴薪永不断绝</span><span>则水的流转便不会枯竭</span><span>草的枯荣亦将生生不息</span><span>暴虐的雷始终游离世间</span><span>惬意的风时常飘扬成旋</span><span>岩后的真相便再无人发掘</span></p>
+      </div>
+      <div class="scroll reveal multi">
+        <h3>残页 · 自定义</h3>
+        <p><span>可火的柴薪终会断绝</span><span>尽数的水顷刻凝结</span><span>腐朽的草永无新蕊</span><span>雷的终局触手可及</span><span>风的起源尘封不清</span><span>岩后的真相便再无人问津</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 截图 -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Screenshots</p>
+      <h2>实机画面</h2>
+      <p>点击任意截图放大查看，Esc 或点击遮罩关闭</p>
+    </div>
+    <div class="media-grid">
+      <button class="shot reveal" type="button" aria-label="放大截图：主菜单"><img src="screenshot-01.jpg" alt="瑟克斯遗纪 主菜单" loading="lazy"><figcaption>主菜单</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：选关页"><img src="screenshot-02.jpg" alt="瑟克斯遗纪 选关页：01 到 06 加无限模式，像素山谷地图" loading="lazy"><figcaption>选关页</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：图鉴元素页"><img src="screenshot-03.jpg" alt="瑟克斯遗纪 图鉴元素页：火水草雷四种元素与其关键词" loading="lazy"><figcaption>图鉴 · 元素</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：图鉴反应页"><img src="screenshot-04.jpg" alt="瑟克斯遗纪 图鉴反应页：燃烧、蒸发、川流、燎原的效果数值" loading="lazy"><figcaption>图鉴 · 反应</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：无限模式"><img src="screenshot-05.jpg" alt="瑟克斯遗纪 无限模式弹窗：随机种子与每日挑战" loading="lazy"><figcaption>无限模式</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：自定义模式方案列表"><img src="screenshot-06.jpg" alt="瑟克斯遗纪 自定义模式：方案 1/7 与导入按钮" loading="lazy"><figcaption>自定义工坊</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：关卡叙事开屏"><img src="screenshot-07.jpg" alt="瑟克斯遗纪 关卡开屏：第一关叙事卷首" loading="lazy"><figcaption>关卡叙事</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：战斗画面"><img src="screenshot-08.jpg" alt="瑟克斯遗纪 战斗画面：棋盘、核心血条与右侧法术栏" loading="lazy"><figcaption>战斗 · 布置</figcaption></button>
+      <button class="shot reveal" type="button" aria-label="放大截图：连锁反应"><img src="screenshot-09.jpg" alt="瑟克斯遗纪 战斗画面：落子后的连锁反应与得分" loading="lazy"><figcaption>战斗 · 连锁</figcaption></button>
+    </div>
+  </section>
+
+  <!-- 信息条 -->
+  <section class="info reveal">
+    <div class="cell"><div class="l">平台</div><div class="v">Android</div></div>
+    <div class="cell"><div class="l">类型</div><div class="v">益智 · 棋盘策略</div></div>
+    <div class="cell"><div class="l">棋盘</div><div class="v gd">11×11</div></div>
+    <div class="cell"><div class="l">反应</div><div class="v gd">21 条</div></div>
+    <div class="cell"><div class="l">关卡</div><div class="v">6 + 无限 + 自定义</div></div>
+    <div class="cell"><div class="l">版本</div><div class="v">1.0</div></div>
+    <div class="cell"><div class="l">适龄</div><div class="v">8+</div></div>
+    <div class="cell"><div class="l">上线</div><div class="v">2026.10 · TapTap</div></div>
+  </section>
+
+  <!-- 底部 -->
+  <section class="bottom">
+    <h2 class="reveal">翻开这本材料</h2>
+    <p class="reveal">在 TapTap 免费下载，替我们把剩下的一半读完。</p>
+    <div class="links reveal">
+      <a class="primary" href="https://www.taptap.cn/app/966377" target="_blank" rel="noreferrer">前往 TapTap 下载</a>
+      <a href="../../index.html">返回作品集</a>
+    </div>
+    <p class="sign">瑟克斯遗纪 — GOVE · 2026 · TAPTAP</p>
+  </section>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="截图放大预览">
+  <button class="close" id="lbClose" aria-label="关闭">×</button>
+  <img id="lbImg" src="" alt="放大的游戏截图" />
+</div>
+
+<script>
+(function(){
+  /* ── 元素元数据 ── */
+  var EL = {
+    f:{name:'火', img:'art/el-fire.png',  c:'var(--fire)'},
+    w:{name:'水', img:'art/el-water.png', c:'var(--water)'},
+    g:{name:'草', img:'art/el-grass.png', c:'var(--grass)'},
+    t:{name:'雷', img:'art/el-thunder.png', c:'var(--thunder)'},
+    a:{name:'风', img:'art/el-wind.png',  c:'var(--wind)'},
+    r:{name:'岩', img:'art/el-rock.png',  c:'var(--rock)'}
+  };
+  var ORDER = ['f','w','g','t','a','r'];
+
+  /* ── 滚动浮现 ── */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  /* ── 反应矩阵（数据全部来自下方清单卡片，两处永不打架） ── */
+  function cardOf(key){ return document.querySelector('.rx[data-key="'+key+'"]'); }
+
+  var matrix = document.getElementById('matrix');
+  var frag = document.createDocumentFragment();
+
+  // 左上角空格
+  var corner = document.createElement('div');
+  corner.className = 'mx-h';
+  frag.appendChild(corner);
+
+  // 表头行
+  ORDER.forEach(function(id){
+    var h = document.createElement('div');
+    h.className = 'mx-h';
+    h.style.setProperty('--hc', EL[id].c);
+    h.innerHTML = '<img class="px" src="'+EL[id].img+'" alt="'+EL[id].name+'"><span>'+EL[id].name+'</span>';
+    frag.appendChild(h);
+  });
+
+  // 行 + 单元格（上三角含对角线）
+  ORDER.forEach(function(row){
+    var h = document.createElement('div');
+    h.className = 'mx-h';
+    h.style.setProperty('--hc', EL[row].c);
+    h.innerHTML = '<img class="px" src="'+EL[row].img+'" alt="'+EL[row].name+'"><span>'+EL[row].name+'</span>';
+    frag.appendChild(h);
+
+    ORDER.forEach(function(col){
+      var key = ORDER.indexOf(col) >= ORDER.indexOf(row)
+        ? row + '+' + col
+        : col + '+' + row;
+      var card = cardOf(key);
+      if(ORDER.indexOf(col) < ORDER.indexOf(row)){
+        var emp = document.createElement('div');
+        emp.className = 'mx-cell empty';
+        emp.setAttribute('aria-hidden','true');
+        frag.appendChild(emp);
+        return;
+      }
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mx-cell';
+      btn.setAttribute('data-key', key);
+      btn.textContent = card ? card.querySelector('h3').textContent : '?';
+      btn.style.setProperty('--rc', card ? card.style.getPropertyValue('--rc') : '#888');
+      btn.setAttribute('aria-label', EL[key.split('+')[0]].name + '与' + EL[key.split('+')[1]].name + '的反应：' + btn.textContent);
+      frag.appendChild(btn);
+    });
+  });
+
+  var tip = document.createElement('p');
+  tip.className = 'mx-tip';
+  tip.textContent = '行与列的交点 = 这对元素的反应';
+  frag.appendChild(tip);
+  matrix.appendChild(frag);
+
+  /* ── 详情面板 ── */
+  var pPair = document.getElementById('rxPair');
+  var pName = document.getElementById('rxName');
+  var pId   = document.getElementById('rxId');
+  var pEff  = document.getElementById('rxEff');
+  var panel = document.getElementById('rxPanel');
+  var curBtn = null;
+
+  function show(key){
+    var card = cardOf(key);
+    if(!card) return;
+    var ids = key.split('+');
+    pPair.innerHTML =
+      '<img class="px" src="'+EL[ids[0]].img+'" alt="'+EL[ids[0]].name+'">' +
+      '<span class="plus">+</span>' +
+      '<img class="px" src="'+EL[ids[1]].img+'" alt="'+EL[ids[1]].name+'">' +
+      '<span class="arrow">→</span>';
+    pName.textContent = card.querySelector('h3').textContent;
+    pId.textContent = key.toUpperCase().replace('+',' + ') + ' · ' + card.querySelector('.tag').textContent;
+    pEff.textContent = card.querySelector('.eff').textContent;
+    var rc = card.style.getPropertyValue('--rc');
+    pName.style.color = rc;
+    panel.style.setProperty('--rc', rc);
+
+    if(curBtn) curBtn.classList.remove('cur');
+    curBtn = matrix.querySelector('.mx-cell[data-key="'+key+'"]');
+    if(curBtn) curBtn.classList.add('cur');
+
+    document.querySelectorAll('.rx.hit').forEach(function(c){ c.classList.remove('hit'); });
+    card.classList.add('hit');
+  }
+
+  matrix.addEventListener('click', function(e){
+    var btn = e.target.closest('.mx-cell');
+    if(btn && !btn.classList.contains('empty')) show(btn.getAttribute('data-key'));
+  });
+
+  // 清单卡片点击 → 同步到面板与矩阵
+  document.querySelectorAll('.rx').forEach(function(card){
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(){ show(card.getAttribute('data-key')); });
+  });
+
+  show('f+f');
+
+  /* ── Lightbox ── */
+  var lb = document.getElementById('lb');
+  var lbImg = document.getElementById('lbImg');
+  var lbClose = document.getElementById('lbClose');
+  function openLB(src, alt){ lbImg.src = src; lbImg.alt = alt || '放大的游戏截图'; lb.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeLB(){ lb.classList.remove('open'); lbImg.src=''; document.body.style.overflow=''; }
+  document.querySelectorAll('.shot').forEach(function(s){
+    s.addEventListener('click', function(){
+      var img = s.querySelector('img');
+      openLB(img.currentSrc || img.src, img.alt);
+    });
+  });
+  lb.addEventListener('click', function(e){ if(e.target === lb || e.target === lbImg){ closeLB(); } });
+  lbClose.addEventListener('click', closeLB);
+  window.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && lb.classList.contains('open')){ closeLB(); }
+  });
+})();
+</script>
+</body>
+</html>

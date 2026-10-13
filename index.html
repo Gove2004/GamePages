@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#06070c" />
   <title>GOVE | 游戏作品集</title>
-  <meta name="description" content="Gove 的独立游戏作品集——从一束光到一整副牌，5 款独立游戏 5 种造物实验，发布于 TapTap、Steam 与 itch.io。" />
+  <meta name="description" content="Gove 的独立游戏作品集——从一束光到一本遗纪，6 款独立游戏 6 种造物实验，发布于 TapTap、Steam 与 itch.io。" />
   <style>
     :root {
       --bg: #06070c;
@@ -19,6 +19,7 @@
       --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
       --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Marker Felt", cursive;
       --ease: cubic-bezier(.2, .7, .3, 1);
+      --c-six: #e2483c;
     }
 
     * { box-sizing: border-box; }
@@ -353,6 +354,45 @@
     .fan i:nth-child(2) { transform: translateX(-50%) rotate(0deg); z-index: 2; }
     .fan i:nth-child(3) { transform: translateX(-50%) rotate(16deg); }
 
+    /* ============ Gate 6 · 瑟克斯遗纪（火红 + 六色环） ============ */
+    .g-six { --accent:#e2483c; --tint:rgba(226,72,60,.09); --bg2:#150e09; --ink:#f7e9dc; --tagc:#d4a99a; --desc:#9d7466; --tagbg:rgba(226,72,60,.08); --tagbd:rgba(226,72,60,.35); --gx:32%; --tilt:1.5deg; }
+    .g-six .cover::before {
+      content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(226,72,60,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(226,72,60,.10) 1px, transparent 1px);
+      background-size: 26px 26px;
+      mask-image: radial-gradient(ellipse at 50% 45%, black, transparent 78%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 45%, black, transparent 78%);
+    }
+    .hexring {
+      left: 50%; bottom: -36px; width: 190px; height: 110px;
+      transform: translateX(-50%);
+    }
+    .hexring .core {
+      position: absolute; top: 50%; left: 50%;
+      width: 24px; height: 24px; margin: -12px 0 0 -12px;
+      background: linear-gradient(135deg, #ffd9b8, #e2483c 62%, #8f2018);
+      border-radius: 4px; transform: rotate(45deg);
+      animation: corepulse 3s ease-in-out infinite;
+    }
+    @keyframes corepulse {
+      0%,100% { box-shadow: 0 0 20px 4px rgba(226,72,60,.45); }
+      50% { box-shadow: 0 0 34px 10px rgba(226,72,60,.62); }
+    }
+    .hexring i {
+      position: absolute; width: 11px; height: 11px; border-radius: 50%;
+      background: currentColor; box-shadow: 0 0 9px currentColor;
+      animation: dotfloat 5s ease-in-out infinite;
+    }
+    @keyframes dotfloat { 0%,100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+    .hexring i:nth-child(2) { color:#e2483c; left:165px; top:55px; margin:-5.5px; animation-delay:0s; }
+    .hexring i:nth-child(3) { color:#4a9be8; left:130px; top:27px; margin:-5.5px; animation-delay:.7s; }
+    .hexring i:nth-child(4) { color:#5fc24e; left:60px;  top:27px; margin:-5.5px; animation-delay:1.4s; }
+    .hexring i:nth-child(5) { color:#b48af2; left:25px;  top:55px; margin:-5.5px; animation-delay:2.1s; }
+    .hexring i:nth-child(6) { color:#3fd0c0; left:60px;  top:83px; margin:-5.5px; animation-delay:2.8s; }
+    .hexring i:nth-child(7) { color:#d9b83f; left:130px; top:83px; margin:-5.5px; animation-delay:3.5s; }
+
     /* ============ 侧栏目录（桌面） ============ */
     .rail {
       position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
@@ -455,6 +495,7 @@
       <a href="#luminary">Archipelago</a>
       <a href="#bug">Bug God</a>
       <a href="#slime">史莱姆牌</a>
+      <a href="#six">瑟克斯遗纪</a>
       <a href="#about">关于</a>
     </div>
     <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false" aria-controls="navLinks"><i></i></button>
@@ -467,9 +508,9 @@
     <div class="hero-content">
       <p class="hero-kicker">Independent Game Portfolio · 2024 — 2026</p>
       <h1>GOVE</h1>
-      <p class="hero-sub">从<em>「一束光」</em>到<em>「一整副牌」</em>，<br>5 款独立游戏，5 种造物实验。</p>
+      <p class="hero-sub">从<em>「一束光」</em>到<em>「一本遗纪」</em>，<br>6 款独立游戏，6 种造物实验。</p>
       <div class="hero-meta">
-        <div><div class="num">5</div><div class="label">款游戏</div></div>
+        <div><div class="num">6</div><div class="label">款游戏</div></div>
         <div><div class="num">3</div><div class="label">个平台</div></div>
         <div><div class="num">2024—2026</div><div class="label">跨三年创作</div></div>
       </div>
@@ -631,6 +672,34 @@
       </div>
     </section>
 
+    <!-- Gate 6 · 瑟克斯遗纪 -->
+    <section class="gate g-six flip" id="six">
+      <span class="ghost" aria-hidden="true">06</span>
+      <div class="gate-inner">
+        <div class="info">
+          <p class="kicker reveal d1">06 / 2026.10 · TapTap · 益智 · 棋盘策略</p>
+          <h2 class="reveal d1">瑟克斯遗纪</h2>
+          <p class="tagline reveal d2">每回合只落一子，看六种元素自己炸开棋盘。</p>
+          <p class="desc reveal d2">一座经历数百次焚毁的图书馆里，瑟克斯先生留下的材料成了唯一的元素使前文本。11×11 的棋盘上，21 条反应彼此连锁：怪物踩到元素会引爆它们，石碑吐元素、涡心吸元素——棋盘有自己的脾气。六关教学、每日种子的无限模式，以及一套可以自己改写的反应表。</p>
+          <div class="tags reveal d3">
+            <span class="tag">益智</span>
+            <span class="tag">六元素反应</span>
+            <span class="tag">21 条连锁</span>
+            <span class="tag">自定义规则</span>
+          </div>
+          <a class="cta reveal d3" href="games/six-elements/index.html">进入详情 <span class="ar">→</span></a>
+        </div>
+        <div class="stage reveal">
+          <div class="cover">
+            <img src="games/six-elements/cover.jpg" alt="瑟克斯遗纪 游戏封面：地下图书馆大厅中央的水晶棱柱与六元素" loading="lazy" />
+          </div>
+          <div class="micro hexring" aria-hidden="true">
+            <span class="core"></span><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- 侧栏目录 -->
@@ -640,6 +709,7 @@
     <a href="#luminary" style="--rc:#f0c674"><i>03</i><span>Archipelago</span></a>
     <a href="#bug" style="--rc:#fb923c"><i>04</i><span>Bug God</span></a>
     <a href="#slime" style="--rc:#2ee6ff"><i>05</i><span>史莱姆牌</span></a>
+    <a href="#six" style="--rc:#e2483c"><i>06</i><span>瑟克斯遗纪</span></a>
   </aside>
 
   <!-- 关于 -->
@@ -647,8 +717,8 @@
     <div class="about-inner">
       <p class="about-kicker">About the Creator</p>
       <h2>关于 Gove</h2>
-      <p>独立开发者，横跨叙事、塔防、解谜、概念合成与卡牌。从 2024 年的一束光开始，每一款游戏都是一次新的造物实验——不重复模板，不回避不完美。</p>
-      <p>首页的五扇门即五种气质：黑暗中的光晕、旋转的不可能几何、黑白战场上穿行的敌人、光与影的涂鸦合成、扇面展开的卡牌——每一扇门后，都是一整个世界。</p>
+      <p>独立开发者，横跨叙事、塔防、解谜、概念合成、卡牌与棋盘策略。从 2024 年的一束光开始，每一款游戏都是一次新的造物实验——不重复模板，不回避不完美。</p>
+      <p>首页的六扇门即六种气质：黑暗中的光晕、旋转的不可能几何、黑白战场上穿行的敌人、光与影的涂鸦合成、扇面展开的卡牌，以及一枚被六色元素环绕的水晶——每一扇门后，都是一整个世界。</p>
       <div class="about-links">
         <a href="https://www.taptap.cn/developer/275988" target="_blank" rel="noreferrer">TapTap 开发者主页</a>
         <a href="https://gove.itch.io/" target="_blank" rel="noreferrer">itch.io</a>
@@ -694,7 +764,7 @@
       }
 
       // 顶栏 + 侧栏当前区块高亮
-      var sections = ['lighting', 'unreal', 'luminary', 'bug', 'slime'].map(function (id) { return document.getElementById(id); });
+      var sections = ['lighting', 'unreal', 'luminary', 'bug', 'slime', 'six'].map(function (id) { return document.getElementById(id); });
       var navAnchors = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
       var railAnchors = Array.prototype.slice.call(document.querySelectorAll('.rail a[href^="#"]'));
       var map = {};
