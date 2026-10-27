@@ -1,0 +1,36 @@
+阿里巴巴普惠体 2.0 65 Medium — 字体授权说明
+================================================
+
+本目录下的 alibaba-puhuiti-65medium.woff2 是下列字体的子集化产物，
+仅保留本页实际用到的字形（约 850 个），用于 Ninth Slime Card 详情页。
+
+原始字体
+--------
+文件名：Alibaba_PuHuiTi_2.0_65_Medium_65_Medium.ttf
+来源：  E:\Projects\Unity\Ninth Slime Card\Assets\Resources\Fonts\
+        （即游戏本体的内置字体）
+版权：  Copyright © 2020-2021 Alibaba (China) Co., Ltd.
+        字体名称表中标注 "Copyright © 2020-2021 Alibaba (China) Co., Ltd."
+
+授权状态
+--------
+阿里巴巴普惠体由阿里巴巴集团公开发布，允许个人与企业免费使用（含商业用途），
+无需授权、无需付费。官方发布页：https://fonts.alibabagroup.com/
+
+⚠ 说明：本仓库在离线环境下整理，未能联网复核最新授权条款原文。
+若后续该字体的授权条款有变更，以阿里巴巴官方发布页为准。
+如对商用范围有疑虑，可删除本目录并在 index.html 中移除 @font-face，
+页面会回落到 font-family 栈中的系统字体（PingFang SC / 微软雅黑 / Noto Sans CJK），
+排版不会损坏。
+
+子集化方式
+----------
+工具：fontTools（subset + woff2 压缩）
+字形来源：页面 HTML 全文出现的字符 ∪ 常用 ASCII 与标点
+校验：脚本比对页面字符集与字体 cmap，缺失字形数 = 0
+体积：7.96 MB → 95.5 KB
+
+回退字体栈
+----------
+font-family: "Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei",
+             "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;

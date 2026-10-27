@@ -1,741 +1,1002 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bug Universe God | Gove</title>
-  <meta name="description" content="Bug Universe God：类涂鸦上帝的收集合成游戏。作为潜在未来的造物者，用「原型的雏形」从光与影开始，合成神学、哲学、物理与天文。" />
-  <style>
-    :root {
-      --bg: #0e0a0b;
-      --bg-soft: #1a1214;
-      --bg-card: #221618;
-      --red: #ff5a5a;
-      --orange: #fb923c;
-      --ink: #f5e9ea;
-      --dim: #b89499;
-      --faint: #6e4a4f;
-      --line: rgba(255, 90, 90, 0.22);
-      --line-soft: rgba(255, 90, 90, 0.12);
-      --hand: "Bradley Hand", "Segoe Print", "Comic Sans MS", "Marker Felt", cursive, "Microsoft YaHei", sans-serif;
-      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bug Universe God · 造物档案 | Gove</title>
+<meta name="description" content="Bug Universe God：由 Gove 制作的类涂鸦上帝的收集合成游戏，延续 Archipelago 的世界观，试图讲述 GoderBye 的往事。受雇于 God Universe Bug，用「原型的雏形」从光与影开始定义万物。" />
+<meta name="theme-color" content="#0e0a0b" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Bug Universe God | Gove" />
+<meta property="og:description" content="类涂鸦上帝的收集合成游戏。作为潜在未来的造物者，受雇于 God Universe Bug，从光与影开始合成 174 条概念配方。" />
+<meta property="og:image" content="cover.jpg" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230e0a0b'/%3E%3Cpolygon points='50,14 84,74 16,74' fill='none' stroke='%23ff5a5a' stroke-width='7'/%3E%3Ccircle cx='50' cy='56' r='8' fill='%23fb923c'/%3E%3C/svg%3E" />
+<style>
+/* ==================================================================
+   Bug Universe God · 造物档案
+   设计方向：手写实验记录本 / 造物档案室
+   —— 纸面、墨迹、档案卡、手绘描边、胶带贴纸
+   ================================================================== */
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+:root {
+  --bg:        #0e0a0b;
+  --bg-soft:   #1a1214;
+  --bg-card:   #221618;
+  --paper:     #16100f;   /* 档案纸底 */
+  --paper-2:   #1d1413;   /* 纸面抬升 */
+  --red:       #ff5a5a;
+  --red-deep:  #b8323a;
+  --orange:    #fb923c;
+  --ink:       #f5e9ea;
+  --dim:       #b89499;
+  --faint:     #6e4a4f;
+  --line:      rgba(255, 90, 90, 0.22);
+  --line-soft: rgba(255, 90, 90, 0.12);
+  --rule:      rgba(184, 148, 153, 0.16);  /* 稿纸横线 */
+  --hand: "Bradley Hand", "Segoe Print", "Comic Sans MS", "Marker Felt", cursive, "Microsoft YaHei", sans-serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 15% 12%, rgba(255, 90, 90, .14), transparent 30rem),
-        radial-gradient(circle at 85% 20%, rgba(251, 146, 60, .10), transparent 26rem),
-        radial-gradient(circle at 50% 110%, rgba(255, 90, 90, .08), transparent 30rem),
-        var(--bg);
-      color: var(--ink);
-      font-family: var(--hand);
-      line-height: 1.75;
-      overflow-x: hidden;
-    }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
-    /* 漂浮空心三角底纹（呼应游戏标题屏） */
-    .tri-field {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .tri-field svg {
-      position: absolute;
-      opacity: .18;
-      animation: drift linear infinite;
-    }
-    @keyframes drift {
-      from { transform: translateY(10vh) rotate(0deg); }
-      to   { transform: translateY(-110vh) rotate(360deg); }
-    }
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* 档案纸纹理：稿纸横线 + 档案表格竖线，随内容滚动（纸是跟着翻的） */
+  background:
+    /* 稿纸横线：30px 一行，像被涂写过的档案纸 */
+    repeating-linear-gradient(0deg,
+      rgba(184, 148, 153, .05) 0 1px, transparent 1px 30px),
+    /* 档案表格竖线：96px 一格，很淡 */
+    repeating-linear-gradient(90deg,
+      rgba(184, 148, 153, .03) 0 1px, transparent 1px 96px),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--hand);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
 
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
+/* 三团档案灯：用 position:fixed 伪元素锚定视口。
+   刻意不用 background-attachment:fixed —— iOS Safari 会忽略该属性，
+   导致灯光跟着页面滚走。伪元素方案在所有浏览器上表现一致。
+   z-index 0 在 .wrap（z-index 2）之下，不会盖住内容。 */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+  background:
+    /* 左上红主光：档案灯打下来 */
+    radial-gradient(circle at 12% 8%, rgba(255, 90, 90, .20), transparent 34rem),
+    /* 右上橙侧光 */
+    radial-gradient(circle at 88% 18%, rgba(251, 146, 60, .14), transparent 30rem),
+    /* 底部回升的暖光 */
+    radial-gradient(circle at 50% 108%, rgba(255, 90, 90, .12), transparent 34rem);
+}
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      width: min(1060px, calc(100% - 44px));
-      margin: 0 auto;
-    }
+/* 纸面颗粒：整页极淡的噪点，模拟实验记录本的纸 */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: .5; mix-blend-mode: overlay;
+  background-image:
+    repeating-linear-gradient(0deg,   rgba(255,255,255,.020) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg,  rgba(255,255,255,.014) 0 1px, transparent 1px 4px);
+}
 
-    /* ---------- 顶部导航 ---------- */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 0;
-      background: linear-gradient(180deg, rgba(14, 10, 11, .94), rgba(14, 10, 11, 0));
-      backdrop-filter: blur(2px);
-    }
-    .topbar a {
-      color: var(--dim);
-      font-size: 15px;
-      transition: color .25s ease;
-    }
-    .topbar a:hover, .topbar a:focus-visible { color: var(--red); }
-    .topbar .back::before { content: "← "; }
-    .topbar .tag {
-      color: var(--faint);
-      font-size: 13px;
-      letter-spacing: .06em;
-      font-family: var(--sans);
-    }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px dashed var(--orange); outline-offset: 3px; }
 
-    /* ---------- Hero ---------- */
-    .hero {
-      padding: 56px 0 40px;
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 44px;
-      align-items: center;
-    }
-    .cover-card {
-      width: 220px;
-      height: 220px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 3px solid rgba(255,255,255,.08);
-      box-shadow:
-        0 24px 60px rgba(255, 90, 90, .18),
-        0 8px 24px rgba(0,0,0,.5);
-      transform: rotate(-4deg);
-      transition: transform .4s ease;
-    }
-    .cover-card:hover { transform: rotate(-2deg) scale(1.03); }
-    .cover-card img { width: 100%; height: 100%; object-fit: cover; }
+.wrap { position: relative; z-index: 2; width: min(1060px, calc(100% - 44px)); margin: 0 auto; }
 
-    .hero-text .kicker {
-      color: var(--orange);
-      font-size: 14px;
-      letter-spacing: .14em;
-      margin: 0 0 18px;
-      transform: rotate(-1deg);
-      display: inline-block;
-      font-family: var(--sans);
-    }
-    .hero-text h1 {
-      margin: 0;
-      font-size: clamp(38px, 7vw, 72px);
-      font-weight: 700;
-      line-height: 1.02;
-      letter-spacing: -.01em;
-    }
-    .hero-text h1 .red { color: var(--red); }
-    .hero-text h1 .line2 { display: block; }
-    .hero-text .slogan {
-      margin: 22px 0 0;
-      font-size: clamp(17px, 2.4vw, 22px);
-      color: var(--ink);
-      line-height: 1.6;
-    }
-    .hero-text .slogan em {
-      font-style: normal;
-      color: var(--orange);
-      border-bottom: 2px dashed var(--orange);
-      padding-bottom: 1px;
-    }
+/* ---------- 跳转到主内容 ---------- */
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 200;
+  padding: 10px 18px; background: var(--red); color: #140708;
+  font-family: var(--sans); font-size: 14px; border-radius: 0 0 10px 0;
+}
+.skip:focus { left: 0; }
 
-    /* 信息条 */
-    .meta-bar {
-      margin: 30px 0 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0;
-      border: 2px dashed var(--line);
-      border-radius: 999px;
-      overflow: hidden;
-      width: fit-content;
-      max-width: 100%;
-    }
-    .meta-bar .item {
-      padding: 9px 20px;
-      font-size: 14px;
-      color: var(--dim);
-      border-right: 1px dashed var(--line);
-      white-space: nowrap;
-      font-family: var(--sans);
-    }
-    .meta-bar .item:last-child { border-right: none; }
-    .meta-bar .item b { color: var(--orange); font-weight: 700; }
+/* ---------- 漂浮空心三角（装饰，保留） ---------- */
+.tri-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.tri-field svg { position: absolute; opacity: .18; animation: drift linear infinite; }
+@keyframes drift {
+  from { transform: translateY(10vh) rotate(0deg); }
+  to   { transform: translateY(-110vh) rotate(360deg); }
+}
 
-    /* ---------- 章节通用 ---------- */
-    .section { padding: 56px 0; }
-    .section-head {
-      margin-bottom: 32px;
-    }
-    .section-head .kicker {
-      font-size: 12px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 8px;
-      font-family: var(--sans);
-    }
-    .section-head h2 {
-      margin: 0;
-      font-size: clamp(26px, 4.6vw, 40px);
-      color: var(--ink);
-      transform: rotate(-1deg);
-      display: inline-block;
-    }
-    .section-head p.lead {
-      margin: 10px 0 0;
-      color: var(--dim);
-      font-size: 15px;
-      max-width: 640px;
-    }
+/* ---------- 顶部导航（档案室标签条） ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0;
+  background: linear-gradient(180deg, rgba(14, 10, 11, .96) 70%, rgba(14, 10, 11, 0));
+  backdrop-filter: blur(3px);
+}
+.topbar a { color: var(--dim); font-size: 15px; transition: color .25s ease; }
+.topbar a:hover, .topbar a:focus-visible { color: var(--red); }
+.topbar .back::before { content: "← "; }
+.topbar .tag {
+  color: var(--faint); font-size: 12.5px; letter-spacing: .06em; font-family: var(--mono);
+  border: 1px dashed var(--line); border-radius: 999px; padding: 3px 12px;
+}
 
-    /* ---------- 世界观文案 ---------- */
-    .story-body {
-      max-width: 720px;
-      font-size: clamp(15px, 2.1vw, 17.5px);
-      line-height: 2;
-      color: var(--ink);
-    }
-    .story-body p { margin: 0 0 18px; }
-    .story-body .hl { color: var(--red); font-weight: 700; }
-    .story-body .hl2 { color: var(--orange); }
-    .story-body .tail {
-      color: var(--faint);
-      font-size: 14px;
-      font-style: italic;
-    }
+/* ---------- 通用：手绘描边容器 ---------- */
+.inked { position: relative; }
+.inked::before {
+  content: ""; position: absolute; inset: -6px; pointer-events: none;
+  border: 2px solid var(--line);
+  border-radius: 14px 10px 16px 8px / 8px 16px 10px 14px;
+  transform: rotate(-.35deg);
+}
 
-    /* ---------- 造物合成台 ---------- */
-    .lab-board {
-      position: relative;
-      padding: 36px 28px 30px;
-      border: 2px dashed var(--line);
-      border-radius: 22px;
-      background:
-        repeating-linear-gradient(0deg, transparent 0 27px, rgba(255,255,255,.018) 27px 28px),
-        rgba(255, 90, 90, 0.04);
-      transform: rotate(.25deg);
-    }
-    .lab-board::before {
-      content: "✱";
-      position: absolute;
-      top: -14px;
-      left: 28px;
-      font-size: 26px;
-      color: var(--orange);
-      background: var(--bg);
-      padding: 0 8px;
-    }
-    .lab-hint {
-      text-align: center;
-      color: var(--faint);
-      font-size: 15px;
-      margin: 0 0 26px;
-    }
-    .elements {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .el {
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
-      border: 2px solid var(--line);
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.12), transparent 60%),
-        var(--bg-card);
-      color: var(--ink);
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .25s ease, border-color .25s, box-shadow .25s, background .25s;
-      font-family: var(--hand);
-    }
-    .el:nth-child(3n)   { transform: rotate(-4deg); }
-    .el:nth-child(3n+1) { transform: rotate(3deg); }
-    .el:nth-child(3n+2) { transform: rotate(-1deg); }
-    .el:hover, .el:focus-visible {
-      border-color: var(--red);
-      transform: scale(1.08) rotate(-5deg);
-      outline: none;
-    }
-    .el.sel {
-      border-color: var(--orange);
-      background:
-        radial-gradient(circle at 35% 30%, rgba(251,146,60,.25), transparent 60%),
-        rgba(251, 146, 60, .12);
-      color: var(--orange);
-      box-shadow: 0 0 32px rgba(251, 146, 60, .4);
-    }
+/* ---------- Hero：封面贴纸 + 档案抬头 ---------- */
+.hero {
+  padding: 52px 0 40px;
+  display: grid; grid-template-columns: 240px 1fr; gap: 46px; align-items: center;
+}
+.cover-card {
+  position: relative;
+  width: 240px; height: 240px; border-radius: 4px; overflow: hidden;
+  border: 8px solid #efe6e2;
+  box-shadow: 0 24px 60px rgba(255, 90, 90, .18), 0 8px 24px rgba(0,0,0,.55);
+  transform: rotate(-3.2deg); transition: transform .45s cubic-bezier(.2,.8,.3,1);
+}
+.cover-card:hover { transform: rotate(-1deg) scale(1.035); }
+.cover-card img { width: 100%; height: 100%; object-fit: cover; }
+/* 胶带 */
+.cover-card::before,
+.cover-card::after {
+  content: ""; position: absolute; width: 74px; height: 22px; z-index: 3;
+  background: rgba(245, 233, 234, .30);
+  border-left: 1px dashed rgba(255,255,255,.35);
+  border-right: 1px dashed rgba(255,255,255,.35);
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+.cover-card::before { top: -12px; left: -20px; transform: rotate(-32deg); }
+.cover-card::after  { bottom: -12px; right: -20px; transform: rotate(-32deg); }
 
-    /* 合成箭头与结果 */
-    .brew {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      padding-top: 18px;
-    }
-    .arrow-down {
-      color: var(--red);
-      font-size: 26px;
-      line-height: 1;
-      transform: rotate(90deg);
-      opacity: .7;
-    }
-    .result {
-      min-height: 120px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-    .result-card {
-      padding: 22px 36px;
-      border-radius: 18px;
-      border: 2px solid var(--orange);
-      background: rgba(251, 146, 60, .08);
-      animation: pop .45s ease;
-      max-width: 460px;
-    }
-    @keyframes pop {
-      from { transform: scale(.7) rotate(-6deg); opacity: 0; }
-      to   { transform: scale(1) rotate(-1deg); opacity: 1; }
-    }
-    .result-card .label {
-      color: var(--faint);
-      font-size: 11px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      font-family: var(--sans);
-    }
-    .result-card .name {
-      color: var(--orange);
-      font-size: 30px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .result-card .desc {
-      color: var(--ink);
-      font-size: 14px;
-      margin-top: 10px;
-      line-height: 1.7;
-      font-family: var(--sans);
-    }
-    .result-empty {
-      color: var(--faint);
-      font-size: 16px;
-    }
+.hero-text .kicker {
+  color: var(--orange); font-size: 13px; letter-spacing: .16em;
+  margin: 0 0 16px; transform: rotate(-1deg); display: inline-block; font-family: var(--mono);
+  border-bottom: 2px dashed var(--orange); padding-bottom: 2px;
+}
+.hero-text h1 {
+  margin: 0; font-size: clamp(38px, 7vw, 72px); font-weight: 700;
+  line-height: 1.02; letter-spacing: -.01em;
+}
+.hero-text h1 .red { color: var(--red); }
+.hero-text h1 .line2 { display: block; }
+.hero-text .slogan { margin: 22px 0 0; font-size: clamp(17px, 2.4vw, 22px); color: var(--ink); line-height: 1.6; }
+.hero-text .slogan em {
+  font-style: normal; color: var(--orange);
+  border-bottom: 2px dashed var(--orange); padding-bottom: 1px;
+}
 
-    /* ---------- 概念领域云 ---------- */
-    .domain-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      max-width: 820px;
-    }
-    .chip {
-      padding: 10px 20px;
-      border-radius: 999px;
-      border: 1.5px solid var(--line-soft);
-      background: var(--bg-soft);
-      color: var(--dim);
-      font-size: 16px;
-      transition: transform .25s ease, border-color .25s, color .25s;
-    }
-    .chip:nth-child(4n)   { color: var(--red);    border-color: rgba(255,90,90,.35);    transform: rotate(-1.2deg); }
-    .chip:nth-child(4n+1) { color: var(--orange); border-color: rgba(251,146,60,.32);  transform: rotate(1deg); }
-    .chip:nth-child(4n+2) { color: var(--ink);    border-color: var(--line-soft);         transform: rotate(-.5deg); }
-    .chip:nth-child(4n+3) { color: var(--orange); border-color: rgba(251,146,60,.28);  transform: rotate(.6deg); }
-    .chip:hover { transform: translateY(-3px) rotate(-2deg) scale(1.05); }
+/* 档案编号条 */
+.meta-bar {
+  margin: 30px 0 0; display: flex; flex-wrap: wrap;
+  border: 2px dashed var(--line); border-radius: 6px; overflow: hidden;
+  width: fit-content; max-width: 100%;
+  background: rgba(22, 16, 15, .6);
+}
+.meta-bar .item {
+  padding: 9px 18px; font-size: 13.5px; color: var(--dim);
+  border-right: 1px dashed var(--line); white-space: nowrap; font-family: var(--sans);
+}
+.meta-bar .item:last-child { border-right: none; }
+.meta-bar .item b { color: var(--orange); font-weight: 700; }
 
-    /* ---------- 开发者的话 ---------- */
-    .devnote blockquote {
-      margin: 0;
-      padding: 34px 38px;
-      border: 2px dashed rgba(255, 90, 90, .28);
-      border-radius: 20px;
-      background: rgba(255, 90, 90, .04);
-      transform: rotate(-.4deg);
-    }
-    .devnote blockquote p {
-      margin: 0 0 16px;
-      font-size: clamp(14.5px, 2vw, 17px);
-      line-height: 1.95;
-      color: var(--ink);
-    }
-    .devnote blockquote p:last-child { margin-bottom: 0; }
-    .devnote .hl { color: var(--red); font-weight: 700; }
-    .devnote .hl2 { color: var(--orange); }
-    .devnote .sig {
-      margin-top: 24px;
-      padding-top: 18px;
-      border-top: 1px dashed var(--line);
-      color: var(--dim);
-      font-size: 14px;
-      text-align: right;
-      font-family: var(--sans);
-    }
-    .devnote .sig b { color: var(--red); }
+/* ---------- 章节通用 ---------- */
+.section { padding: 54px 0; }
+.section-head { margin-bottom: 30px; }
+.section-head .kicker {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--orange); margin: 0 0 10px;
+}
+.section-head h2 {
+  margin: 0 0 10px; font-size: clamp(24px, 4vw, 36px); line-height: 1.2; font-weight: 700;
+  display: inline-block; position: relative;
+}
+/* 手绘下划线 */
+.section-head h2::after {
+  content: ""; position: absolute; left: 0; right: -6px; bottom: -6px; height: 3px;
+  background: var(--red); border-radius: 3px; opacity: .75;
+  transform: rotate(-.4deg) scaleX(var(--ul, 1)); transform-origin: left center;
+}
+.section-head .lead { margin: 14px 0 0; color: var(--dim); font-size: 15.5px; max-width: 74ch; font-family: var(--sans); }
 
-    /* ---------- 截图 ---------- */
-    .media-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    .shot {
-      position: relative;
-      overflow: hidden;
-      border: 1.5px solid var(--line);
-      border-radius: 14px;
-      cursor: pointer;
-      background: var(--bg-soft);
-      padding: 0;
-      transform: rotate(-.6deg);
-      transition: transform .3s ease, border-color .3s;
-    }
-    .shot:nth-child(even) { transform: rotate(.7deg); }
-    .shot:nth-child(3n)   { transform: rotate(.3deg); }
-    .shot:hover, .shot:focus-visible {
-      transform: rotate(0) scale(1.03);
-      border-color: var(--red);
-      outline: none;
-    }
-    .shot img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      transition: transform .4s ease;
-    }
-    .shot:hover img { transform: scale(1.04); }
+/* ---------- 档案纸卡片（通用纸面） ---------- */
+.paper {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.022), transparent 60%),
+    var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
+  padding: 30px 32px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.34);
+}
+/* 稿纸横线 */
+.ruled {
+  background-image: repeating-linear-gradient(
+    180deg, transparent 0 31px, var(--rule) 31px 32px);
+  background-position: 0 6px;
+}
 
-    /* ---------- 信息格 ---------- */
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1px;
-      background: var(--line);
-      border: 2px dashed var(--line);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .info-cell {
-      background: var(--bg);
-      padding: 22px 16px;
-      text-align: center;
-    }
-    .info-cell .label {
-      font-size: 11px;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 6px;
-      font-family: var(--sans);
-    }
-    .info-cell .value {
-      font-size: 16px;
-      color: var(--ink);
-      font-weight: 700;
-      font-family: var(--sans);
-    }
-    .info-cell .value.accent { color: var(--orange); }
+/* ---------- 世界观 ---------- */
+.story-body p { margin: 0 0 18px; font-size: 16.5px; }
+.story-body p:last-child { margin-bottom: 0; }
+.story-body .quote {
+  border-left: 3px solid var(--red); padding: 4px 0 4px 20px;
+  color: var(--ink); font-size: 17px; margin-bottom: 24px;
+}
+.story-body .hl  { color: var(--red); }
+.story-body .hl2 { color: var(--orange); }
+.story-body .tail { color: var(--faint); font-size: 14.5px; font-family: var(--sans); }
 
-    /* ---------- 底部 CTA ---------- */
-    .bottom {
-      padding: 64px 0 56px;
-      text-align: center;
-    }
-    .bottom h2 {
-      margin: 0 0 14px;
-      font-size: clamp(26px, 5vw, 40px);
-      color: var(--ink);
-      transform: rotate(-1deg);
-      display: inline-block;
-    }
-    .bottom p {
-      margin: 0 0 28px;
-      color: var(--dim);
-      font-size: 16px;
-    }
-    .bottom .links {
-      display: inline-flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .bottom .links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 13px 28px;
-      border: 2px solid var(--line);
-      border-radius: 999px;
-      color: var(--ink);
-      font-size: 16px;
-      transition: all .25s ease;
-    }
-    .bottom .links a:hover, .bottom .links a:focus-visible {
-      border-color: var(--red);
-      color: var(--red);
-      background: rgba(255,90,90,.06);
-      outline: none;
-    }
-    .bottom .links a.primary {
-      border-color: var(--orange);
-      color: var(--orange);
-      background: rgba(251,146,60,.08);
-      font-weight: 700;
-    }
-    .bottom .links a.primary:hover, .bottom .links a.primary:focus-visible {
-      box-shadow: 0 0 40px rgba(251,146,60,.22);
-    }
-    .bottom .sign {
-      margin-top: 40px;
-      color: var(--faint);
-      font-size: 13px;
-      transform: rotate(-1deg);
-      display: inline-block;
-      font-family: var(--sans);
-    }
+/* ---------- 雇佣档案：公文 ---------- */
+.contract { display: grid; gap: 16px; }
+.contract .row {
+  position: relative;
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--red-deep);
+  border-radius: 2px;
+  padding: 22px 26px 22px 30px;
+  transition: transform .35s ease, border-color .35s ease;
+}
+.contract .row:hover { transform: translateX(4px); border-left-color: var(--red); }
+.contract .when {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .14em;
+  color: var(--orange); margin-bottom: 12px; text-transform: uppercase;
+}
+.contract .txt { margin: 0; white-space: pre-line; font-size: 16px; line-height: 1.95; }
+.contract .sys { color: var(--faint); font-style: italic; font-family: var(--sans); font-size: 14.5px; }
 
-    /* ---------- Lightbox ---------- */
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(0, 0, 0, .93);
-      cursor: zoom-out;
-    }
-    .lightbox.open { display: flex; }
-    .lightbox img {
-      max-width: min(1040px, 96vw);
-      max-height: 88vh;
-      border-radius: 14px;
-      box-shadow: 0 30px 100px rgba(0,0,0,.7);
-    }
+/* ---------- 合成台：墨水槽实验台 ---------- */
+.lab-board {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,90,90,.07), transparent 60%),
+    var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 26px clamp(18px, 4vw, 34px) 30px;
+  box-shadow: inset 0 0 90px rgba(0,0,0,.5), 0 16px 44px rgba(0,0,0,.4);
+}
+.lab-hint {
+  margin: 0 0 20px; font-family: var(--sans); font-size: 13px; color: var(--faint);
+  border-bottom: 1px dashed var(--line-soft); padding-bottom: 14px;
+}
 
-    /* ---------- 滚动浮现 ---------- */
-    .reveal {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity .8s ease, transform .8s ease;
-    }
-    .reveal.in { opacity: 1; transform: none; }
+/* 关卡选择：档案分隔页标签 */
+.stage-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.stage-picker button {
+  font-family: var(--sans); font-size: 13px; cursor: pointer;
+  padding: 8px 15px; color: var(--dim);
+  background: var(--paper-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px 3px 0 0;
+  transition: all .28s ease;
+  position: relative;
+}
+.stage-picker button:hover { color: var(--ink); border-color: var(--line); transform: translateY(-2px); }
+.stage-picker button[aria-pressed="true"] {
+  color: #140708; background: var(--red); border-color: var(--red); font-weight: 700;
+  box-shadow: 0 6px 18px rgba(255,90,90,.3);
+}
 
-    /* ---------- 响应式 ---------- */
-    @media (max-width: 860px) {
-      .hero {
-        grid-template-columns: 1fr;
-        gap: 28px;
-        text-align: center;
-      }
-      .cover-card { margin: 0 auto; }
-      .meta-bar { margin-left: auto; margin-right: auto; }
-      .section-head { text-align: center; }
-      .section-head p.lead { margin-left: auto; margin-right: auto; }
-    }
-    @media (max-width: 720px) {
-      .media-grid { grid-template-columns: 1fr 1fr; }
-      .meta-bar .item { padding: 8px 14px; font-size: 13px; }
-      .el { width: 78px; height: 78px; font-size: 14px; }
-      .devnote blockquote { padding: 24px 20px; }
-      .lab-board { padding: 28px 18px 24px; }
-    }
-    @media (max-width: 480px) {
-      .media-grid { grid-template-columns: 1fr; }
-      .meta-bar { border-radius: 16px; flex-direction: column; width: 100%; }
-      .meta-bar .item {
-        border-right: none;
-        border-bottom: 1px dashed var(--line);
-        width: 100%;
-        text-align: center;
-      }
-      .meta-bar .item:last-child { border-bottom: none; }
-      .topbar .tag { display: none; }
-    }
+/* 元素池：墨滴 */
+.elements {
+  display: flex; flex-wrap: wrap; gap: 9px;
+  min-height: 92px; padding: 18px;
+  background: rgba(0,0,0,.28);
+  border: 1px dashed var(--line-soft); border-radius: 3px;
+  margin-bottom: 22px;
+}
+.el {
+  font-family: var(--hand); font-size: 15px; cursor: pointer;
+  padding: 7px 15px; color: var(--ink);
+  background: rgba(255,255,255,.035);
+  border: 1px solid var(--line-soft);
+  border-radius: 999px 999px 999px 4px;
+  transition: transform .22s ease, background .22s ease, border-color .22s ease, color .22s ease;
+}
+.el:hover { transform: translateY(-3px) rotate(-1.5deg); border-color: var(--red); background: rgba(255,90,90,.10); }
+.el[aria-pressed="true"] {
+  background: var(--red); color: #140708; border-color: var(--red); font-weight: 700;
+  transform: rotate(-2deg) scale(1.06);
+  box-shadow: 0 0 0 3px rgba(255,90,90,.18), 0 8px 22px rgba(255,90,90,.28);
+}
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        animation: none !important;
-      }
-      .reveal { opacity: 1; transform: none; }
-      h1, .section-head h2, .bottom h2, .bottom .sign,
-      .lab-board, .devnote blockquote, .cover-card { transform: none !important; }
-      .tri-field svg { animation: none !important; }
-    }
-  </style>
+/* 合成槽 → 结果 */
+.brew { display: grid; grid-template-columns: 60px 1fr; gap: 16px; align-items: center; }
+.arrow-down {
+  font-size: 34px; color: var(--red); text-align: center;
+  animation: nudge 2.4s ease-in-out infinite;
+}
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); opacity: .55; }
+  50%      { transform: translateX(7px); opacity: 1; }
+}
+.result {
+  min-height: 132px; padding: 20px 22px;
+  background: rgba(0,0,0,.34);
+  border: 1px solid var(--line-soft); border-left: 3px solid var(--red);
+  border-radius: 3px;
+}
+.result-empty { margin: 0; color: var(--faint); font-family: var(--sans); font-size: 14px; }
+.result-card .label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--faint); margin-bottom: 8px;
+}
+.result-card .badge {
+  margin-left: 10px; padding: 2px 9px; border-radius: 999px;
+  background: rgba(251,146,60,.16); color: var(--orange); font-size: 10.5px;
+}
+.result-card .name {
+  font-size: clamp(24px, 4vw, 34px); font-weight: 700; color: var(--red);
+  line-height: 1.2; margin-bottom: 8px;
+}
+.result-card .formula { font-family: var(--mono); font-size: 12.5px; color: var(--dim); margin-bottom: 12px; }
+.result-card .desc { font-size: 15.5px; color: var(--ink); margin-bottom: 8px; }
+.result-card .desc.fault { color: var(--faint); font-style: italic; }
+.result-card .res {
+  font-size: 14.5px; color: var(--dim); font-family: var(--sans);
+  border-top: 1px dashed var(--line-soft); padding-top: 10px;
+}
+/* 合成爆闪 */
+.result-card.is-new { animation: flash .7s ease-out; }
+@keyframes flash {
+  0%   { box-shadow: 0 0 0 0 rgba(255,90,90,.55); }
+  100% { box-shadow: 0 0 0 26px rgba(255,90,90,0); }
+}
+
+.lab-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; align-items: center; }
+.lab-actions button {
+  font-family: var(--sans); font-size: 13.5px; cursor: pointer;
+  padding: 9px 20px; color: var(--ink);
+  background: transparent; border: 1px dashed var(--line); border-radius: 3px;
+  transition: all .28s ease;
+}
+.lab-actions button:hover { border-style: solid; border-color: var(--red); color: var(--red); background: rgba(255,90,90,.07); }
+
+/* ---------- 配方图鉴：档案卡片 ---------- */
+.codex-tools {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  margin-bottom: 22px;
+}
+.codex-tools input[type="search"] {
+  flex: 1 1 260px; min-width: 0;
+  font-family: var(--sans); font-size: 14.5px;
+  padding: 11px 16px; color: var(--ink);
+  background: rgba(0,0,0,.34);
+  border: 1px solid var(--line-soft); border-radius: 3px;
+}
+.codex-tools input[type="search"]::placeholder { color: var(--faint); }
+.codex-tools .count { font-family: var(--mono); font-size: 12.5px; color: var(--faint); }
+
+.codex-group { margin-bottom: 10px; }
+.codex-group[open] { margin-bottom: 34px; }
+
+/* 折叠头：原生 summary，无 JS 也能开合，读屏天然支持 */
+.codex-group > summary {
+  margin: 0; font-size: 19px; font-weight: 700; color: var(--ink);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px;
+  border-bottom: 2px solid var(--line-soft); padding-bottom: 10px;
+  cursor: pointer; list-style: none;
+  transition: border-color .3s ease;
+}
+.codex-group > summary::-webkit-details-marker { display: none; }
+.codex-group > summary::marker { content: ""; }
+.codex-group > summary:hover { border-bottom-color: var(--red); }
+.codex-group > summary:focus-visible { outline: 2px solid var(--red); outline-offset: 5px; }
+.codex-group[open] > summary { margin-bottom: 16px; border-bottom-color: var(--line); }
+
+.codex-group > summary .cg-t {
+  flex: 0 1 auto; min-width: 0;
+  /* 还原成 h3 的语义但沿用 summary 的排版 */
+  margin: 0; font-family: inherit; font-size: inherit;
+  font-weight: inherit; letter-spacing: inherit; line-height: inherit;
+  color: inherit;
+}
+.codex-group > summary .cg-arrow {
+  margin-left: auto; flex: none;
+  font-size: 13px; line-height: 1; color: var(--faint);
+  transition: transform .3s cubic-bezier(.2,.8,.3,1), color .3s ease;
+}
+.codex-group > summary:hover .cg-arrow { color: var(--red); }
+.codex-group[open] > summary .cg-arrow { transform: rotate(180deg); color: var(--red); }
+
+@media (prefers-reduced-motion: reduce) {
+  .codex-group > summary .cg-arrow { transition: none !important; }
+}
+
+/* 关卡组头部的徽章与副标题。
+   注意：这两个 span 是 <summary> 的直接子元素、与 h3 平级，
+   所以选择器必须挂在 summary 下，不能写成 `h3 .n`。 */
+.codex-group > summary .n {
+  font-family: var(--mono); font-size: 11.5px; color: var(--orange);
+  background: rgba(251,146,60,.12); padding: 2px 9px; border-radius: 999px;
+  align-self: center;
+}
+.codex-group > summary .gsub {
+  font-family: var(--sans); font-size: 13px; color: var(--faint); font-weight: 400;
+}
+
+.codex-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(258px, 1fr)); gap: 10px; }
+.rc {
+  position: relative; text-align: left; cursor: pointer;
+  font-family: var(--sans); font-size: 13.5px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 11px 13px; color: var(--dim);
+  background: var(--paper-2);
+  border: 1px solid var(--line-soft); border-radius: 3px;
+  transition: transform .3s cubic-bezier(.2,.8,.3,1), border-color .3s ease, background .3s ease;
+}
+/* 歪斜卡片，悬停回正 */
+.codex-list .rc:nth-child(3n+1) { transform: rotate(-.5deg); }
+.codex-list .rc:nth-child(3n+2) { transform: rotate(.45deg); }
+.codex-list .rc:nth-child(3n)   { transform: rotate(-.25deg); }
+.rc:hover, .rc:focus-visible {
+  transform: rotate(0deg) translateY(-3px) scale(1.02);
+  border-color: var(--red); background: rgba(255,90,90,.08); color: var(--ink);
+  box-shadow: 0 10px 26px rgba(0,0,0,.4);
+}
+.rc .a, .rc .b { color: var(--ink); }
+.rc .plus, .rc .to { color: var(--faint); }
+.rc .c { color: var(--orange); font-weight: 700; }
+.rc .star { color: var(--red); margin-left: auto; font-size: 12px; }
+.rc.hidden { display: none; }
+.rc[data-fault="1"] .c { color: var(--faint); font-weight: 400; font-style: italic; }
+.codex-empty {
+  text-align: center; color: var(--faint); font-family: var(--sans);
+  font-size: 14.5px; padding: 40px 0;
+}
+/* ---------- 原型集：跨版故事页 ---------- */
+.stories { display: grid; gap: 0; }
+
+/* 每一章 = 一张跨版档案页 */
+.story-card {
+  position: relative;
+  display: grid; grid-template-columns: 1.05fr .95fr;
+  gap: 0; align-items: stretch;
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 22px;
+  background: var(--paper);
+  box-shadow: 0 14px 40px rgba(0,0,0,.36);
+  transition: border-color .4s ease, transform .4s ease;
+}
+.story-card:hover { border-color: var(--line); transform: translateY(-2px); }
+/* 偶数章左右互换，形成翻页节奏 */
+.story-card:nth-child(even) .story-art { order: 2; }
+
+/* 插画侧：真实官方插画，融入暗红基调 */
+.story-art {
+  position: relative; overflow: hidden; min-height: 320px;
+  background: #0a0708;
+}
+.story-art img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: saturate(.82) contrast(1.06) brightness(.88);
+  mix-blend-mode: luminosity;
+  opacity: .82;
+  transition: transform .8s cubic-bezier(.2,.8,.3,1), opacity .5s ease, filter .5s ease;
+}
+.story-card:hover .story-art img {
+  transform: scale(1.045); opacity: .95; filter: saturate(1) contrast(1.1) brightness(.96);
+}
+/* 暗红染色层：让插画融进档案基调 */
+.story-art::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(105deg, rgba(255,90,90,.30), rgba(251,146,60,.16) 55%, transparent 85%),
+    radial-gradient(ellipse at 30% 70%, rgba(184,50,58,.34), transparent 62%);
+  mix-blend-mode: screen;
+}
+/* 边缘遮罩：向文字侧淡出 */
+.story-art::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(90deg, transparent 55%, var(--paper) 100%);
+}
+.story-card:nth-child(even) .story-art::after {
+  background: linear-gradient(270deg, transparent 55%, var(--paper) 100%);
+}
+.story-art .tag-s {
+  position: absolute; left: 16px; bottom: 14px; z-index: 3;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+  color: var(--ink); background: rgba(14,10,11,.72);
+  border: 1px solid var(--line); border-radius: 3px; padding: 4px 11px;
+}
+
+/* 文字侧 */
+.story-text { padding: 34px clamp(22px, 3.4vw, 40px); display: flex; flex-direction: column; }
+.story-text .no {
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--orange); margin: 0 0 12px;
+}
+.story-text h3 {
+  margin: 0 0 6px; font-size: clamp(23px, 3.4vw, 31px); font-weight: 700; line-height: 1.2;
+  color: var(--ink);
+}
+.story-text .target {
+  margin: 0 0 20px; font-family: var(--sans); font-size: 14px; color: var(--red);
+}
+.story-text .poem {
+  margin: 0 0 22px; white-space: pre-line;
+  font-size: 16.5px; line-height: 2.05; color: var(--ink);
+  border-left: 2px solid var(--line); padding-left: 18px;
+}
+.story-text .nums {
+  margin: auto 0 0; display: flex; flex-wrap: wrap; gap: 8px;
+  border-top: 1px dashed var(--line-soft); padding-top: 16px;
+}
+.story-text .nums span {
+  font-family: var(--mono); font-size: 11.5px; color: var(--faint);
+  border: 1px solid var(--line-soft); border-radius: 3px; padding: 3px 10px;
+}
+.story-text .nums b { color: var(--orange); font-weight: 700; }
+
+/* ---------- 概念领域 ---------- */
+.domain-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+.domain-cloud .chip {
+  display: inline-flex; flex-direction: column; gap: 3px;
+  padding: 12px 17px; font-size: 15px; color: var(--ink);
+  background: var(--paper-2);
+  border: 1px solid var(--line-soft); border-radius: 3px;
+  transition: transform .3s ease, border-color .3s ease, background .3s ease;
+}
+.domain-cloud .chip:nth-child(3n+1) { transform: rotate(-.6deg); }
+.domain-cloud .chip:nth-child(3n+2) { transform: rotate(.5deg); }
+.domain-cloud .chip:hover {
+  transform: rotate(0) translateY(-3px);
+  border-color: var(--red); background: rgba(255,90,90,.08);
+}
+.domain-cloud .chip small { font-family: var(--sans); font-size: 12px; color: var(--faint); }
+
+/* ---------- 开发者的话 ---------- */
+.devnote blockquote {
+  margin: 0; padding: 32px clamp(20px, 4vw, 40px);
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--red);
+  border-radius: 3px;
+}
+.devnote blockquote p { margin: 0 0 15px; font-size: 16px; }
+.devnote blockquote p:last-child { margin-bottom: 0; }
+.devnote .hl  { color: var(--red); }
+.devnote .hl2 { color: var(--orange); }
+.devnote .sig { margin-top: 22px; color: var(--faint); font-family: var(--sans); font-size: 14px; }
+.devnote .sig b { color: var(--orange); }
+
+/* ---------- 实机画面 ---------- */
+.media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.shot {
+  position: relative; overflow: hidden; cursor: zoom-in; padding: 0;
+  background: var(--paper-2);
+  border: 1px solid var(--line-soft); border-radius: 3px;
+  transition: transform .35s cubic-bezier(.2,.8,.3,1), border-color .35s ease;
+}
+.shot:nth-child(odd)  { transform: rotate(-.7deg); }
+.shot:nth-child(even) { transform: rotate(.6deg); }
+.shot:hover, .shot:focus-visible {
+  transform: rotate(0) translateY(-4px) scale(1.02);
+  border-color: var(--red); box-shadow: 0 14px 34px rgba(0,0,0,.45);
+}
+.shot img { width: 100%; aspect-ratio: 16/9; object-fit: cover; filter: brightness(.9) contrast(1.04); }
+.shot::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.42) 100%);
+}
+
+/* ---------- 信息格 ---------- */
+.info-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 1px; background: var(--line-soft);
+  border: 1px solid var(--line-soft); border-radius: 4px; overflow: hidden;
+}
+.info-cell { background: var(--paper); padding: 22px 16px; text-align: center; }
+.info-cell .label {
+  margin: 0 0 8px; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--faint);
+}
+.info-cell .value { margin: 0; font-size: 15px; color: var(--ink); font-weight: 700; }
+.info-cell .value.accent { color: var(--red); }
+
+/* ---------- 底部 CTA ---------- */
+.bottom { padding: 68px 0 58px; text-align: center; }
+.bottom h2 { margin: 0 0 14px; font-size: clamp(26px, 4.4vw, 40px); color: var(--ink); }
+.bottom p { margin: 0 0 28px; color: var(--dim); font-size: 15.5px; font-family: var(--sans); }
+.bottom .links { display: inline-flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.bottom .links a {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; font-size: 14.5px;
+  border: 1px dashed var(--line); border-radius: 3px;
+  color: var(--ink); transition: all .3s ease;
+}
+.bottom .links a:hover, .bottom .links a:focus-visible {
+  border-style: solid; border-color: var(--red); color: var(--red); background: rgba(255,90,90,.08);
+}
+.bottom .links a.primary { background: var(--red); color: #140708; border: 1px solid var(--red); font-weight: 700; }
+.bottom .links a.primary:hover, .bottom .links a.primary:focus-visible {
+  background: var(--orange); border-color: var(--orange); color: #140708;
+  box-shadow: 0 0 34px rgba(255,90,90,.34);
+}
+.bottom .sign {
+  margin-top: 40px; color: var(--faint);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed; inset: 0; z-index: 100;
+  display: none; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(0,0,0,.95);
+}
+.lightbox[hidden] { display: none; }
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: min(1060px, 94vw); max-height: 82vh;
+  border-radius: 3px; border: 6px solid rgba(245,233,234,.9);
+  box-shadow: 0 30px 100px rgba(0,0,0,.75);
+}
+.lb-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 44px; height: 44px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; line-height: 1;
+  background: rgba(22,16,15,.85); color: var(--dim);
+  border: 1px solid var(--line); border-radius: 50%;
+  transition: all .3s ease;
+}
+.lb-close:hover, .lb-close:focus-visible {
+  border-color: var(--red); color: var(--red); background: rgba(255,90,90,.1);
+}
+.lb-cap {
+  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+  margin: 0; max-width: 90%; text-align: center;
+  color: var(--dim); font-family: var(--sans); font-size: 13px;
+}
+
+/* ---------- 滚动浮现（默认可见，仅 JS 就绪后才隐藏） ---------- */
+.reveal { opacity: 1; transform: none; }
+html.js-reveal .reveal {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity .9s ease, transform .9s ease;
+}
+html.js-reveal .reveal.in { opacity: 1; transform: none; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 30px; justify-items: center; text-align: center; }
+  .hero-text .slogan { margin-left: auto; margin-right: auto; }
+  .meta-bar { margin-left: auto; margin-right: auto; }
+  .media-grid { grid-template-columns: 1fr 1fr; }
+  .story-card { grid-template-columns: 1fr; }
+  .story-card:nth-child(even) .story-art { order: 0; }
+  .story-art { min-height: 240px; }
+  .story-art::after,
+  .story-card:nth-child(even) .story-art::after {
+    background: linear-gradient(180deg, transparent 52%, var(--paper) 100%);
+  }
+}
+@media (max-width: 620px) {
+  .wrap { width: calc(100% - 30px); }
+  .section { padding: 40px 0; }
+  .media-grid { grid-template-columns: 1fr; }
+  .brew { grid-template-columns: 1fr; }
+  .arrow-down { transform: rotate(90deg); animation: none; }
+  .paper { padding: 22px 18px; }
+  .contract .row { padding: 18px 16px 18px 20px; }
+  .story-text { padding: 26px 18px; }
+  .story-text .poem { font-size: 15.5px; padding-left: 14px; }
+  .codex-list { grid-template-columns: 1fr; }
+  .topbar .tag { display: none; }
+  .cover-card { width: 200px; height: 200px; }
+  .meta-bar { border-radius: 4px; }
+  .meta-bar .item { width: 100%; border-right: none; border-bottom: 1px dashed var(--line); text-align: center; }
+  .meta-bar .item:last-child { border-bottom: none; }
+  .section-head h2::after { right: 0; }
+}
+
+/* ---------- 降级：尊重系统减弱动效 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .tri-field { display: none; }
+  html.js-reveal .reveal { opacity: 1 !important; transform: none !important; }
+  .story-card, .shot, .rc, .chip, .domain-cloud .chip { transform: none !important; }
+  .story-card:hover .story-art img { transform: none; }
+}
+</style>
 </head>
 <body>
-  <!-- 漂浮空心三角（纯装饰） -->
-  <div class="tri-field" aria-hidden="true">
-    <svg width="60" height="52" style="top:12%;left:6%;animation-duration:26s;"><polygon points="30,4 56,48 4,48" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
-    <svg width="34" height="30" style="top:30%;left:18%;animation-duration:34s;"><polygon points="17,3 32,27 2,27" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
-    <svg width="80" height="70" style="top:55%;left:3%;animation-duration:40s;"><polygon points="40,6 74,64 6,64" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
-    <svg width="46" height="40" style="top:20%;right:10%;animation-duration:30s;"><polygon points="23,4 42,36 4,36" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
-    <svg width="28" height="24" style="top:68%;right:16%;animation-duration:24s;"><polygon points="14,2 26,22 2,22" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
-    <svg width="56" height="48" style="top:82%;left:22%;animation-duration:36s;"><polygon points="28,5 52,44 4,44" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
-  </div>
+<a class="skip" href="#main">跳到主要内容</a>
 
-  <div class="wrap">
-    <!-- 顶部导航 -->
-    <nav class="topbar">
-      <a class="back" href="../../index.html">返回作品集</a>
-      <span class="tag">概念合成 · 不完美美学</span>
-      <a href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">TapTap 商店 ↗</a>
-    </nav>
+<!-- 漂浮空心三角（纯装饰） -->
+<div class="tri-field" aria-hidden="true">
+  <svg width="60" height="52" style="top:12%;left:6%;animation-duration:26s;"><polygon points="30,4 56,48 4,48" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
+  <svg width="34" height="30" style="top:30%;left:18%;animation-duration:34s;"><polygon points="17,3 32,27 2,27" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
+  <svg width="80" height="70" style="top:55%;left:3%;animation-duration:40s;"><polygon points="40,6 74,64 6,64" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
+  <svg width="46" height="40" style="top:20%;right:10%;animation-duration:30s;"><polygon points="23,4 42,36 4,36" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
+  <svg width="28" height="24" style="top:68%;right:16%;animation-duration:24s;"><polygon points="14,2 26,22 2,22" fill="none" stroke="#ff5a5a" stroke-width="1.5"/></svg>
+  <svg width="56" height="48" style="top:82%;left:22%;animation-duration:36s;"><polygon points="28,5 52,44 4,44" fill="none" stroke="#fb923c" stroke-width="1.5"/></svg>
+</div>
 
-    <!-- Hero -->
-    <header class="hero">
-      <div class="cover-card reveal">
-        <img src="cover.jpg" alt="Bug Universe God 应用图标：红色八边形染色玻璃窗，同心圆从中心向外扩散" />
+<div class="wrap">
+  <nav class="topbar">
+    <a class="back" href="../../index.html">返回作品集</a>
+    <span class="tag">God Universe Bug · 造物者 20251016</span>
+    <a href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">TapTap 商店 ↗</a>
+  </nav>
+
+  <main id="main">
+  <!-- ============ Hero ============ -->
+  <header class="hero">
+    <div class="cover-card reveal">
+      <img src="cover.jpg" alt="Bug Universe God 应用图标：红色八边形染色玻璃窗，同心圆从中心向外扩散" />
+    </div>
+    <div class="hero-text">
+      <p class="kicker reveal">TapTap 聚光灯 2025 · 21 天游戏创作挑战</p>
+      <h1 class="reveal">
+        <span class="red">B</span>ug
+        <span class="line2"><span class="red">U</span>niverse</span>
+        <span class="line2"><span class="red">G</span>od</span>
+      </h1>
+      <p class="slogan reveal">你相信，世界是被创造出来的吗？<br />作为<em>潜在未来的造物者</em>，你受雇于 God Universe Bug，工作内容是——造物。</p>
+      <div class="meta-bar reveal">
+        <div class="item">类型 <b>类涂鸦上帝 · 收集合成</b></div>
+        <div class="item">合成配方 <b>174 条</b></div>
+        <div class="item">世界观 <b>Archipelago</b></div>
+        <div class="item">编号 <b>20251016</b></div>
       </div>
-      <div class="hero-text">
-        <p class="kicker reveal">TapTap 聚光灯 2025 · 21 天游戏创作挑战</p>
-        <h1 class="reveal">
-          <span class="red">B</span>ug
-          <span class="line2"><span class="red">U</span>niverse</span>
-          <span class="line2"><span class="red">G</span>od</span>
-        </h1>
-        <p class="slogan reveal">你相信，世界是被创造出来的吗？<br />作为<em>潜在未来的造物者</em>，你的工作并非挥舞刀剑，而是操控概念本身。</p>
-        <div class="meta-bar reveal">
-          <div class="item">类型 <b>类涂鸦上帝 · 收集合成</b></div>
-          <div class="item">上线 <b>2025.10.27</b></div>
-          <div class="item">评分 <b>9.0</b></div>
-          <div class="item">关注 <b>3510</b></div>
+    </div>
+  </header>
+
+  <!-- ============ 世界观 ============ -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// World</p>
+      <h2>欢迎入职 God Universe Bug</h2>
+      <p class="lead">公司致力于理解并塑造世界的本征。造物主的伟业，如今由造物者继承。</p>
+    </div>
+    <div class="story-body paper ruled reveal">
+      <p class="quote">Bug Universe God是由Gove制作的一款类涂鸦上帝的收集合成游戏，延续Archipelago的世界观，试图讲述GoderBye的往事<br /><span style="font-family:var(--sans);font-size:12px;color:var(--faint);">—— 文本.json · key = <code>about_info</code>（原文照录）</span></p>
+      <p>欢迎来到 <span class="hl">God Universe Bug</span>。在这里，我们相信世界源于虚无，而造物主的伟业，如今将由我们造物者来继承。</p>
+      <p>你将使用公司最核心的技术<span class="hl2">「原型的雏形」</span>，从最基本的元素，逐渐开始定义万物，最终创造整个世界。</p>
+      <p>神学、哲学、文学、物理学、天文学、航海学、经济学、政治学，甚至是神秘学、魔法还有科技——共 <span class="hl">174 条</span>真实合成路径，分布在 <span class="hl">8 个关卡</span>之中。你的每一次组合，都将影响一个世界的演化。</p>
+      <p>公司对你的评价是：<span class="hl2">「倘若排除他，你就是迄今为止最有创造力的造物者。」</span></p>
+      <p class="tail">—— 游戏延续 Archipelago 的世界观，试图讲述 GoderBye 的往事。</p>
+    </div>
+  </section>
+
+  <!-- ============ 雇佣档案 / 剧情 ============ -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Employment Record</p>
+      <h2>造物者 20251016 的雇佣档案</h2>
+      <p class="lead">以下六段全部为 剧情.json 原文照录，按「时机」字段触发。从测试者到高级造物者，薪资 5O → 10O → 20O／日。</p>
+    </div>
+    <div class="contract reveal">
+      <div class="row">
+        <div class="when">首次开始</div>
+        <p class="txt">欢迎您，潜在未来的造物者
+在这里，我们前所未有的尊重一位学者
+他的研究同他的本征一样重要
+他曾说过，世界是被创造出来的
+现在，作为潜在未来的造物者
+公司对您的测试即将开始
+别紧张，期待您的表现</p>
+      </div>
+      <div class="row">
+        <div class="when">通过第 0 关</div>
+        <p class="txt">恭喜您通过基础造物测试
+您的创造力评估为：合格
+God Universe Bug正式聘任您为初级造物者
+您的编号为20251016
+您的薪资标准为 5O/日
+接下来您将负责一些基础的工作
+祝您工作顺利</p>
+      </div>
+      <div class="row">
+        <div class="when">通过第 1 关</div>
+        <p class="txt">您好，初级造物者20251016
+God Universe Bug已然注意到您工作中的优秀​​变现
+公司不会埋没人才，亦不会推崇伟权
+现在您已晋升为中级造物者
+在负责一些更复杂的工作同时
+薪资也将上调为 10O/日
+祝您工作顺利</p>
+      </div>
+      <div class="row">
+        <div class="when">通过第 3 关</div>
+        <p class="txt">真是难以置信，亲爱的中级造物者20251016
+您的工作效率令人震惊
+您应该是God Universe Bug有记录以来
+最快晋升到​​高级造物者的员工
+您的薪资上涨为 20O/日，你也将面对更为棘手的任务
+公司为有您这样的人才而感到自豪
+祝您工作顺利</p>
+      </div>
+      <div class="row">
+        <div class="when">通过第 5 关</div>
+        <p class="txt">尊敬的高级造物者20251016，早上中午晚上好
+还记得吗，曾向您提及的那位，最初的造物者
+由于您的表现已超出了常规评估体系的范畴
+因此不知您何时有空，​​白先生​​希望与您在他的办公室见一面
+特别注意的是
+您需要对此次会面及其内容严格保密
+顺颂时祺</p>
+      </div>
+      <div class="row">
+        <div class="when">通过第 7 关</div>
+        <p class="txt"><span class="sys">（跟随无中生有的指引，你来到了地图上不存在的房间）</span>
+<span class="sys">（一道门凭空被创造在你面前，缓缓打开）</span>
+<span class="sys">（你看到一位白发的男子，他坐在轮椅上，左腿是残缺）</span>
+<span class="sys">（他饶有兴趣地打量着你，随后说道）</span>
+史丹利，我记得没错吧，你的名字
+作为唯一一个，你现在感觉如何呢
+<span class="sys">（他停下来，深吸一口气）</span>
+那时候的我们还执着于探寻奥秘
+​​三角之神
+那是一切之上、之左、与右的存在
+也是一切之​​下、之左、与右的存在
+他不停地阻挠着造物的研究
+而身旁的某人还被伟权迷昏了头脑
+如你所见，一场意外爆炸，在多方的期许下
+<span class="sys">（他指了指残缺的右腿）</span>
+残存的我只能重新开始，也就是现在的公司
+<span class="sys">（说完，他闭上眼，像是在回味）</span>
+<span class="sys">（你们静了很一会儿，他才重新睁眼）</span>
+说了这么多，其实我只有一个问题
+你现在觉得自己是一位真正的造物者/主吗
+<span class="sys">（他微笑地等待着你的回答）</span></p>
+      </div>
+    </div>
+  </section>
+  <!-- ============ 造物合成台（墨水槽实验台） ============ -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Alchemy Table</p>
+      <h2>造物合成台</h2>
+      <p class="lead">点选两个概念元素，看它们在「原型的雏形」下合成什么。全部 174 条配方实时可查——选择顺序不影响结果。</p>
+    </div>
+    <div class="lab-board reveal">
+      <p class="lab-hint">先选一个关卡，再点击两个元素 ↓　·　同一个元素点两次可合成它自己（如 光+光、界+界）　·　选中后再点一次可取消</p>
+
+      <div class="stage-picker" id="stage-picker" role="group" aria-label="选择关卡">
+        <button type="button" data-stage="0" aria-pressed="true">第 0 关 · 光影造物</button>
+        <button type="button" data-stage="1" aria-pressed="false">第 1 关 · 一块岩石的哲思</button>
+        <button type="button" data-stage="2" aria-pressed="false">第 2 关 · 现实的乐章</button>
+        <button type="button" data-stage="3" aria-pressed="false">第 3 关 · 永不停歇的箭羽</button>
+        <button type="button" data-stage="4" aria-pressed="false">第 4 关 · 半波增长</button>
+        <button type="button" data-stage="5" aria-pressed="false">第 5 关 · 国王的伟大发明</button>
+        <button type="button" data-stage="6" aria-pressed="false">第 6 关 · 三角与无限解构</button>
+        <button type="button" data-stage="7" aria-pressed="false">第 7 关 · 苍白造物</button>
+      </div>
+
+      <div class="elements" id="elements" role="group" aria-label="可选概念元素"></div>
+
+      <div class="brew">
+        <div class="arrow-down" aria-hidden="true">→</div>
+        <div class="result" id="result" role="status" aria-live="polite" aria-atomic="true">
+          <p class="result-empty">等待合成…</p>
         </div>
       </div>
-    </header>
 
-    <!-- 世界观 -->
-    <section class="section">
-      <div class="section-head reveal">
-        <p class="kicker">// World</p>
-        <h2>欢迎来到 God Universe Bug</h2>
-        <p class="lead">公司致力于理解并塑造世界本征——造物主的伟业，如今由造物者继承。</p>
+      <div class="lab-actions">
+        <button type="button" id="btn-clear">清空选择</button>
+        <button type="button" id="btn-lucky">随机来一手</button>
+        <span class="count" id="lab-count" style="font-family:var(--sans);font-size:13px;color:var(--faint);align-self:center;"></span>
       </div>
-      <div class="story-body reveal">
-        <p>欢迎来到 <span class="hl">God Universe Bug</span>，公司致力于理解并塑造世界本征。在这里，我们相信世界源于虚无，而造物主的伟业，如今将由我们造物者来继承。</p>
-        <p>你将使用公司最核心的技术<span class="hl2">「原型的雏形」</span>，从最基本的元素，逐渐开始定义万物，最终创造整个世界。</p>
-        <p>神学，哲学，文学，物理学，天文学，航海学，经济学，政治学，甚至是神秘学，魔法还有科技。你的每一次组合，都将影响一个世界的演化——进一步影响公司的运转，最终改变……</p>
-        <p class="tail">—— 游戏延续 Archipelago 的世界观，为玩家讲述 GoderBye 的往事。</p>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 造物合成台 -->
-    <section class="section">
-      <div class="section-head reveal">
-        <p class="kicker">// Alchemy Table</p>
-        <h2>造物合成台</h2>
-        <p class="lead">点选两个概念元素，看它们在「原型的雏形」下合成什么——万物始于光与影。</p>
+  <!-- ============ 配方图鉴 · 全部 174 条（档案卡片） ============ -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Codex</p>
+      <h2>配方图鉴 · 全部 174 条</h2>
+      <p class="lead">完整抄录自 配方.json 的全部两两合成配方。搜索概念名即可筛选，点击任意一条可回到合成台演示。</p>
+    </div>
+    <div class="reveal">
+      <div class="codex-tools">
+        <label for="codex-search" class="count">搜索</label>
+        <input type="search" id="codex-search" placeholder="输入概念名，如 光、界、世界、三角神…" autocomplete="off" />
+        <span class="count" id="codex-count" role="status" aria-live="polite"></span>
       </div>
-      <div class="lab-board reveal">
-        <p class="lab-hint">点击选择两个元素 ↓（再点一次取消）</p>
-        <div class="elements" id="elements">
-          <button class="el" type="button" data-el="光">光</button>
-          <button class="el" type="button" data-el="影">影</button>
-          <button class="el" type="button" data-el="界">界</button>
-          <button class="el" type="button" data-el="世界">世界</button>
-          <button class="el" type="button" data-el="神话">神话</button>
-          <button class="el" type="button" data-el="科学">科学</button>
-        </div>
-        <div class="brew">
-          <div class="arrow-down" aria-hidden="true">→</div>
-          <div class="result" id="result">
-            <p class="result-empty">等待合成…</p>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div id="codex"></div>
+    </div>
+  </section>
+  <!-- ============ 原型集（故事.json）：八章跨版档案页 ============ -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Prototypes</p>
+      <h2>原型集 · 八个原型的雏形</h2>
+      <p class="lead">故事.json 的八段原型原文，每段对应一个关卡，并附该关的合成规模（Bugs／Pass／All／Init 为原字段）。配图为官方章节插画。</p>
+    </div>
+    <div class="stories reveal" id="stories"></div>
+  </section>
 
-    <!-- 概念领域 -->
-    <section class="section">
-      <div class="section-head reveal">
-        <p class="kicker">// Domains</p>
-        <h2>从光与影开始，定义一个世界的全部维度</h2>
-      </div>
-      <div class="domain-cloud reveal">
-        <span class="chip">神学</span>
-        <span class="chip">哲学</span>
-        <span class="chip">文学</span>
-        <span class="chip">物理学</span>
-        <span class="chip">天文学</span>
-        <span class="chip">航海学</span>
-        <span class="chip">经济学</span>
-        <span class="chip">政治学</span>
-        <span class="chip">神秘学</span>
-        <span class="chip">魔法</span>
-        <span class="chip">科技</span>
-      </div>
-    </section>
+  <!-- ============ 概念领域 ============ -->
+  <section class="section">
+    <div class="section-head reveal">
+      <p class="kicker">// Domains</p>
+      <h2>从光与影开始，定义一个世界的全部维度</h2>
+      <p class="lead">以下是配方.json 中真实出现过的概念领域，括注为该领域在 8 个关卡中的代表概念。</p>
+    </div>
+    <div class="domain-cloud reveal">
+      <span class="chip">神学 <small>神话传说 · 献祭仪式 · 补天</small></span>
+      <span class="chip">哲学 <small>西西弗斯 · 本征 · 命题</small></span>
+      <span class="chip">文学 <small>语素 · 诗歌 · 意境</small></span>
+      <span class="chip">物理学 <small>质能方程 · 相对论 · 量子</small></span>
+      <span class="chip">天文学 <small>星星 · 历法 · 星辰大海</small></span>
+      <span class="chip">航海学 <small>航星 · 洋流 · 极光</small></span>
+      <span class="chip">经济学 <small>市场 · 货币 · 等价交换</small></span>
+      <span class="chip">政治学 <small>律法 · 王冠 · 我们的王</small></span>
+      <span class="chip">神秘学 <small>神秘 · 预言 · 不可知</small></span>
+      <span class="chip">魔法 <small>黑魔法 · 铭文符咒 · 无限源泉</small></span>
+      <span class="chip">科技 <small>机械 · 元胞自动机 · 巨像</small></span>
+      <span class="chip">图书馆 <small>解析 + 实验室</small></span>
+    </div>
+  </section>
 
-    <!-- 开发者的话 -->
-    <section class="section devnote">
-      <div class="section-head reveal">
-        <p class="kicker">// Developer's Note</p>
-        <h2>开发者的话</h2>
-      </div>
-      <blockquote class="reveal">
-        <p>我很抱歉，虫虫宇宙神真的<span class="hl">不是一款好玩的游戏</span>。（开发者都这样说）</p>
-        <p>其中最大的一个错误就是，<span class="hl">追求设计性而抛弃了游戏性</span>。另一个同样致命的错误就是，<span class="hl">追求内容量而失去内容质</span>。</p>
-        <p>具体点，犯了什么错误？</p>
-        <p>1. 强硬结合原本的 Archipelago Pale 的故事和 Bug 的主题。<br />
-        2. 无引导，无提示，自己无从得知的负反馈和无的正反馈。<br />
-        3. 合成逻辑毫无规律，不可预测，只能穷举。</p>
-        <p>游戏在设计阶段未能预测到后续的计划崩坏。并且目前游戏表现远超原型以至于我觉得还行。我接下来只会修复小 bug，做好小引导，但改变不了这<span class="hl2">艺术大粪</span>的本质。</p>
-        <p>遗憾的是，作为玩家，你什么都做不了。没有人能受得了它恶心人，包括我。</p>
-        <p class="sig">— <b>Gove</b>，策划 / 程序 / 剧情文案 / 制作人</p>
-      </blockquote>
-    </section>
+  <!-- ============ 开发者的话 ============ -->
+  <section class="section devnote">
+    <div class="section-head reveal">
+      <p class="kicker">// Developer's Note</p>
+      <h2>开发者的话</h2>
+    </div>
+    <blockquote class="reveal">
+      <p>我很抱歉，虫虫宇宙神真的<span class="hl">不是一款好玩的游戏</span>。（开发者都这样说）</p>
+      <p>其中最大的一个错误就是，<span class="hl">追求设计性而抛弃了游戏性</span>。另一个同样致命的错误就是，<span class="hl">追求内容量而失去内容质</span>。</p>
+      <p>具体点，犯了什么错误？</p>
+      <p>1. 强硬结合原本的 Archipelago Pale 的故事和 Bug 的主题。<br />
+      2. 无引导，无提示，自己无从得知的负反馈和无的正反馈。<br />
+      3. 合成逻辑毫无规律，不可预测，只能穷举。</p>
+      <p>游戏在设计阶段未能预测到后续的计划崩坏。并且目前游戏表现远超原型以至于我觉得还行。我接下来只会修复小 bug，做好小引导，但改变不了这<span class="hl2">艺术大粪</span>的本质。</p>
+      <p>遗憾的是，作为玩家，你什么都做不了。没有人能受得了它恶心人，包括我。</p>
+      <p class="sig">— <b>Gove</b>，策划 / 程序 / 剧情文案 / 制作人</p>
+    </blockquote>
+  </section>
 
-    <!-- 实机画面 -->
-    <section class="section media">
-      <div class="section-head reveal">
-        <p class="kicker">// Screenshots</p>
-        <h2>实机画面</h2>
-      </div>
-      <div class="media-grid">
-        <button class="shot reveal" type="button" aria-label="放大截图：标题界面，漂浮的空心三角与「开始游戏」">
-          <img src="screenshot-01.jpg" alt="Bug Universe God 标题界面：深色背景上漂浮空心三角轮廓，左侧竖排 Bug Universe God 字样（B/U/G 为红色），右侧发光的开始游戏按钮" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图：设置面板与游戏简介">
-          <img src="screenshot-02.jpg" alt="Bug Universe God 设置界面：音效与音乐滑杆，以及关于 Gove 制作、ComfyUI 美术、Suno 音乐、Kenney 音效的说明" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图：图书馆中的光影造物">
-          <img src="screenshot-03.jpg" alt="Bug Universe God 收集库界面：中央圆形画框展示光影造物，左右红色箭头切换条目，四角分布返回、图书馆、开始按钮" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图：首次开始的欢迎独白">
-          <img src="screenshot-04.jpg" alt="Bug Universe God 故事记录界面：左侧记录其一至其五菜单，右侧显示首次开始时对潜在未来造物者的欢迎独白" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图：涂鸦合成台，光与影开始造物">
-          <img src="screenshot-05.jpg" alt="Bug Universe God 合成玩法界面：黑板风涂鸦铺满屏幕，中央发光球体通过箭头连向四周方框，底部可选光与影两个元素" loading="lazy" />
-        </button>
-      </div>
-    </section>
+  <!-- ============ 实机画面 ============ -->
+  <section class="section media">
+    <div class="section-head reveal">
+      <p class="kicker">// Screenshots</p>
+      <h2>实机画面</h2>
+    </div>
+    <div class="media-grid">
+      <button class="shot reveal" type="button" aria-label="放大截图：标题界面，漂浮的空心三角与开始游戏">
+        <img src="screenshot-01.jpg" alt="Bug Universe God 标题界面：深色背景上漂浮空心三角轮廓，左侧竖排 Bug Universe God 字样（B/U/G 为红色），右侧发光的开始游戏按钮" loading="lazy" />
+      </button>
+      <button class="shot reveal" type="button" aria-label="放大截图：设置面板与游戏简介">
+        <img src="screenshot-02.jpg" alt="Bug Universe God 设置界面：音效与音乐滑杆，以及关于 Gove 制作、ComfyUI 美术、Suno 音乐、Kenney 音效的说明" loading="lazy" />
+      </button>
+      <button class="shot reveal" type="button" aria-label="放大截图：图书馆中的光影造物">
+        <img src="screenshot-03.jpg" alt="Bug Universe God 图书馆界面：中央圆形画框展示光影造物，左右红色箭头切换条目，四角分布返回、图书馆、开始按钮" loading="lazy" />
+      </button>
+      <button class="shot reveal" type="button" aria-label="放大截图：首次开始的欢迎独白">
+        <img src="screenshot-04.jpg" alt="Bug Universe God 剧情界面：左侧记录其一至其五菜单，右侧显示首次开始时对潜在未来造物者的欢迎独白" loading="lazy" />
+      </button>
+      <button class="shot reveal" type="button" aria-label="放大截图：涂鸦合成台，光与影开始造物">
+        <img src="screenshot-05.jpg" alt="Bug Universe God 合成玩法界面：黑板风涂鸦铺满屏幕，中央发光球体通过箭头连向四周方框，底部可选光与影两个元素" loading="lazy" />
+      </button>
+    </div>
+  </section>
 
-    <!-- 信息格 -->
-    <section class="info-grid reveal">
+  <!-- ============ 信息格 ============ -->
+  <section class="section">
+    <div class="info-grid reveal">
       <div class="info-cell">
         <p class="label">平台</p>
         <p class="value">安卓 / iOS / PC</p>
@@ -745,43 +1006,664 @@
         <p class="value">2025.10.27</p>
       </div>
       <div class="info-cell">
-        <p class="label">最近版本</p>
-        <p class="value">1.1.0</p>
+        <p class="label">合成配方</p>
+        <p class="value accent">174 条</p>
       </div>
       <div class="info-cell">
-        <p class="label">类型</p>
-        <p class="value">概念合成 / 休闲</p>
+        <p class="label">关卡 / 原型</p>
+        <p class="value">8 关 · 8 原型</p>
       </div>
       <div class="info-cell">
-        <p class="label">TapTap 评分</p>
-        <p class="value accent">9.0</p>
+        <p class="label">剧情节点</p>
+        <p class="value">6 段</p>
       </div>
       <div class="info-cell">
         <p class="label">开发者</p>
         <p class="value">Gove · 神之倒三角</p>
       </div>
-    </section>
-
-    <!-- 底部 CTA -->
-    <section class="bottom">
-      <h2 class="reveal">成为造物者</h2>
-      <p class="reveal">在 TapTap 免费下载，用「原型的雏形」定义你的世界。</p>
-      <div class="links reveal">
-        <a class="primary" href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">在 TapTap 下载 →</a>
-        <a href="../../index.html">返回作品集 →</a>
+      <div class="info-cell">
+        <p class="label">交流群</p>
+        <p class="value">QQ 435238119</p>
       </div>
-      <p class="sign">Bug Universe God — Gove · 2025 · TapTap 聚光灯 GameJam</p>
-    </section>
-  </div>
+    </div>
+  </section>
 
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="截图放大预览">
-    <img id="lightbox-img" src="" alt="" />
-  </div>
+  <!-- ============ 底部 CTA ============ -->
+  <section class="bottom">
+    <h2 class="reveal">成为造物者</h2>
+    <p class="reveal">在 TapTap 免费下载，用「原型的雏形」定义你的世界。</p>
+    <div class="links reveal">
+      <a class="primary" href="https://www.taptap.cn/app/779705" target="_blank" rel="noreferrer">在 TapTap 下载 →</a>
+      <a href="../../index.html">返回作品集 →</a>
+    </div>
+    <p class="sign">Bug Universe God — Gove · 2025 · TapTap 聚光灯 GameJam · QQ 交流群 435238119</p>
+  </section>
+  </main>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="截图放大预览" hidden>
+  <button class="lb-close" type="button" id="lb-close" aria-label="关闭预览">×</button>
+  <img id="lightbox-img" src="" alt="截图放大预览" />
+  <p class="lb-cap" id="lb-cap"></p>
+</div>
 
   <script>
-    (function () {
-      // 滚动浮现
+  (function () {
+    'use strict';
+
+    /* ==================================================================
+       数据来源：E:\Projects\Unity\Bug Universe God\Assets\StreamingAssets\Config\
+         · Bug Universe God_配方.json（27 条基础元素 + 174 条两两合成配方）
+         · Bug Universe God_剧情.json（6 段剧情，已内联在 HTML 中）
+         · Bug Universe God_故事.json（8 段原型，见 STORIES）
+         · Bug Universe God_文本.json（UI 文本，见 about_info 引用）
+       ================================================================== */
+
+    /* ===== 基础元素（配方.json 中无 A_Name/B_Name 的 27 条记录） ===== */
+    var BASE = [
+{ c: "光", s: 0, cid: 1, desc: "Bug Universe God 说要有 Light" },
+{ c: "影", s: 0, cid: 2, desc: "But Unique Gove 说不够" },
+{ c: "神话传说", s: 1, cid: 11, desc: "我们今日需要这些，并非为了解释世界，而是为了安放灵魂" },
+{ c: "第一推动力", s: 1, cid: 12, desc: "哲学与神学中一切事物运动的最终原因和目的" },
+{ c: "洞壁", s: 1, cid: 13, desc: "设想在一个地穴中有一批囚徒" },
+{ c: "语素", s: 2, cid: 32, desc: "语言中有意义的、最小的、尚未自由运用的音义结合体" },
+{ c: "韵律", s: 2, cid: 33, desc: "好的韵具有好的规律性，那是和谐的波动" },
+{ c: "意境", s: 2, cid: 34, desc: "令人感受领悟、意味无穷却又难以明确表达的统一体" },
+{ c: "能量", s: 3, cid: 54, desc: "能量是质点空间相对于观察者在某个时空范围内运动的量" },
+{ c: "空间", s: 3, cid: 55, desc: "空间是一切运动所发生或不能发生的部分量" },
+{ c: "时间", s: 3, cid: 56, desc: "时间是标注运动发生瞬间及持续历程的基本量" },
+{ c: "水", s: 4, cid: 78, desc: "人不能两次踏进同一条河流，无论是这个人还是这条河" },
+{ c: "锚点", s: 4, cid: 79, desc: "意识形态的定位与回归，避免在混沌世界中迷失自我" },
+{ c: "时节", s: 4, cid: 80, desc: "春雨惊春，夏满芒夏。秋处露秋，冬雪雪冬" },
+{ c: "苹果", s: 5, cid: 103, desc: "这树上的果实与地上的那些无异，都来自同一粒种子" },
+{ c: "刀刃", s: 5, cid: 104, desc: "十步杀一人，千里不留行。事了拂衣去，深藏身与名" },
+{ c: "黄金", s: 5, cid: 105, desc: "闪光的东西并不都是金子，但金子总会发光" },
+{ c: "天平", s: 5, cid: 106, desc: "命运赠送的礼物，早已在暗中标好了价格" },
+{ c: "魔法", s: 6, cid: 136, desc: "一切皆为心智，对立着，震动着，上如同下，下如同上" },
+{ c: "齿轮", s: 6, cid: 137, desc: "宇宙如巨大的精密钟表，原型的雏形机械地运转着" },
+{ c: "载体", s: 6, cid: 138, desc: "事物的生成与存在离不开质料，当获得形式后便成为现实" },
+{ c: "学习", s: 6, cid: 139, desc: "人的心灵如最初的空白，新的观念在形成，旧的观念被加固" },
+{ c: "王冠", s: 7, cid: 168, desc: "戴上王冠的人必须有足够的实力掌控整个王国" },
+{ c: "学者", s: 7, cid: 169, desc: "对于一位学者来说理论和实践哪一门更为重要" },
+{ c: "虚无", s: 7, cid: 170, desc: "别看了，这里什么都没有，这关的提示词也是" },
+{ c: "本征", s: 7, cid: 171, desc: "存在者存在而不存在者不存在的性质即是本征" },
+{ c: "造物", s: 7, cid: 172, desc: "使不存在者成为存在者所需的就是造物" }
+    ];
+
+    var RECIPES = [
+[0,3,"光","光","无上圣光","纠缠着一切从这片的虚空中闪烁而出的光芒，再没有什么能够与之匹敌的吧","我们称赞它，我们歌颂它，我们为它颠倒，我们为它疯狂。在一阵狂欢之后，虚空中有了所求的模样",1],
+[0,4,"影","光","界","轻清的东西缓缓上升，重浊的东西慢慢下降，在那之间是界","有了界的限制，浊与清逐渐分离。等你回过神时，清者寡淡飘渺，浊者稠实刻板，皆无存在可谈",0],
+[0,5,"影","影","暗面","事与物皆有黑暗面。它们并非如我们通常所想的那样","你只看见了黑暗的一面，却忽视了看不见的另一面，如同你身后的明月，密谋者们最终得胜",0],
+[0,6,"无上圣光","光","上限溢出","故障：值超过了表达者能表达的范围","",0],
+[0,7,"界","光","视界","光锥之内，就是命运。视界之外，便是虚无","你只是揉一揉双眼，便看到了既定的未来，你和你的孩子们最终饿死在门口，在一个寒冷的冬夜",0],
+[0,8,"界","影","势界","势界不是静态的，而是一个动态的、正在被争夺和塑造的领域","构建完成后你才发现它是不断发展变化的，一时间你甚至没找到摧毁它的方法，无妨",1],
+[0,9,"界","界","世界","古往今来曰世，上下四方曰界","亲眼见证一个崭新的世界的诞生，它如同奇点般在你手心展开，如此精巧，如此脆弱",1],
+[0,10,"暗面","无上圣光","对立面","有无相生，难易相成，长短相形，高下相倾，音声相和，前后相随","你猛然回头，正好对上大人的目光。关于反向帝国的事实，目前我仍认为应当是少数人的秘密",1],
+[1,14,"神话传说","神话传说","禁忌","故障：面对神圣的、不洁的、危险的事物需要保持态度","",0],
+[1,15,"第一推动力","神话传说","创世纪","故障：上帝创造世界，人间的堕落，不应有的牺牲","",0],
+[1,16,"第一推动力","第一推动力","奇迹","活着本身就是一种奇迹","可他追求的是存在的意义，失去意义，活着也不过是一具死去的躯壳",0],
+[1,17,"洞壁","神话传说","篝火","马车颠呀颠，人们围着她快乐地转着圈","如同这般，嘲笑他，戏弄他，他在人群的外边，同一块岩石孤独终老",0],
+[1,18,"洞壁","第一推动力","碎石","石头碎了就是碎石，没必要为此惋惜","一夜间便碎裂了岩石，学者再无可争辩的对手，他来不及倾述理论，阐释道义",0],
+[1,19,"奇迹","洞壁","种子","生根，发芽，抽茎，长叶，开花，结果","风带来一粒种子，最终成为尸骨上的一片草丛，哦对了，岩石最后也化作了小丘",0],
+[1,20,"篝火","神话传说","献祭仪式","最大的献祭，是献祭我们最珍爱之物","人们将这位疯子视作作为一切不幸的源头，在一个精心挑选的夜晚，他们用烈火烧死了他",0],
+[1,21,"篝火","第一推动力","科学","建立在可检验的解释和可预测的规律的知识系统","认为科学能解决所有问题是一件不科学的事情，哲学的第一个问题依旧存在并将持续折磨致死",0],
+[1,22,"篝火","洞壁","影子","你们追求光明，于是光投下了更多的影子","他看着那些影子有些入神，尽然开始尝试和曾经的自己争论存在的意义，真是无药可救了",0],
+[1,23,"篝火","篝火","村庄","我顺手摸到的东西越少越好，万里无云如同我永恒的悲伤","每当人们茶余饭后谈论起这位疯子，无论是同情者还是嘲讽者，他们仍愿施舍自己的怜悯",1],
+[1,24,"碎石","神话传说","补天","故障：造物者不可将杜撰之物可信以为真","",0],
+[1,25,"碎石","第一推动力","西西弗斯","人是生而无能为力的，人永远在救赎自己的原罪","悲催的哲学家明白了自己存在的意义，他推着这块巨石一步一步朝山顶走去",0],
+[1,26,"碎石","奇迹","上帝的巨石","巨石挡在必经之路，上帝无法摧毁，也无法举起","不久之前，有人问过他同样的问题，遗憾的是直到现在他也没有找到合适的答案",0],
+[1,27,"种子","神话传说","世界树","故障：一些秘密之所有被隐藏是有原因的","",0],
+[1,28,"种子","洞壁","竹石","草木之生，始于毫末，穿石之力，源于不息","生机的种子自岩缝里生长，一点一点碎裂了岩石，学者再不用与石头争辩，他有自己的生活",1],
+[1,29,"种子","奇迹","四叶草","第四片叶子比其他任何一片都要稀有","些许时运难以拯救一位将死之人，他对所谓侥幸嗤之以鼻，糟糕死了",0],
+[1,30,"种子","篝火","面包","满地都是星光，他却低头看见了一块面包","我们亲爱的哲学家疯狂的啃食着手中的面包，看来他已经饿坏了",1],
+[1,31,"种子","碎石","岩石生命","千万年的沉默换来思考，呼吸间只留下一个盛朝","当学者的尸骸最终消散，这块拥有智慧启迪的岩石将继承同样的意志，延续同一本征的生命",1],
+[2,35,"语素","语素","修辞","翩若惊鸿，婉若游龙。轻云之蔽月，流风之回雪","再也忍不住长久的压抑，他表达了心底的爱意，眼前的少女瞬间变为花朵",0],
+[2,36,"韵律","语素","诗歌","山水风云竹石花草雪霜星月禽鸟之类，不得犯此一字","近水楼台不得月，向阳花木难为春。作罢，他敞开双手迎接毁灭",0],
+[2,37,"韵律","韵律","杂音","故障：1.76兆赫把你与被人们遗忘的那一天环环相扣","",0],
+[2,38,"意境","语素","印象","在这金色的信念旁，我要为他们把灯举起","诗人重定义了自己，你扫过他哑然平淡的余生，至少他不必再为此而苦恼",1],
+[2,39,"意境","意境","飘渺","世界的尽头就是归墟，归墟不断地吞噬海水，永远都不会注满","他无聊到开始杜撰牛鬼蛇神的事情，直到牛鬼蛇神真的站到他的面前，他吓得失其魂魄，五色无主",0],
+[2,40,"修辞","语素","文藻","譬如富室橱柜，虽有珠玉满架，而无粟米充饥","他试图以堆砌的修饰掩盖含义，可是总有人要去理解那些隐晦的词句",0],
+[2,41,"修辞","意境","暗箭","含沙射人，所中者则身体筋急，头痛、发热，剧者至死","我们不能假设一位诗人的善良，他用他的能力去攻击和伤害别人，往往自食其果",0],
+[2,42,"修辞","修辞","抽象","一门从繁杂的事物中抽取其本质的技术","掌握这门技术的人往往面临后继无人的窘境，因为他们往往比正常人更加早逝",0],
+[2,43,"诗歌","韵律","唱诗班","故障：一切造物的工尚未完毕，哲学的胎儿为我等重塑天地","",0],
+[2,44,"诗歌","意境","画","老画师只教过他西洋画派，没有向他传授东方画派","你说后来啊，后来他做了画家，一个世人眼中技艺精湛但沉默寡言的画家",1],
+[2,45,"印象","语素","词句","简短的字联结成词，接着成句，然后成段，最后却不成文","诗人看着自己刚写下的遗书，最后的死法写得有些好笑，但最终还是逐字逐句念出了声",0],
+[2,46,"印象","韵律","洗脑术","故障：第一章第十条，不可轻信它人，不可坚信自我","",0],
+[2,47,"印象","意境","艺术","愿我们行于主观情感与客观物象交融的美学空间","很久之后你想起现在这个下午，还是不经感叹，为什么艺术家要等到死后才身价百倍",0],
+[2,48,"印象","诗歌","明月","做不了太白，就活成明月","酒入豪肠，七分酿成了月光，余下的三分啸成剑气，绣口一吐，就整个心脏",0],
+[2,49,"印象","印象","回响","念念不忘，必有回响，一叠一浪，相印于心","偶然的意念一次又一次闪过他的脑海，直到他再也承受不住这终日的梦魇",0],
+[2,50,"飘渺","语素","形容","不可名状之物无法用语言去形容","再也忍不住长久的压抑，他疯狂的去形容一切，于是一切都变得不幸",0],
+[2,51,"飘渺","韵律","空灵","来自赫尔辛根莫斯肯的师父带来一把渊龙骸骨制成的伞","安非他命，如是我闻，不必再追问，施主，空不异色，色不异空",1],
+[2,52,"飘渺","印象","幻觉","没有相应的客观刺激时为何会出现对应的主观体验","他用谎言为自己编织了一个美丽的世界，你意识到这就如同你现在正在做的一样",1],
+[2,53,"飘渺","飘渺","无极","故障：以你的级别还不能接触宇宙原型的创造","",0],
+[3,57,"能量","能量","破死","故障：无法承载的破坏被造物者们称作破死","",0],
+[3,58,"空间","能量","物质","构成一切物体的实体和场的客观存在，或者说褶皱","就像汇聚在空间低处的能量凝结为物质，浓重的物质最终放停了脚步",1],
+[3,59,"空间","空间","寰宇","有限无界的唯一连续体，并非众星之所，而是众在之集","你指了指空荡荡的寰宇，她不自觉地竟真踏上了一场更大的旅途",0],
+[3,60,"时间","能量","运动","没有运动的物质和没有物质的运动是同样不可想象的","你试图剥离其运动的性质，但显然这是错误的，不可取的，难以想象的",0],
+[3,61,"时间","空间","相对论","故障：不同观察者会测量到同一时空下的不同情况","",0],
+[3,62,"时间","时间","永恒","永恒是条自我吞噬的蛇，此刻是在在吞咽与排泄的间隙","你为她缔造了精美的纸带，她最后死在了名为莫比乌斯的鸟笼",0],
+[3,63,"物质","能量","质能方程","允许奇迹发生的最高律法，禁止无中生有的最终底线","尝试解释，尝试理解，高瞻远瞩的理论却难以解决迫在眉睫的实际",0],
+[3,64,"物质","空间","奇点黑洞","故障：它将自我囚禁其中，连同你也一起吧","",0],
+[3,65,"物质","时间","衰变","重浊的东西下降到底便不能再下降","你突然开始思考一位癌症患者，她在生命的最后仍然维持着笑容",0],
+[3,66,"物质","物质","聚变","轻清的东西上升到顶便不能再上升","你不得不承认少女的勇气，她选择冲向火海结束她的人生",0],
+[3,67,"寰宇","能量","大撕裂","假使万有的纽带难以维系，联系本身也将失去联系","真是可笑，你不惜撕裂整个世界来拯救她，可最终却连她也碎成了渣",0],
+[3,68,"寰宇","物质","热寂","假使最后的两个光子相撞，就如同最初它们分离那样","不必理会，直到尽头，匆忙的脚步最终自然会停下，如同生活",1],
+[3,69,"寰宇","寰宇","元宇宙","故障：第一章第一条，​​禁止于虚无之外再创世","",0],
+[3,70,"运动","空间","目的地","运动有了目的就有了方向，前往才能够抵达","在设下目标后不久，你便听到了来自少女完成目标的欢声，你也因此而喜悦",1],
+[3,71,"运动","时间","前目的地","他停下来，回过身去，子弹正中眉心，那枪声沉闷至极","很快，在距离她七十三码的地方，少女看到一个熟悉又陌生的老太婆在疯狂摆手",0],
+[3,72,"运动","物质","力","力是维持运动的原因，力不是维持运动的原因","你决定亲手施加力，尽管这有悖于规定，但显然有效，少女停在了山脚",1],
+[3,73,"运动","运动","光速","错误：行前速光以法无再们我果如","",0],
+[3,74,"永恒","能量","守恒","既不会凭空产生，也不会凭空消失，只会转移和转换","就这样，你很庆幸自己解决了这一问题，你旁边的同事却突然面露难色",0],
+[3,75,"永恒","空间","梦","依稀记得在梦里梦到一个依稀记得的梦","梦中的感受是如此的真切，以至于真正的双腿也缓缓迈开梦游的步伐",0],
+[3,76,"永恒","物质","量子","最小的，基本的，微观的，离散的，不可分割的","从最小时间间隔来看的话，眼前这位美丽的，弥散的，绝对静止的的少女终于得救了",1],
+[3,77,"永恒","运动","永动机","故障：本科学院以后不再审查有关永动机的一切设计","",0],
+[4,81,"水","水","海洋","海纳百川，有容乃大​。壁立千仞，无欲则刚​","二十岁的他站在船头张开双臂迎接日出，二十岁的他躺在床头缩成一团阴暗爬行",0],
+[4,82,"锚点","水","星星","透明的心灵，会流泪的眼睛，再去相信的勇气","他陷在垃圾堆的沟渠里，抬头便看到漫天的星辰，模糊中有一双手伸进来",0],
+[4,83,"锚点","锚点","原点","以原点为中心，像水波纹一样推及开，愈推愈远，愈推愈薄","他的人生，零岁是起点，四十三岁是中点，还有可预见的六年后的终点",0],
+[4,84,"时节","水","冷暖","人间冷暖，世态炎凉，先知这样告诫人们","当初，一连串的糟心事发生后，他摇摇晃晃晕晕乎乎跌进了路旁的垃圾堆里",0],
+[4,85,"时节","锚点","气候","你可知道这里为何终年下雪","记一次航行中，漫天飞舞，满地堆积，晶莹透彻的晶体被当地人称作雪",1],
+[4,86,"海洋","水","大洪水","故障：人在地上罪恶极大，需用洪水，天下地上活物，无一不死","",0],
+[4,87,"海洋","锚点","深蓝","海洋是一个大沙漠，蓝色的巨人们行走在其中","重回新生的他曾试图重回大海，可现在他一看到这片深蓝便开始抽搐呕吐甚至昏厥",0],
+[4,88,"海洋","时节","潮汐","海水朝朝朝朝朝朝朝落，浮云长长长长长长长消","听着酒馆中的其他人一天又一天谈论海的新消息，他将手中的酒一饮而尽",0],
+[4,89,"星星","水","水星游记","故障：在梦里，空中悬浮着千万个水珠","",0],
+[4,90,"星星","锚点","航星","永别啊，我曾凝望，曾是航向的日出，末路残烛","他翻开曾写下的日志，记一次航星失而复得的那段，他努力回忆试图再感受一次那种欣喜",0],
+[4,91,"星星","时节","历法","干如树干，强壮而为天阳；支如树枝，柔弱而为地阴","曾经每到冬天，出海或是不出海将是值得他思考的问题，现在根本不用考虑了",0],
+[4,92,"星星","海洋","星辰大海","故障：星光长远，目光短浅，仰望星空切记不要超过预警时间","",0],
+[4,93,"星星","星星","天文学","迄今为止的一切，一粒悬浮在光中的微尘","他将异变的遭遇写信告诉天文台的好友，十年间每月如此，却连一封回信都未收到",0],
+[4,94,"原点","锚点","坐标","你有自己看待事物的坐标系吗，我思故我在","他将海上的遭遇写信告诉天文台的好友，十年间每月如此，回信也分享着好友的故事",1],
+[4,95,"原点","海洋","先祖细菌","故障：所有演算都说明内共生学说有一定的正确性","",0],
+[4,96,"原点","星星","极光","度过深冬，漫过街道，在冬至日的极光里，肆无忌惮地拥抱","童年的他听水手们谈论美丽的极光，那些奇妙的海上传闻促使他成为一名真正的水手",1],
+[4,97,"冷暖","水","冰","朝受命而夕饮冰，其内热与","他最远一次到过冰海，那次差点没从冰块中游离出来，还好水手们团结一致",1],
+[4,98,"冷暖","时节","季风","浩渺行无极，扬帆但信风","记忆中的风如约而至，轻拂在他脸上，原本应该吹起他苍白的头发",0],
+[4,99,"冷暖","海洋","洋流","因为你的到来，我的世界成了不冻港","即便再不能出海，他也知道跟随大洋流能找到渔场，丰满与否，姑且度日",0],
+[4,100,"冷暖","星星","夜空","月亮是夜晚的伤口，每颗星星都是滴血","他曾经有多么喜爱夜晚，现在就会产生多么大的生理厌恶，更别提他曾最喜爱的大海",0],
+[4,101,"冷暖","原点","绝对零度","故障：活的东西已经死了，在这涨落起伏的波中","",0],
+[4,102,"气候","冷暖","热带","红木沿着海岸生长，在这圣十字之地，王国，国王","难以想象在那座岛上，那些美味多汁的果子居然长在树上，而不是在灌木丛中",0],
+[5,107,"苹果","苹果","禁果","故障：别吃，会死。你再三叮嘱，可蛇比田野一切的活物更狡猾","",0],
+[5,108,"刀刃","苹果","恩赐","上位者赋予的礼物，同下位者赋予的礼物一样不怀好意","让我们的王得知你在公司所做的一切，我们的王会在事成之后奖励你",0],
+[5,109,"刀刃","刀刃","纷争","不和的声音在耳边响起，双方的武器举过头顶","回答我们的王，你是否还会继续站在王国的利益的对立面",0],
+[5,110,"黄金","苹果","金苹果","故障：在黑色大地的深处，世界的尽头，看守着金苹果","",0],
+[5,111,"黄金","刀刃","痕迹","存在的行为留下证据，原有的本征需要固定","每年我们的王都会在王国图书馆举办纪念仪式，纪念一些这里曾发生过的事",0],
+[5,112,"天平","苹果","市场","日中为市，致天下之民，聚天下之货，交易而退，各得其所","公司在自由市场的角落中逐渐发展壮大，如今足以与王国分庭抗礼",1],
+[5,113,"天平","黄金","价值","泡沫，羽毛，空气，统统转化为王国前进的动力","王国不断的投入大量人力物力财力，却再没有当初的蓬勃发展的趋势了",0],
+[5,114,"天平","天平","律法","礼不下庶人，刑不上大夫，或者，法不加于尊","道德作为最后的底线，令双方都尚未做出逾越的行为",0],
+[5,115,"恩赐","苹果","家族","以血脉为锁链的传承，在链与链之间编制一张更大的网","旧的家族体系早在新王登基时候便已经消亡，现在是我们的王的时代",0],
+[5,116,"恩赐","刀刃","赐死","故障：你已经死了，在你正式加入公司的时候","",0],
+[5,117,"恩赐","黄金","荣耀","如果留在城下，荣名将永不朽灭；如果返回家园，却可以颐养天年","适当如今，已经分不清哪些是王国的，哪些是人民的了",0],
+[5,118,"纷争","苹果","饥荒","喂！朋友，你看起来不太好，你最好在天黑之前找点吃的","家里的苹果并不是永远吃不完的，除非它能在公司无中生有",1],
+[5,119,"纷争","刀刃","暴乱","沉默呵，沉默呵！不在沉默中爆发，就在沉默中灭亡","本征轻易平息了一场小的叛乱，但大的就要来了",0],
+[5,120,"纷争","黄金","贫困","日入三O支出四O结果是悲惨，日入五O支出四O结果是幸福","百分之六十作为低级，百分之三十作为中级，百分之十作为高级",0],
+[5,121,"痕迹","刀刃","断剑","故障：每个故事王国都理应有一位勇者，一位魔王或巨龙","",0],
+[5,122,"痕迹","黄金","瑕玉","绝对的完美千篇一律，无序的缺陷万里挑一","我们的王手中掌握着唯一的本征，借此他掌控着王国的一切",0],
+[5,123,"市场","苹果","商品","具体劳动创造商品的使用价值，抽象劳动形成商品的价值","公司的业务涵盖各个层次，这都是造物者们辛勤劳作的功劳",1],
+[5,124,"市场","黄金","货币","凝固的社会信用，劳动的抽象本征，跨越物物交换的集体幻觉","在潜在未来的很长一段是时间里，G仍是O需要取代的目标",1],
+[5,125,"市场","天平","等价交换","故障：造物者们不必考虑这些，你只需要去做就行","",0],
+[5,126,"市场","纷争","供求","无形之手公允地调节着一切，向着更重的一方倾斜","我们的王早已注意到公司的本征存在并启动了对公司的限制计划",0],
+[5,127,"律法","纷争","裁决","是时候对这起案件做出最终的定夺了","关于当年实验室的爆炸原因至今仍是一个无人知晓的谜团",0],
+[5,128,"律法","痕迹","完美主义","故障：祂不是神，祂是一切之上，之左，与右","",0],
+[5,129,"律法","市场","劳动","劳动最光荣、劳动最崇高、劳动最伟大、劳动最美丽","正如所说的，劳动最光荣、劳动最崇高、劳动最伟大、劳动最美丽",1],
+[5,130,"律法","价值","权义","没有无权力的义务，也没有无义务的权利","在这里工作你大可放心，你将享有应有的权力，执行应行的义务",1],
+[5,131,"赐死","家族","终结","无论是王国、公司还是个体，所有故事的必然句号","照这样说的话，王国、公司和你所做的一切都将失去其存在的意义",0],
+[5,132,"饥荒","苹果","王国的哲学","人们在饱腹的时候思考意义，直到他们再次陷入饥饿","真是可笑啊，王国的哲学居然令学者同石头挖掘本征，朽木枯石",0],
+[5,133,"暴乱","刀刃","王国的文学","文字记录着很多血的教训，反过来也成为不见血的兵器","真是可笑啊，王国的文学居然令诗人的思想一字问斩，固步自封",0],
+[5,134,"贫困","黄金","王国的政学","黄金在人与人的手中传递，不时有碎屑落在地上","真是可笑啊，王国的政学居然令船只和水手严禁出海，闭关锁国",0],
+[5,135,"权义","劳动","过去的公司","故障：不必谈论公司的过去，它的未来应当着眼于当下","",0],
+[6,140,"魔法","魔法","黑魔法","故障：关于太阳和世界，无可奉告，我只看到世人是多么苦恼","",0],
+[6,141,"齿轮","魔法","流式","万物流变，无物永驻，更别提一个人或者一条河","一天一世界的日子过的很快，现在已经收是你进入公司的第五年",0],
+[6,142,"齿轮","齿轮","机械","复杂的机械模拟群星的轨迹，原型的雏形叙述此事","公司居然成功在在真实世界中复刻了那些神奇的玩意儿",0],
+[6,143,"载体","魔法","铭文符咒","铭文符咒的本质，并非创造能量，而是命令能量","一个世界的文字就足以研究很久，公司只能抛弃这些次要的去寻求主要的",0],
+[6,144,"载体","齿轮","矿石","与其怀疑一个杜撰的矿场，不如怀疑一个虚假的世界","这个世界的人们已经意识到自己的世界不是真是的呢，你这样想",1],
+[6,145,"学习","魔法","神秘","本征的首次使用标志着物自体不可体察的观点被彻底打破","为了尽量减少对成型世界的影响，你都尽量保持在神秘之处做手脚",0],
+[6,146,"学习","齿轮","叠形","涨落的形干扰着实验的结果，就像在隐瞒着什么","那些突然出现的三角形令你感到厌烦，因为它们意味这次实验以失败告终",0],
+[6,147,"学习","载体","存在","你需要认识你自己，需要有自己的思考，我思故我在","你见过太多不同的世界，它们有一些共有的性质，你私下里称之为，道",0],
+[6,148,"学习","学习","元学习","故障：学习如何学习，重构认知过程，实现自我进化","",0],
+[6,149,"流式","魔法","无限源泉","故障：原型的雏形始终无法解释底部的泉口为何存在","",0],
+[6,150,"流式","齿轮","驱动","在第一因完成启动仪式后，庞大的设备开始运转","你轻轻启动的每个崭新的世界，它们都是如此的晶莹透彻美丽脆弱和谐",0],
+[6,151,"机械","魔法","巨像","它一直手持光芒之剑，在边界等待着黄昏的到来","听说是有一位中级造物者的世界被一个巨像直接摧毁，当场爆炸",1],
+[6,152,"机械","学习","科技","我后悔我出生得过早，不能知道将要发生的一些事情","所有造物者的的办公区域都干净舒适，这就是公司科技带来的好处之一",1],
+[6,153,"机械","流式","元胞自动机","故障：这是原型的雏形的最早版本，但在一次爆炸中损坏","",0],
+[6,154,"矿石","魔法","魔石","短暂的魔法如需长存，需将一瞬间凝固为永恒","用石头将魔法储存起来再使用，在这里发生的一切肯定会很有意思",1],
+[6,155,"矿石","齿轮","粉碎机","一个又一个的世界不断被吞噬，还原为最初的虚无","你去过一次公司的粉碎间，在那里你看到了一切世界的尽头，也是源头",0],
+[6,156,"矿石","流式","流明","一粒光，自天堂的十四层枷锁中剥离，坠入那北端的海洋","你惊叹于人们的绝地反击的可歌可泣，但你不知道这是真实世界的投影",0],
+[6,157,"矿石","机械","原初","新的研究结果和旧的理论观点相互佐证，证明万物同源","那一次你甚至真的以为这些家伙发现了他们世界的本质，为此你既紧张又兴奋",1],
+[6,158,"神秘","载体","预言","认识你自己、凡事勿过度、妄立誓则祸近","有些行为是公司是禁止的，这就导致故事中的预言有时灵有时不灵",0],
+[6,159,"神秘","学习","神秘学","故障：神秘哲学有三本神秘的书，但只有一本是真的","",0],
+[6,160,"神秘","流式","命运","女神们纺织、测量、剪断，水中的鱼跃出河面","你曾耐心地注视着小人的一生，直到有人在身后提醒你别发呆",0],
+[6,161,"神秘","机械","遗迹","每一个死去的世界都会被运往粉碎间粉碎后重新回收","有的世界回收的并不彻底，甚至还保留着上一位造物者的手笔",0],
+[6,162,"神秘","神秘","不可知","故障：原型的雏形最难以理解的是它居然是可以被理解的","",0],
+[6,163,"存在","载体","虚色","故障：你的眼，你的灵，你看到没有颜色的颜色迅速填满一切","",0],
+[6,164,"存在","学习","知识","知识就好比一个圆圈，圆圈里面是已知的，圆圈外面是未知的","在这个世界，智慧是智慧之神的敌人，知识是无知之海表面漂浮的诱饵",1],
+[6,165,"存在","流式","灵","无形的那些称作灵，有形的这些称作壳","小世界的灵全都来自真实世界，这也正是它能运行的必要条件之一",0],
+[6,166,"存在","神秘","不存在者","故障：存在者存在，不存在者不存在","",0],
+[6,167,"存在","叠形","三角神","故障：三角在旋变，开叠，分形，递缩，挠曲，振波，拓扑着","",0],
+[7,173,"学者","王冠","实验室","王国实验室曾是所有学术天才们梦寐以求的研究圣地","但是在一次意外的爆炸之后这里彻底变为了废墟，两位幸存者也就此分别",0],
+[7,174,"学者","学者","命题","一个命题对应一个主观看法，也对应一个客观事实","先导留下了两个命题，第一个是万物的本征，第二个是虚无的造物",0],
+[7,175,"本征","王冠","权御","阴谋阳谋明仇暗斗化作一江浊浪东流","沿着护城的河一直转圈，在圆形的尽头，我们的王就在那里，手中的本征闪烁",0],
+[7,176,"本征","学者","解析","哈哈哈哈哈，世界的真理，我已解明","公司技术成果来源于造物过程的一些有趣有用的发现，并进一步转化为更现实的东西",0],
+[7,177,"本征","虚无","固定","真实世界的本征也不过是流中一体，舟中两三人矣","如果存在一个没有本征的事物，不稳定的它将即刻回归进虚无，没有没有本征的事物",0],
+[7,178,"造物","王冠","我们的王","故障：我们的王如同他的本征，我们的王就是我们的王","",0],
+[7,179,"造物","学者","古德尔白","故障：白先生是公司的创始人，他的本征同样值得我们尊重","",0],
+[7,180,"造物","虚无","创造","创造是造物主赋予造物者们的伟大能力","造物者们通过原型的雏形完成他们的工作，并记录和回报在此过程中的有效事物",0],
+[7,181,"造物","本征","真实世界","真实世界是无限的、自指的，甚至包含彼此矛盾的真理","一个世界就是一个原型的雏形，一个真实世界就是一个巨大的世界",0],
+[7,182,"实验室","学者","求学时光","有时候，大家都在回味那段共同学习的快乐时光","这不仅令你想起自己的求学时光，十多年的岁月模糊得就像今晨的昨夜",0],
+[7,183,"实验室","本征","万物的焦点","万物的焦点汇聚之时，火焰将会爆裂开来","一开始大家都以为那些形只会浮现与干扰，只要一边忍受一边改进就好",0],
+[7,184,"实验室","造物","万物的端点","万物的端点穷尽之时，新的枝叶重新生出","至于白先生最后是如何孤身一人在王国的角落建立起公司并逐渐发展壮大到如今",1],
+[7,185,"命题","王冠","冠位指定","我们的王凭借本征的力量成功登上王座","还要再重复一遍吗？我们的王，凭借手中闪烁的本征，成功登上王座",0],
+[7,186,"命题","学者","门徒","曾有十二位门徒追随，现在只有十一位","白先生和我们的王都成在同一位先导门下进行过一段时间的研究，后来先生离去了",1],
+[7,187,"命题","虚无","大爆炸","故障：这是当事人都不愿回忆的往事，尽管只剩下两位幸存者","",0],
+[7,188,"命题","实验室","先导","古德尔白和我们的王曾一起在先导的门下求学","伟大的先导，本征和造物都是他的未完成的命题，他留下这份宝贵的遗产后不久便离去",0],
+[7,189,"权御","本征","愚人众","故障：我们的王用瑕疵的本征愚弄他的臣民","",0],
+[7,190,"解析","王冠","数值解","一是在迷你世界中模拟真实世界的运行法则","通过分析模拟世界产生的模拟数据，公司能给对真实世界中的现象做出较精确的预测",0],
+[7,191,"解析","学者","解析解","二是在我的世界中观察全新世界的运行规律","通过观察模拟世界之中的运行规律，公司能够对真实世界中的原型模型进行一定修正",0],
+[7,192,"解析","虚无","坍缩解","故障：小世界的坍缩解甚至在一定程度上影响真实世界","",0],
+[7,193,"解析","实验室","图书馆","图书馆建立在实验室的废墟之上，就像在伤口上","尽管藏书今非昔比，但是如今的冷清却更显得往日的热闹格外宝贵",0],
+[7,194,"解析","命题","答案","思想的线索已经断头，知识久已使我作呕","相信到了这个时候，你对这一切也有了自己心中的答案了吧",0],
+[7,195,"真实世界","本征","作者","故障：作者就是我，我就是Gove","",0],
+[7,196,"真实世界","造物","造物者","Bug Universe God的员工被称作造物者","倘若排除他，你就是迄今为止最有创造力的造物者，这是公司对你的评价",1],
+[7,197,"真实世界","实验室","原型的雏形","故障：古德尔白从未谈及原型的雏形的制作工艺","",0],
+[7,198,"真实世界","命题","倒三角","故障：那是一切之下，之左，与右的存在","",0],
+[7,199,"真实世界","固定","西之王国","故障：如同北之王国一样，只是上演着不同的事","",0],
+[7,200,"真实世界","创造","BUG","Bug Universe God欢迎更多人加入造物者的行列","这意味着在我们的王与白先生之中，你只能选择一个人，就像他们当初做的那样",1],
+[7,201,"真实世界","真实世界","阿奇佩拉戈","故障：群岛的人们甚至还未完全了解自己的世界","",0]
+    ];
+
+    /* ===== 故事.json 的 8 段原型（原文照录，含 Bugs/Pass/All/Init 原字段） ===== */
+    /* 每章的官方插画位于 assets/，用于跨版档案页的背景 */
+    var STORIES = [
+{ id: 0, name: "光影造物", target: "创造一个标志性造物", bugs: 1, pass: 4, all: 10, init: 2,
+        content: "他说\n世界是被创造出来的\n起初只有无尽的虚无\n所谓虚无\n即是不存在者之存在\n造物主自虚无中诞生又消逝\n光与影从虚无中剥离又填补\n直到标志性的造物被创造\n一个原型的雏形得以产生" },
+      { id: 1, name: "一块岩石的哲思", target: "拯救这位癫狂的哲学家", bugs: 4, pass: 5, all: 21, init: 3,
+        content: "他嘲笑路人皆是痴愚\n哲学的句子迅速消散在风里\n他依靠在岩石上独自叹息\n岩石却回应了他的疑虑\n自此之后他便彻底失心\n对一块石头争辩真理\n日渐消瘦，日渐惊奇\n在可预见的未来里\n疯子死于与石的对话" },
+      { id: 2, name: "现实的乐章", target: "救赎这位言出法随的诗人", bugs: 4, pass: 4, all: 22, init: 3,
+        content: "诗人再不能吟诵他的句子\n因为每一字都成了真\n他开口暮色昏沉，天穹便降下三分\n他慨叹天下谁人，竟无一人作声\n他遇见最心爱的姑娘\n却再不敢形容她的模样\n他怕如花似玉，他怕倾国倾城\n在惶恐的日子最后\n他写下了遗言" },
+      { id: 3, name: "永不停歇的箭羽", target: "让她停下来歇歇脚吧", bugs: 6, pass: 4, all: 24, init: 3,
+        content: "年轻的女郎哟\n为何你的双脚不停奔走\n风吹过麦浪，花坠入溪流\n沿途那么多的美景\n为何你一刻也不愿停留\n追询的声音被拉成金丝后断裂\n就像每一帧静止空中的箭\n你还记得今晨出发时的离别吗\n等你抵达昨日后又是否还记得" },
+      { id: 4, name: "半波增长", target: "回忆这位老小孩的前半生经历", bugs: 5, pass: 4, all: 25, init: 3,
+        content: "左眼盛着八十岁的夕阳\n右眼却映着六岁的贝壳\n一个小男孩正向路人骄傲地炫耀\n炫耀他波澜壮阔的一生\n从中年的垃圾堆里爬起\n他变回了年轻时候的自己\n他的帅气为他又一次赢得了爱情\n直到妻子再也忍受不住少年的身体\n带着思绪与情感永久的离去" },
+      { id: 5, name: "国王的伟大发明", target: "搜集公司与王国的关系", bugs: 7, pass: 6, all: 33, init: 4,
+        content: "人们称颂他，不只是因为他是他们的王\n人们亲眼见证他触摸一块石头\n而后粗粝的棱角便有了自己的思考\n在一个恰当的时间\n他能令未经教化的流浪汉聪慧善良\n在一个合适的地点\n他能令垃圾堆中的老乞丐重返青春\n面对他，面对他的本征\n不成器的造物者们不得不低头" },
+      { id: 6, name: "三角与无限解构", target: "列举一个有趣世界", bugs: 9, pass: 6, all: 32, init: 4,
+        content: "看这位小小魔法师做好了十足的准备\n这将是她第一次施展那本书上的神奇法术\n魔药，咒语，再来一点运气\n她的小脸憋得通红对准一旁空地\n轰隆的一声一颗法球即刻发射出去\n轰隆的又两声是第二颗和第三颗\n直到第一千零一颗法球冲向天空\n她不得不意识到这个不得了的事情\n糟糕糟糕魔法失控啦" },
+      { id: 7, name: "苍白造物", target: "哈哈，白先生", bugs: 10, pass: 4, all: 34, init: 5,
+        content: "造物是从虚无中定义万物的存在\n存在一旦被决定便固有其本征\n古德尔白是一位同样天才的学者\n但他最后还是转身投向那苍白之中\n不断有三角的形干扰实验的果\n因为造物的对立面是彻底的毁灭\n将成的本征在爆炸后与未完成的造物作别\n古德尔白，一无所有的他\n最初的造物者在废墟中一点点重新建立" }
+    ];
+
+    /* ==================================================================
+       1. 规范化的配方索引
+       --------------------------------------------------------------
+       原页面 bug：用 selected.slice().sort().join('|') 生成查询键，
+       但配方表按「记录书写顺序」硬编码键（如 '影|光'、'界|光'），
+       两边的排序规则不一致，导致 '界|光'、'界|影' 永远无法命中。
+       修复：查询键与索引键使用同一个 canonicalKey()，两侧都排序。
+
+       ⚠ 本函数语义不得改动：174 条配方在任意选择顺序下都必须命中。
+       ================================================================== */
+    function canonicalKey(a, b) {
+      // 统一用稳定比较；同一对元素只有唯一一种键
+      return (a <= b) ? (a + "\u0000" + b) : (b + "\u0000" + a);
+    }
+
+    var byPair = Object.create(null);   // 规范化键 -> 配方对象
+    var byStage = Object.create(null);  // S_ID -> [配方对象]
+    var allElements = Object.create(null);
+
+    RECIPES.forEach(function (r) {
+      var rec = {
+        s: r[0], cid: r[1], a: r[2], b: r[3], c: r[4],
+        desc: r[5], result: r[6], pass: r[7],
+        key: canonicalKey(r[2], r[3])
+      };
+      if (!(rec.key in byPair)) byPair[rec.key] = rec;  // 实测 174 条无重复键
+      (byStage[rec.s] || (byStage[rec.s] = [])).push(rec);
+      allElements[rec.a] = true;
+      allElements[rec.b] = true;
+      allElements[rec.c] = true;
+    });
+    BASE.forEach(function (b) { allElements[b.c] = true; });
+
+    function lookup(a, b) { return byPair[canonicalKey(a, b)] || null; }
+
+    /* ==================================================================
+       2. 合成台（墨水槽实验台）
+       ================================================================== */
+    var stagePicker = document.getElementById('stage-picker');
+    var elWrap = document.getElementById('elements');
+    var resultEl = document.getElementById('result');
+    var countEl = document.getElementById('lab-count');
+    var btnClear = document.getElementById('btn-clear');
+    var btnLucky = document.getElementById('btn-lucky');
+    var selected = [];
+    var stage = 0;
+    var discovered = Object.create(null);
+
+    // 某关卡可选元素 = 该关基础元素 + 该关配方里出现过的一切概念
+    function stagePool(s) {
+      var pool = [];
+      var seen = Object.create(null);
+      BASE.forEach(function (b) { if (b.s === s) { pool.push(b.c); seen[b.c] = true; } });
+      (byStage[s] || []).forEach(function (r) {
+        [r.a, r.b, r.c].forEach(function (n) {
+          if (!seen[n]) { seen[n] = true; pool.push(n); }
+        });
+      });
+      return pool;
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function setEmpty(msg) {
+      resultEl.innerHTML = '<p class="result-empty">' + esc(msg) + '</p>';
+    }
+
+    function renderStageButtons() {
+      Array.prototype.forEach.call(stagePicker.querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-pressed', String(Number(b.dataset.stage) === stage));
+      });
+    }
+
+    function renderElements() {
+      var pool = stagePool(stage);
+      elWrap.innerHTML = '';
+      pool.forEach(function (name) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'el';
+        btn.dataset.el = name;
+        btn.textContent = name;
+        btn.setAttribute('aria-pressed', 'false');
+        elWrap.appendChild(btn);
+      });
+    }
+
+    function syncPressed() {
+      Array.prototype.forEach.call(elWrap.querySelectorAll('.el'), function (b) {
+        b.setAttribute('aria-pressed', String(selected.indexOf(b.dataset.el) >= 0));
+      });
+    }
+
+    function clearSelection() {
+      selected = [];
+      syncPressed();
+      setEmpty('等待合成…');
+    }
+
+    function showResult(a, b) {
+      var rec = lookup(a, b);
+      if (!rec) {
+        setEmpty('故障：这对组合超出了「原型的雏形」的表达范围');
+        return;
+      }
+      var isNew = !discovered[rec.key];
+      discovered[rec.key] = true;
+      var html = '<div class="result-card' + (isNew ? ' is-new' : '') + '">' +
+        '<div class="label">合成结果' + (isNew ? '<span class="badge">新发现</span>' : '<span class="badge">已收录</span>') + '</div>' +
+        '<div class="name">' + esc(rec.c) + '</div>' +
+        '<div class="formula">' + esc(rec.a) + ' + ' + esc(rec.b) + ' → ' + esc(rec.c) +
+          '　（S_ID ' + rec.s + ' / C_ID ' + rec.cid + '）</div>' +
+        '<div class="desc' + (rec.desc.indexOf('故障') === 0 ? ' fault' : '') + '">' + esc(rec.desc) + '</div>';
+      if (rec.result) {
+        html += '<div class="res">' + esc(rec.result) + '</div>';
+      }
+      html += '</div>';
+      resultEl.innerHTML = html;
+      updateCount();
+    }
+
+    function toggle(name) {
+      var i = selected.indexOf(name);
+      if (i >= 0) {
+        // 已选过一次：
+        //  · 当前只有它一个，且它与自己存在配方（如 光+光、真实世界+真实世界）
+        //    → 第二次点击补成「同名两份」并合成；
+        //  · 已经是同名两份，或它没有自身配方 → 取消选中。
+        var alreadyTwice = selected.length === 2 && selected[0] === name && selected[1] === name;
+        if (selected.length === 1 && !alreadyTwice && lookup(name, name)) {
+          selected.push(name);
+          syncPressed();
+          showResult(name, name);
+          return;
+        }
+        selected = selected.filter(function (n) { return n !== name; });
+        syncPressed();
+        setEmpty(selected.length === 0 ? '等待合成…' : '再选一个元素…');
+        return;
+      }
+      if (selected.length >= 2) selected = [];
+      selected.push(name);
+      syncPressed();
+      if (selected.length === 2) {
+        showResult(selected[0], selected[1]);
+      } else {
+        setEmpty('再选一个元素…');
+      }
+    }
+
+    elWrap.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.el') : null;
+      if (btn) toggle(btn.dataset.el);
+    });
+
+    stagePicker.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('button[data-stage]') : null;
+      if (!btn) return;
+      stage = Number(btn.dataset.stage);
+      renderStageButtons();
+      renderElements();
+      clearSelection();
+      updateCount();
+    });
+
+    function updateCount() {
+      var total = (byStage[stage] || []).length;
+      var got = 0;
+      (byStage[stage] || []).forEach(function (r) { if (discovered[r.key]) got++; });
+      countEl.textContent = '第 ' + stage + ' 关：已发现 ' + got + ' / ' + total + ' 条配方';
+    }
+
+    btnClear.addEventListener('click', function () { clearSelection(); });
+
+    btnLucky.addEventListener('click', function () {
+      var pool = stagePool(stage);
+      if (pool.length < 2) return;
+      var a = pool[Math.floor(Math.random() * pool.length)];
+      var b = pool[Math.floor(Math.random() * pool.length)];
+      selected = [a, b];
+      syncPressed();
+      showResult(a, b);
+      updateCount();
+    });
+
+    renderStageButtons();
+    renderElements();
+    updateCount();
+
+    /* ==================================================================
+       3. 配方图鉴（档案卡片）
+       ================================================================== */
+    var codex = document.getElementById('codex');
+    var searchInput = document.getElementById('codex-search');
+    var codexCount = document.getElementById('codex-count');
+
+    function buildCodex() {
+      var html = '';
+      for (var s = 0; s <= 7; s++) {
+        var list = byStage[s] || [];
+        if (!list.length) continue;
+        var st = STORIES[s];
+        html += '<details class="codex-group">' +
+          '<summary>' +
+          '<h3 class="cg-t">第 ' + s + ' 关 · ' + esc(st.name) + '</h3>' +
+          '<span class="n">' + list.length + ' 条配方</span>' +
+          '<span class="gsub">目标：' + esc(st.target) + '</span>' +
+          '<span class="cg-arrow" aria-hidden="true">\u25BE</span>' +
+          '</summary>' +
+          '<div class="codex-list">';
+        list.forEach(function (r) {
+          var isFault = r.desc.indexOf('故障') === 0;
+          html += '<button class="rc" type="button" data-a="' + esc(r.a) + '" data-b="' + esc(r.b) + '" data-stage="' + r.s + '"' +
+            ' data-search="' + esc((r.a + r.b + r.c + r.desc).toLowerCase()) + '"' +
+            (isFault ? ' data-fault="1"' : '') +
+            ' title="' + esc(r.desc) + '">' +
+            '<span class="a">' + esc(r.a) + '</span><span class="plus">+</span>' +
+            '<span class="b">' + esc(r.b) + '</span><span class="to">→</span>' +
+            '<span class="c">' + esc(r.c) + '</span>' +
+            (r.pass ? '<span class="star" title="Pass=1：该关卡的通关目标配方">★</span>' : '') +
+            '</button>';
+        });
+        html += '</div></details>';
+      }
+      codex.innerHTML = html;
+      filterCodex();
+    }
+
+    function filterCodex() {
+      var q = (searchInput.value || '').trim().toLowerCase();
+      var shown = 0;
+      var total = 0;
+      Array.prototype.forEach.call(codex.querySelectorAll('.codex-group'), function (g, gi) {
+        var vis = 0;
+        Array.prototype.forEach.call(g.querySelectorAll('.rc'), function (b) {
+          total++;
+          var hit = !q || b.dataset.search.indexOf(q) >= 0;
+          b.classList.toggle('hidden', !hit);
+          if (hit) { vis++; shown++; }
+        });
+        g.style.display = vis ? '' : 'none';
+        /* 搜索时自动展开命中的关卡组，否则用户看不到搜索结果；
+           无搜索时默认只展开第 1 关，其余折叠，保持页面紧凑 */
+        g.open = q ? (vis > 0) : (gi === 0);
+      });
+      codexCount.textContent = q
+        ? '匹配 ' + shown + ' / ' + total + ' 条'
+        : '共 ' + total + ' 条配方';
+      var emptyEl = document.getElementById('codex-empty');
+      if (!shown && q) {
+        if (!emptyEl) {
+          emptyEl = document.createElement('p');
+          emptyEl.id = 'codex-empty';
+          emptyEl.className = 'codex-empty';
+          codex.appendChild(emptyEl);
+        }
+        emptyEl.textContent = '没有匹配「' + q + '」的配方。试试：光、界、世界、三角神、古德尔白、阿奇佩拉戈。';
+        emptyEl.style.display = '';
+      } else if (emptyEl) {
+        emptyEl.style.display = 'none';
+      }
+    }
+
+    searchInput.addEventListener('input', filterCodex);
+
+    codex.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.rc') : null;
+      if (!btn) return;
+      var s = Number(btn.dataset.stage);
+      stage = s;
+      renderStageButtons();
+      renderElements();
+      selected = [btn.dataset.a, btn.dataset.b];
+      syncPressed();
+      showResult(btn.dataset.a, btn.dataset.b);
+      updateCount();
+      document.getElementById('elements').scrollIntoView({ block: 'center' });
+    });
+
+    buildCodex();
+
+    /* ==================================================================
+       4. 原型集（故事.json）—— 八章跨版档案页，配官方插画
+       ================================================================== */
+    // 章节插画：assets/ch-<id>-<章节名>.webp（与 STORIES 一一对应）
+    var CHAPTER_ART = [
+      'assets/ch-0-光影造物.webp',
+      'assets/ch-1-一块岩石的哲思.webp',
+      'assets/ch-2-现实的乐章.webp',
+      'assets/ch-3-永不停歇的箭羽.webp',
+      'assets/ch-4-半波增长.webp',
+      'assets/ch-5-国王的伟大发明.webp',
+      'assets/ch-6-三角与无限解构.webp',
+      'assets/ch-7-苍白造物.webp'
+    ];
+
+    var storiesEl = document.getElementById('stories');
+    storiesEl.innerHTML = STORIES.map(function (st) {
+      var art = CHAPTER_ART[st.id];
+      return '<article class="story-card">' +
+        '<div class="story-art">' +
+          '<img src="' + art + '" alt="第 ' + st.id + ' 关「' + esc(st.name) + '」官方章节插画" loading="lazy" />' +
+          '<span class="tag-s">S_ID ' + st.id + '</span>' +
+        '</div>' +
+        '<div class="story-text">' +
+          '<p class="no">S_ID ' + st.id + ' · 第 ' + st.id + ' 关</p>' +
+          '<h3>' + esc(st.name) + '</h3>' +
+          '<p class="target">目标：' + esc(st.target) + '</p>' +
+          '<p class="poem">' + esc(st.content) + '</p>' +
+          '<p class="nums">' +
+            '<span>目标配方 <b>' + st.pass + '</b></span>' +
+            '<span>故障项 <b>' + st.bugs + '</b></span>' +
+            '<span>全部 <b>' + st.all + '</b></span>' +
+            '<span>初始 <b>' + st.init + '</b></span>' +
+          '</p>' +
+        '</div>' +
+        '</article>';
+    }).join('');
+
+    /* ==================================================================
+       5. Lightbox（含关闭按钮与焦点管理）
+       ================================================================== */
+    var lightbox = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lightbox-img');
+    var lbCap = document.getElementById('lb-cap');
+    var lbClose = document.getElementById('lb-close');
+    var lastFocus = null;
+
+    function openLb(img) {
+      lastFocus = document.activeElement;
+      lbImg.src = img.currentSrc || img.src;
+      lbImg.alt = img.alt;
+      lbCap.textContent = img.alt;
+      lightbox.hidden = false;
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      lbClose.focus();
+    }
+
+    function closeLb() {
+      if (!lightbox.classList.contains('open')) return;
+      lightbox.classList.remove('open');
+      lightbox.hidden = true;
+      lbImg.src = '';
+      document.body.style.overflow = '';
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.shot'), function (s) {
+      s.addEventListener('click', function () { openLb(s.querySelector('img')); });
+    });
+    lbClose.addEventListener('click', closeLb);
+    lightbox.addEventListener('click', function (e) { if (e.target === lightbox) closeLb(); });
+
+    document.addEventListener('keydown', function (e) {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') { closeLb(); return; }
+      if (e.key === 'Tab') {           // 焦点锁在对话框内
+        e.preventDefault();
+        lbClose.focus();
+      }
+    });
+
+    /* ==================================================================
+       6. 滚动浮现（带降级）
+       --------------------------------------------------------------
+       .reveal 默认 opacity:1（CSS 中），只有确认 IntersectionObserver
+       可用时才给 <html> 加 .js-reveal 去隐藏元素。
+       因此 IO 失效时页面完整可见，绝不会整页空白。
+       ================================================================== */
+    var revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window && revealEls.length) {
+      document.documentElement.classList.add('js-reveal');
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
           if (en.isIntersecting) {
@@ -790,75 +1672,13 @@
           }
         });
       }, { threshold: 0.12 });
-      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
-
-      // 造物合成台
-      var recipes = {
-        '光|影':     { name: '界',       desc: '轻清者上升，重浊者下降——光与影划出第一条边界。' },
-        '光|光':     { name: '无上圣光', desc: '两束光交缠，从虚空中闪烁而出的至亮之物。' },
-        '影|影':     { name: '暗面',     desc: '事物皆有黑暗面，它们并非如我们通常所想。' },
-        '界|界':     { name: '世界',     desc: '古往今来曰世，上下四方曰界。' },
-        '界|光':     { name: '视界',     desc: '光锥之内就是命运，视界之外便是虚无。' },
-        '界|影':     { name: '势界',     desc: '一个动态的、正在被争夺与塑造的领域。' },
-        '世界|神话': { name: '文明',     desc: '神话是文明的童年，文明是神话的衰老。' },
-        '世界|科学': { name: '理性',     desc: '以可证伪的方式，逼近世界的本征。' },
-        '光|神话':   { name: '奇迹',     desc: '超越自然法则的显现，信仰的具象化。' },
-        '影|科学':   { name: '未知',     desc: '已知的边界之外，永远存在的阴影。' }
-      };
-      var els = document.querySelectorAll('.el');
-      var result = document.getElementById('result');
-      var selected = [];
-
-      function renderEmpty(msg) {
-        result.innerHTML = '<p class="result-empty">' + msg + '</p>';
-      }
-
-      els.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var name = btn.dataset.el;
-          var idx = selected.indexOf(name);
-          if (idx >= 0) {
-            btn.classList.remove('sel');
-            selected.splice(idx, 1);
-          } else {
-            if (selected.length >= 2) {
-              els.forEach(function (e) { e.classList.remove('sel'); });
-              selected = [];
-            }
-            btn.classList.add('sel');
-            selected.push(name);
-          }
-          if (selected.length === 2) {
-            var key = selected.slice().sort().join('|');
-            var out = recipes[key];
-            result.innerHTML = out
-              ? '<div class="result-card"><div class="label">合成结果</div><div class="name">' + out.name + '</div><div class="desc">' + out.desc + '</div></div>'
-              : '<p class="result-empty">故障：这对组合超出了「原型的雏形」的表达范围</p>';
-          } else {
-            renderEmpty(selected.length === 0 ? '等待合成…' : '再选一个元素…');
-          }
-        });
-      });
-
-      // Lightbox
-      var lightbox = document.getElementById('lightbox');
-      var lbImg = document.getElementById('lightbox-img');
-      var shots = document.querySelectorAll('.shot');
-
-      shots.forEach(function (s) {
-        s.addEventListener('click', function () {
-          var img = s.querySelector('img');
-          lbImg.src = img.src;
-          lbImg.alt = img.alt;
-          lightbox.classList.add('open');
-        });
-      });
-      function closeLb() { lightbox.classList.remove('open'); }
-      lightbox.addEventListener('click', closeLb);
-      window.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeLb();
-      });
-    })();
+      Array.prototype.forEach.call(revealEls, function (el) { io.observe(el); });
+      // 兜底：2.5s 后仍未进入视口的元素直接显示，避免任何情况下的空白
+      setTimeout(function () {
+        Array.prototype.forEach.call(revealEls, function (el) { el.classList.add('in'); });
+      }, 2500);
+    }
+  })();
   </script>
 </body>
 </html>

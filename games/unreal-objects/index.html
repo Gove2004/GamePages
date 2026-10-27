@@ -1,881 +1,2355 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UnReal Objects · 不可能物体 | Gove</title>
-  <meta name="description" content="UnReal Objects：Godot 4.3 制作的俯视像素解谜。彭罗斯三角、不可能立方体、埃舍尔阶梯、恶魔音叉——二维成立而三维冲突的透视错觉实验。" />
-  <style>
-    :root {
-      --bg: #0a0a12;
-      --bg-soft: #12121e;
-      --bg-card: #161626;
-      --violet: #9b8cff;
-      --violet-dim: rgba(155, 140, 255, 0.16);
-      --cyan: #40e0ff;
-      --red: #ff4d6d;
-      --amber: #ffb347;
-      --green: #7ba04a;
-      --ink: #d8d6e8;
-      --dim: #8a89a3;
-      --faint: #4a4960;
-      --line: rgba(155, 140, 255, 0.18);
-      --line-soft: rgba(155, 140, 255, 0.09);
-      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UnReal Objects · 不可能物体 | Gove</title>
+<meta name="description" content="UnReal Objects：Godot 4.3 制作的俯视像素解谜。拾取字母动作牌，一步跨越二维与三维的逻辑冲突。彭罗斯三角形、不可能立方体、埃舍尔阶梯、恶魔音叉。" />
+<meta name="theme-color" content="#06060c" />
+<style>
+  /* ==================================================================
+     UnReal Objects — 像素棋盘 / CRT 街机
+     0. 变量与基础   1. CRT 覆盖层   2. 像素框 .px   3. 通用件
+     ================================================================== */
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+  :root {
+    --bg:        #06060c;
+    --deep:      #0a0a13;
+    --panel:     #101019;
+    --panel2:    #161623;
+    --panel3:    #1e1e2e;
+    --edge:      #35354f;
+    --edge-hi:   #4e4e72;
+    --ink:       #eae8f6;
+    --dim:       #a5a2c0;
+    --faint:     #67658a;
+    --violet:    #9b8cff;
+    --violet-2:  #6f5cff;
+    --cyan:      #40e0ff;
+    --red:       #ff4d6d;
+    --amber:     #ffb347;
+    --grass:     #7cc35a;
+    --brown:     #a87f5e;
+    --paper:     #cfc7b4;
+    --ink-paper: #17131c;
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Courier New", monospace;
+    /* 阶梯像素角：两段 3px 台阶，供所有 .px 面板使用 */
+    --stair: polygon(
+      0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0,
+      calc(100% - 6px) 0, calc(100% - 6px) 3px, calc(100% - 3px) 3px, calc(100% - 3px) 6px, 100% 6px,
+      100% calc(100% - 6px), calc(100% - 3px) calc(100% - 6px), calc(100% - 3px) calc(100% - 3px),
+      calc(100% - 6px) calc(100% - 3px), calc(100% - 6px) 100%,
+      6px 100%, 6px calc(100% - 3px), 3px calc(100% - 3px), 3px calc(100% - 6px), 0 calc(100% - 6px)
+    );
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--mono);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
+  * { box-sizing: border-box; }
 
-    /* CRT 暗角 */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 55;
-      pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.65) 100%);
-    }
-    /* CRT 扫描线 */
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 56;
-      pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
-      mix-blend-mode: multiply;
-    }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-    button { font-family: inherit; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1.72;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      width: min(1040px, calc(100% - 40px));
-      margin: 0 auto;
-    }
+  /* ==================================================================
+     0. 背景氛围层 = 一台通着电的街机机台背板
+        ::before  双层辉光：紫罗兰主光压在页首，青色副光偏右上，
+                  左侧深紫补光、右下琥珀余温、页脚回光
+        ::after   4px 像素网格 + 1px CRT 扫描线 + 2px 抖动噪点
+        两层都 position:fixed，滚动时像背光而不是贴图跟着跑
+     ================================================================== */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      /* 页首灯管：一条横向的机台顶光 */
+      linear-gradient(180deg, rgba(155, 140, 255, .22) 0, rgba(155, 140, 255, 0) 300px),
+      /* 主辉光：紫罗兰 */
+      radial-gradient(64% 48% at 50% -2%,  rgba(155, 140, 255, .50), rgba(155, 140, 255, 0) 70%),
+      /* 副辉光：青色，偏右上 */
+      radial-gradient(48% 36% at 88% 20%,  rgba(64, 224, 255, .26),  rgba(64, 224, 255, 0) 68%),
+      /* 补光：深紫，左侧中段 */
+      radial-gradient(52% 42% at 0% 56%,   rgba(111, 92, 255, .30),  rgba(111, 92, 255, 0) 72%),
+      /* 余温：琥珀，右下角 */
+      radial-gradient(38% 30% at 86% 84%,  rgba(255, 179, 71, .15),  rgba(255, 179, 71, 0) 72%),
+      /* 回光：页脚再亮一次，避免下半页发死 */
+      radial-gradient(60% 34% at 50% 106%, rgba(155, 140, 255, .24), rgba(155, 140, 255, 0) 72%);
+    animation: bg-breathe 13s ease-in-out infinite;
+  }
 
-    /* ---------- 顶部导航 ---------- */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 60;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-      background: linear-gradient(180deg, rgba(10, 10, 18, 0.96), rgba(10, 10, 18, 0));
-      font-size: 12px;
-      letter-spacing: 0.12em;
-    }
-    .topbar a {
-      color: var(--dim);
-      transition: color 0.3s ease, text-shadow 0.3s ease;
-    }
-    .topbar a:hover, .topbar a:focus-visible {
-      color: var(--violet);
-      text-shadow: 0 0 12px var(--violet-dim);
-      outline: none;
-    }
-    .topbar .back::before { content: "<- "; color: var(--violet); }
-    .topbar .tag {
-      color: var(--faint);
-      text-transform: uppercase;
-      font-size: 10px;
-    }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      /* 像素网格（竖） */
+      repeating-linear-gradient(90deg, rgba(155, 140, 255, .095) 0 1px, rgba(155, 140, 255, 0) 1px 4px),
+      /* 像素网格（横） */
+      repeating-linear-gradient(0deg,  rgba(155, 140, 255, .075) 0 1px, rgba(155, 140, 255, 0) 1px 4px),
+      /* CRT 扫描线 */
+      repeating-linear-gradient(0deg,  rgba(0, 0, 0, .34) 0 1px, rgba(0, 0, 0, 0) 1px 3px),
+      /* 低色深屏幕的抖动噪点（2px 棋盘） */
+      repeating-conic-gradient(rgba(234, 232, 246, .045) 0% 25%, rgba(234, 232, 246, 0) 0% 50%);
+    background-size: auto, auto, auto, 4px 4px;
+  }
 
-    /* 像素标题色差 */
-    .pixel {
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      text-shadow:
-        2px 0 0 rgba(255, 77, 109, 0.35),
-        -2px 0 0 rgba(64, 224, 255, 0.35);
-    }
+  /* 机台背光的极缓慢呼吸；降低动效时由全局规则关掉，保持静止 */
+  @keyframes bg-breathe {
+    0%, 100% { opacity: .80; }
+    50%      { opacity: 1; }
+  }
 
-    /* ---------- Hero ---------- */
-    .hero {
-      padding: 56px 0 48px;
-      text-align: center;
-      position: relative;
-    }
-    .hero .kicker {
-      color: var(--violet);
-      font-size: 11px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      margin: 0 0 28px;
-    }
-    .impossible-hero {
-      width: clamp(180px, 28vw, 240px);
-      height: clamp(180px, 28vw, 240px);
-      margin: 0 auto 28px;
-      animation: spin 26s linear infinite;
-      cursor: pointer;
-      transition: filter 0.3s;
-      filter: drop-shadow(0 0 18px var(--violet-dim));
-    }
-    .impossible-hero:hover { filter: drop-shadow(0 0 28px rgba(155,140,255,0.45)); }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(30px, 6.5vw, 60px);
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1.1;
-    }
-    h1 .o { color: var(--violet); }
-    h1 .cn {
-      display: block;
-      font-size: clamp(13px, 2vw, 17px);
-      letter-spacing: 0.5em;
-      color: var(--dim);
-      text-transform: none;
-      margin-top: 10px;
-      text-shadow: none;
-      font-weight: 400;
-    }
-    .hero .sub {
-      margin: 22px auto 0;
-      max-width: 600px;
-      color: var(--dim);
-      font-size: clamp(13px, 1.7vw, 15px);
-      line-height: 1.85;
-    }
-    .hero .sub b { color: var(--violet); font-weight: 700; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+  code {
+    font-family: var(--mono);
+    font-size: 0.92em;
+    color: var(--cyan);
+    background: rgba(64, 224, 255, .07);
+    padding: 1px 5px;
+    box-shadow: 0 0 0 1px rgba(64, 224, 255, .16);
+  }
+  b, strong { color: var(--ink); font-weight: 700; }
+  ::selection { background: var(--violet); color: #08080f; }
 
-    /* 信息条 */
-    .meta-bar {
-      margin: 32px auto 0;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      overflow: hidden;
-      width: fit-content;
-      max-width: 100%;
-      background: var(--bg-soft);
-    }
-    .meta-bar .item {
-      padding: 10px 18px;
-      font-size: 11px;
-      color: var(--dim);
-      border-right: 1px solid var(--line-soft);
-      white-space: nowrap;
-    }
-    .meta-bar .item:last-child { border-right: none; }
-    .meta-bar .item b { color: var(--violet); font-weight: 600; }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 
-    /* cover 展示 */
-    .cover-frame {
-      margin: 40px auto 0;
-      max-width: 720px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-    .cover-frame img {
-      width: 100%;
-      display: block;
-      image-rendering: pixelated;
-      filter: contrast(1.05);
-    }
-    .cover-frame::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0 1px, transparent 1px 3px);
-      mix-blend-mode: multiply;
-    }
-    .cover-frame .label {
-      position: absolute;
-      bottom: 8px;
-      left: 10px;
-      font-size: 10px;
-      color: var(--faint);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      z-index: 2;
-    }
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 
-    /* ---------- 滚动浮现 ---------- */
-    .reveal {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.9s ease, transform 0.9s ease;
-    }
-    .reveal.in { opacity: 1; transform: none; }
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 300;
+    padding: 10px 16px;
+    background: var(--panel3);
+    color: var(--violet);
+    font-size: 12px;
+    letter-spacing: .1em;
+    box-shadow: 0 0 0 2px var(--violet);
+  }
+  .skip-link:focus { left: 10px; top: 10px; }
 
-    /* ---------- 通用 section 头 ---------- */
-    .sec {
-      padding: 64px 0;
-    }
-    .sec-head {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .sec-head .kicker {
-      color: var(--violet);
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      margin: 0 0 12px;
-    }
-    .sec-head h2 {
-      margin: 0 0 10px;
-      font-size: clamp(22px, 3.6vw, 32px);
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .sec-head p {
-      margin: 0;
-      color: var(--faint);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-    }
+  /* ==================================================================
+     1. CRT 覆盖层：扫描线 + 闪烁 + 滚动亮带 + 暗角
+     ================================================================== */
+  .crt { position: fixed; inset: 0; z-index: 120; pointer-events: none; }
+  .crt i { position: absolute; display: block; }
 
-    /* ---------- 前提 ---------- */
-    .premise {
-      max-width: 720px;
-      margin: 0 auto;
-      text-align: center;
-      padding: 56px 0;
-    }
-    .premise p {
-      margin: 0 0 18px;
-      font-size: clamp(15px, 2.2vw, 20px);
-      line-height: 1.85;
-      color: var(--ink);
-    }
-    .premise p .v { color: var(--violet); }
-    .premise p .c { color: var(--cyan); }
-    .premise .note {
-      margin-top: 28px;
-      font-size: 12px;
-      color: var(--faint);
-      line-height: 1.9;
-    }
+  .crt .scan {
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .26) 0 1px, rgba(0, 0, 0, 0) 1px 3px);
+    mix-blend-mode: multiply;
+    opacity: .6;
+    animation: crt-flicker 6.5s steps(1, end) infinite;
+  }
+  .crt .sweep {
+    left: 0; right: 0; top: 0;
+    height: 26vh;
+    background: linear-gradient(180deg,
+      rgba(155, 140, 255, 0) 0%,
+      rgba(155, 140, 255, .05) 55%,
+      rgba(64, 224, 255, .085) 88%,
+      rgba(64, 224, 255, 0) 100%);
+    animation: crt-sweep 8.5s linear infinite;
+  }
+  .crt .vig {
+    inset: 0;
+    background: radial-gradient(ellipse 92% 78% at 50% 46%,
+      rgba(0, 0, 0, 0) 42%,
+      rgba(0, 0, 0, .38) 78%,
+      rgba(0, 0, 0, .62) 100%);
+  }
+  .crt .chroma {
+    inset: 0;
+    box-shadow:
+      inset 3px 0 0 rgba(255, 77, 109, .07),
+      inset -3px 0 0 rgba(64, 224, 255, .07);
+  }
 
-    /* ---------- 操作方式 ---------- */
-    .howto {
-      background: var(--bg-soft);
-      border-top: 1px solid var(--line-soft);
-      border-bottom: 1px solid var(--line-soft);
-    }
-    .key-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 8px;
-    }
-    .key-card {
-      padding: 22px 20px;
-      border: 1px solid var(--line-soft);
-      border-radius: 4px;
-      background: var(--bg-card);
-      transition: border-color 0.3s, transform 0.3s;
-    }
-    .key-card:hover { border-color: var(--violet); transform: translateY(-2px); }
-    .key-cap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 38px;
-      height: 38px;
-      padding: 0 10px;
-      border: 1px solid var(--line);
-      border-bottom-width: 3px;
-      border-radius: 4px;
-      background: var(--bg);
-      color: var(--violet);
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      letter-spacing: 0.05em;
-    }
-    .key-card h3 {
-      margin: 0 0 6px;
-      font-size: 14px;
-      color: var(--ink);
-      font-weight: 700;
-    }
-    .key-card p {
-      margin: 0;
-      font-size: 12px;
-      color: var(--dim);
-      line-height: 1.7;
-    }
-    .key-card .impossible {
-      color: var(--red);
-    }
+  @keyframes crt-flicker {
+    0%, 100% { opacity: .60; }
+    47%      { opacity: .60; }
+    48%      { opacity: .47; }
+    49%      { opacity: .63; }
+    71%      { opacity: .58; }
+    72%      { opacity: .66; }
+  }
+  @keyframes crt-sweep {
+    0%   { transform: translateY(-30vh); }
+    100% { transform: translateY(112vh); }
+  }
 
-    /* ---------- 不可能物体图鉴 ---------- */
-    .catalog-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-    .obj-card {
-      padding: 30px 26px;
-      border: 1px solid var(--line-soft);
-      border-radius: 4px;
-      background: var(--bg-card);
-      transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-    .obj-card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: currentColor;
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-    .obj-card:hover, .obj-card:focus-visible {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      outline: none;
-    }
-    .obj-card:hover::before, .obj-card:focus-visible::before { opacity: 0.7; }
-    .obj-card:nth-child(1) { color: var(--violet); }
-    .obj-card:nth-child(2) { color: var(--cyan); }
-    .obj-card:nth-child(3) { color: var(--amber); }
-    .obj-card:nth-child(4) { color: var(--red); }
-    .obj-card:nth-child(1):hover, .obj-card:nth-child(1):focus-visible { border-color: var(--violet); }
-    .obj-card:nth-child(2):hover, .obj-card:nth-child(2):focus-visible { border-color: var(--cyan); }
-    .obj-card:nth-child(3):hover, .obj-card:nth-child(3):focus-visible { border-color: var(--amber); }
-    .obj-card:nth-child(4):hover, .obj-card:nth-child(4):focus-visible { border-color: var(--red); }
-    .obj-card .icon {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 18px;
-      transition: transform 0.6s ease;
-    }
-    .obj-card:hover .icon {
-      transform: rotate(15deg) scale(1.08);
-    }
-    .obj-card .num {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      font-size: 32px;
-      font-weight: 700;
-      opacity: 0.1;
-      color: var(--ink);
-    }
-    .obj-card h3 {
-      margin: 0 0 4px;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: 0.04em;
-    }
-    .obj-card .scene {
-      font-size: 10px;
-      color: var(--faint);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .obj-card p {
-      margin: 0;
-      color: var(--dim);
-      font-size: 13px;
-      line-height: 1.7;
-    }
+  /* ==================================================================
+     2. .px —— 统一像素面板
+        drop-shadow 出硬投影，::before 用 clip-path 切阶梯角并画 3px 边框
+     ================================================================== */
+  .px {
+    position: relative;
+    isolation: isolate;
+    filter: drop-shadow(5px 5px 0 rgba(0, 0, 0, .5));
+  }
+  .px::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    z-index: -1;
+    pointer-events: none;
+    border: 3px solid transparent;
+    background:
+      linear-gradient(var(--fill, var(--panel)), var(--fill, var(--panel))) padding-box,
+      var(--frame, var(--edge)) border-box;
+    clip-path: var(--stair);
+  }
+  .px--flat { filter: none; }
+  .px--flat::before { inset: 0; border-width: 2px; }
 
-    /* ---------- 截图 ---------- */
-    .media-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    .shot {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--line-soft);
-      border-radius: 4px;
-      cursor: zoom-in;
-      background: var(--bg-card);
-      padding: 0;
-      transition: border-color 0.3s;
-    }
-    .shot:hover, .shot:focus-visible {
-      border-color: var(--violet);
-      outline: none;
-    }
-    .shot img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      image-rendering: pixelated;
-      filter: contrast(1.08) saturate(0.9);
-      transition: transform 0.5s ease, filter 0.5s ease;
-    }
-    .shot:hover img, .shot:focus-visible img {
-      transform: scale(1.05);
-      filter: contrast(1.12) saturate(1.1);
-    }
-    .shot::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
-      mix-blend-mode: multiply;
-    }
+  /* ==================================================================
+     3. 通用件：按键帽、像素按钮、标签、区块头
+     ================================================================== */
+  .kcap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2em;
+    height: 2em;
+    padding: 0 .45em;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: .06em;
+    color: var(--violet);
+    background: var(--panel2);
+    box-shadow:
+      0 0 0 2px var(--edge),
+      inset 0 -3px 0 rgba(0, 0, 0, .55),
+      inset 0 2px 0 rgba(255, 255, 255, .07);
+  }
+  .kcap--wide { font-size: 10px; letter-spacing: 0; }
+  .kcap--hot { color: var(--amber); box-shadow: 0 0 0 2px rgba(255, 179, 71, .5), inset 0 -3px 0 rgba(0, 0, 0, .55); }
 
-    /* ---------- 技术信息 ---------- */
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1px;
-      background: var(--line-soft);
-      border: 1px solid var(--line-soft);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .info-cell {
-      background: var(--bg);
-      padding: 22px 16px;
-      text-align: center;
-    }
-    .info-cell .label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 8px;
-    }
-    .info-cell .value {
-      font-size: 13px;
-      color: var(--ink);
-      font-weight: 600;
-    }
-    .info-cell .value.accent { color: var(--violet); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--panel2);
+    box-shadow:
+      0 0 0 2px var(--edge),
+      inset 0 -4px 0 rgba(0, 0, 0, .55),
+      inset 0 2px 0 rgba(255, 255, 255, .06);
+    transition: transform .16s steps(2, end), background .16s linear, color .16s linear, box-shadow .16s linear;
+  }
+  .btn:hover, .btn:focus-visible {
+    transform: translateY(-3px);
+    color: var(--violet);
+    background: var(--panel3);
+    box-shadow:
+      0 0 0 2px var(--violet),
+      inset 0 -4px 0 rgba(0, 0, 0, .55),
+      inset 0 2px 0 rgba(255, 255, 255, .08);
+  }
+  .btn--primary {
+    color: #0a0a12;
+    background: var(--violet);
+    box-shadow:
+      0 0 0 2px var(--violet),
+      inset 0 -4px 0 rgba(0, 0, 0, .3),
+      inset 0 2px 0 rgba(255, 255, 255, .35);
+  }
+  .btn--primary:hover, .btn--primary:focus-visible {
+    color: #0a0a12;
+    background: #b7abff;
+    box-shadow:
+      0 0 0 2px #b7abff,
+      inset 0 -4px 0 rgba(0, 0, 0, .3),
+      inset 0 2px 0 rgba(255, 255, 255, .45);
+  }
 
-    /* ---------- 底部 ---------- */
-    .bottom {
-      padding: 64px 0 56px;
-      text-align: center;
-    }
-    .bottom h2 {
-      margin: 0 0 14px;
-      font-size: clamp(22px, 3.6vw, 32px);
-      color: var(--ink);
-    }
-    .bottom p {
-      margin: 0 0 28px;
-      color: var(--dim);
-      font-size: 13px;
-    }
-    .bottom .links {
-      display: inline-flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .bottom .links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border: 1px solid var(--line-soft);
-      border-radius: 4px;
-      color: var(--ink);
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s, box-shadow 0.3s;
-    }
-    .bottom .links a:hover, .bottom .links a:focus-visible {
-      border-color: var(--violet);
-      color: var(--violet);
-      background: var(--violet-dim);
-      outline: none;
-    }
-    .bottom .links a.primary {
-      border-color: var(--violet);
-      color: var(--violet);
-      background: var(--violet-dim);
-    }
-    .bottom .links a.primary:hover, .bottom .links a.primary:focus-visible {
-      box-shadow: 0 0 30px rgba(155, 140, 255, 0.25);
-    }
-    .bottom .sign {
-      margin-top: 36px;
-      color: var(--faint);
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-    }
+  .kicker {
+    margin: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--violet);
+  }
+  .kicker b { color: var(--faint); font-weight: 400; }
 
-    /* ---------- Lightbox ---------- */
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(5, 5, 12, 0.95);
-      cursor: zoom-out;
-    }
-    .lightbox.open { display: flex; }
-    .lightbox img {
-      max-width: min(1100px, 96vw);
-      max-height: 88vh;
-      border-radius: 4px;
-      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.7);
-      image-rendering: pixelated;
-      border: 1px solid var(--line);
-    }
-    .lightbox .close-hint {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
-      color: var(--faint);
-      letter-spacing: 0.15em;
-    }
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: min(1060px, calc(100% - 36px));
+    margin: 0 auto;
+  }
 
-    /* ---------- 响应式 ---------- */
-    @media (max-width: 720px) {
-      .catalog-grid { grid-template-columns: 1fr; }
-      .media-grid { grid-template-columns: 1fr 1fr; }
-      .meta-bar .item { padding: 8px 12px; font-size: 10px; }
-      .hero { padding: 36px 0 32px; }
-      .sec { padding: 44px 0; }
-    }
-    @media (max-width: 480px) {
-      .media-grid { grid-template-columns: 1fr; }
-      .meta-bar { border-radius: 4px; width: 100%; }
-      .meta-bar .item {
-        border-right: none;
-        border-bottom: 1px solid var(--line-soft);
-        width: 100%;
-        text-align: center;
-      }
-      .meta-bar .item:last-child { border-bottom: none; }
-      .topbar .tag { display: none; }
-    }
+  .sec { padding: 66px 0; }
+  .sec-head { margin: 0 0 34px; max-width: 760px; }
+  .sec-head h2 {
+    margin: 0 0 10px;
+    font-size: clamp(21px, 3.4vw, 30px);
+    font-weight: 700;
+    line-height: 1.24;
+    color: var(--ink);
+    text-shadow: 3px 3px 0 #05050a, 1.5px 0 0 rgba(255, 77, 109, .35), -1.5px 0 0 rgba(64, 224, 255, .35);
+  }
+  .sec-head .sub {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--faint);
+    letter-spacing: .04em;
+  }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-        animation: none !important;
-      }
-      .reveal { opacity: 1; transform: none; }
+  /* 滚动浮现：渐进增强，无 JS 时内容默认可见 */
+  .reveal { opacity: 1; transform: none; }
+  html.js-anim .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  html.js-anim .reveal.in { opacity: 1; transform: none; }
+
+  /* ==================================================================
+     4. 顶部 HUD
+     ================================================================== */
+  .hud {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    margin-bottom: 4px;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, rgba(6, 6, 12, .97) 62%, rgba(6, 6, 12, 0));
+    box-shadow: inset 0 -2px 0 rgba(53, 53, 79, .55);
+  }
+  .hud a { color: var(--dim); transition: color .18s linear, text-shadow .18s linear; }
+  .hud a:hover, .hud a:focus-visible { color: var(--violet); text-shadow: 0 0 10px rgba(155, 140, 255, .5); }
+  .hud-back::before { content: "< "; color: var(--violet); }
+  .hud-mid { color: var(--faint); letter-spacing: .22em; white-space: nowrap; }
+  .hud-mid b { color: var(--ink); }
+  .hud-nav { display: flex; gap: 14px; }
+  .hud-nav a { display: inline-flex; align-items: center; gap: 5px; }
+  .hud-nav a::after {
+    content: "";
+    width: 4px; height: 4px;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  /* ==================================================================
+     5. Hero：标题 + 棋盘舞台
+     ================================================================== */
+  .hero { padding: 34px 0 8px; }
+
+  .boot {
+    margin: 0 0 20px;
+    font-size: 10.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .boot b { color: var(--grass); font-weight: 400; }
+  .boot i { font-style: normal; color: var(--violet); }
+
+  .title {
+    margin: 0;
+    font-size: clamp(30px, 7.2vw, 68px);
+    line-height: .98;
+    letter-spacing: .01em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-shadow:
+      5px 5px 0 #04040a,
+      2px 0 0 rgba(255, 77, 109, .45),
+      -2px 0 0 rgba(64, 224, 255, .45);
+    animation: ab-jitter 7s steps(1, end) infinite;
+  }
+  .title .o { color: var(--violet); }
+  .title .cn {
+    display: block;
+    margin-top: 14px;
+    font-size: clamp(12px, 1.8vw, 16px);
+    letter-spacing: .62em;
+    color: var(--dim);
+    text-shadow: none;
+    font-weight: 400;
+  }
+  @keyframes ab-jitter {
+    0%, 92%   { text-shadow: 5px 5px 0 #04040a, 2px 0 0 rgba(255, 77, 109, .45), -2px 0 0 rgba(64, 224, 255, .45); }
+    93%       { text-shadow: 5px 5px 0 #04040a, 5px 0 0 rgba(255, 77, 109, .55), -5px 0 0 rgba(64, 224, 255, .55); }
+    94%       { text-shadow: 5px 5px 0 #04040a, 1px 0 0 rgba(255, 77, 109, .5), -1px 0 0 rgba(64, 224, 255, .5); }
+    95%, 100% { text-shadow: 5px 5px 0 #04040a, 2px 0 0 rgba(255, 77, 109, .45), -2px 0 0 rgba(64, 224, 255, .45); }
+  }
+
+  .tagline {
+    margin: 22px 0 26px;
+    max-width: 620px;
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 1.8;
+    color: var(--dim);
+  }
+  .tagline b { color: var(--violet); }
+
+  /* ---------- 棋盘舞台 ---------- */
+  .stage {
+    position: relative;
+    aspect-ratio: 18 / 7;
+    container-type: inline-size;
+    --fill: #0b0b14;
+    --frame: var(--edge-hi);
+  }
+  .board {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    clip-path: var(--stair);
+    --cell: 46px;
+    --cell: 5.5556cqw;
+  }
+
+  /* 真实棋盘底纹：plains.png 96×192 = 3×6 个 32px 瓦片，一瓦片对齐一格 */
+  .tex {
+    position: absolute;
+    inset: 0;
+    background-image: url("assets/plains.png");
+    background-repeat: repeat;
+    background-size: 16.6667% 85.7143%;
+    image-rendering: pixelated;
+    filter: saturate(.72) brightness(.52) contrast(1.06);
+    animation: px-jitter 9s steps(1, end) infinite;
+  }
+  @keyframes px-jitter {
+    0%, 90%  { transform: translate(0, 0); }
+    91%      { transform: translate(-1px, 1px); }
+    92%      { transform: translate(1px, -1px); }
+    93%      { transform: translate(0, 1px); }
+    94%,100% { transform: translate(0, 0); }
+  }
+
+  /* 格线 */
+  .gridlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, .34) 0 1px, rgba(0, 0, 0, 0) 1px 100%),
+      repeating-linear-gradient(0deg, rgba(0, 0, 0, .34) 0 1px, rgba(0, 0, 0, 0) 1px 100%);
+    background-size: 5.5556% 14.2857%;
+  }
+
+  /* 暗角，让底纹退到背景 */
+  .veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 78% 90% at 26% 40%, rgba(6, 6, 12, 0) 0%, rgba(6, 6, 12, .55) 72%, rgba(6, 6, 12, .86) 100%),
+      linear-gradient(180deg, rgba(6, 6, 12, .5), rgba(6, 6, 12, .05) 40%, rgba(6, 6, 12, .72));
+  }
+
+  /* 可交互格子层（JS 生成） */
+  .cells {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(18, 1fr);
+    grid-auto-rows: 1fr;
+    overflow: hidden;
+  }
+  .cell {
+    position: relative;
+    transition: transform .16s steps(2, end), background-color .16s linear, box-shadow .16s linear;
+    background: rgba(0, 0, 0, 0);
+    cursor: crosshair;
+  }
+  .cell:hover {
+    transform: translateY(-4px);
+    background: rgba(155, 140, 255, .16);
+    box-shadow:
+      inset 0 0 0 2px rgba(155, 140, 255, .55),
+      inset 0 -6px 0 rgba(0, 0, 0, .35),
+      0 0 18px rgba(155, 140, 255, .22);
+    z-index: 3;
+  }
+  .cell:hover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(155, 140, 255, .18) 0 2px, transparent 2px 5px);
+  }
+
+  /* ---------- 主角：真实 6×10 精灵表，48px 一帧 ---------- */
+  .player {
+    position: absolute;
+    z-index: 6;
+    pointer-events: none;
+    --fw: calc(var(--cell) * 2.1);
+    --row: 0;
+    width: var(--fw);
+    height: var(--fw);
+    left: calc(var(--pc, 4.5) * var(--cell));
+    top: calc(var(--pr, 1.12) * var(--cell));
+    transform: translateX(-50%);
+    background-image: url("assets/player.png");
+    background-repeat: no-repeat;
+    background-size: calc(var(--fw) * 6) calc(var(--fw) * 10);
+    background-position: 0 calc(var(--row) * var(--fw) * -1);
+    image-rendering: pixelated;
+    animation: uo-frames .5s steps(1, end) infinite;
+    transition: left .42s cubic-bezier(.42, 0, .3, 1), top .42s cubic-bezier(.42, 0, .3, 1);
+  }
+  .player.is-left { transform: translateX(-50%) scaleX(-1); }
+
+  @keyframes uo-frames {
+    0%       { background-position-x: 0; }
+    16.6667% { background-position-x: calc(var(--fw) * -1); }
+    33.3333% { background-position-x: calc(var(--fw) * -2); }
+    50%      { background-position-x: calc(var(--fw) * -3); }
+    66.6667% { background-position-x: calc(var(--fw) * -4); }
+    83.3333% { background-position-x: calc(var(--fw) * -5); }
+    100%     { background-position-x: 0; }
+  }
+
+  /* ---------- 舞台上的其它道具 ---------- */
+  .holo {
+    position: absolute;
+    z-index: 2;
+    right: calc(var(--cell) * .5);
+    bottom: calc(var(--cell) * .45);
+    width: calc(var(--cell) * 3.4);
+    height: auto;
+    opacity: .42;
+    mix-blend-mode: screen;
+    animation: uo-spin 46s linear infinite;
+  }
+  .holo:hover { animation-play-state: paused; }
+  @keyframes uo-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .flag {
+    position: absolute;
+    z-index: 5;
+    width: calc(var(--cell) * 1.55);
+    height: auto;
+    left: calc(var(--cell) * 13.4);
+    top: calc(var(--cell) * 1.05);
+    transform-origin: 50% 92%;
+    animation: flag-sway 3.4s ease-in-out infinite;
+  }
+  @keyframes flag-sway {
+    0%, 100% { transform: rotate(-2.5deg); }
+    50%      { transform: rotate(2.5deg); }
+  }
+
+  .pick {
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--cell) * 1.05);
+    height: calc(var(--cell) * 1.05);
+    left: calc((var(--c, 0) + .5) * var(--cell));
+    top: calc((var(--r, 0) + .5) * var(--cell));
+    transform: translate(-50%, -50%);
+    font-size: calc(var(--cell) * .5);
+    font-weight: 700;
+    line-height: 1;
+    color: #0b0b14;
+    background: var(--amber);
+    box-shadow:
+      0 0 0 2px #3a2a10,
+      inset 0 -4px 0 rgba(0, 0, 0, .28),
+      0 0 22px rgba(255, 179, 71, .35);
+    animation: pick-float 2.6s steps(6, end) infinite;
+    transition: opacity .3s linear, transform .3s linear;
+  }
+  @keyframes pick-float {
+    0%, 100% { margin-top: 0; }
+    50%      { margin-top: calc(var(--cell) * -.14); }
+  }
+
+  /* 尘土粒子 */
+  .dust { position: absolute; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+  .dust i {
+    position: absolute;
+    width: calc(var(--cell) * .42);
+    height: calc(var(--cell) * .12);
+    background-image: url("assets/dust.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    image-rendering: pixelated;
+    opacity: 0;
+    animation: dust-drift 9s linear infinite;
+  }
+  .dust i:nth-child(1) { left: 18%; bottom: 22%; animation-delay: 0s; }
+  .dust i:nth-child(2) { left: 33%; bottom: 44%; animation-delay: 1.8s; }
+  .dust i:nth-child(3) { left: 58%; bottom: 30%; animation-delay: 3.4s; }
+  .dust i:nth-child(4) { left: 72%; bottom: 52%; animation-delay: 5.1s; }
+  .dust i:nth-child(5) { left: 88%; bottom: 26%; animation-delay: 6.9s; }
+  @keyframes dust-drift {
+    0%   { opacity: 0; transform: translate(0, 0); }
+    12%  { opacity: .5; }
+    60%  { opacity: .35; }
+    100% { opacity: 0; transform: translate(calc(var(--cell) * 1.2), calc(var(--cell) * -2.6)); }
+  }
+
+  /* 舞台上的 HUD 小牌 */
+  .stage-hud {
+    position: absolute;
+    z-index: 7;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 9px;
+    font-size: calc(var(--cell) * .21);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    background: rgba(8, 8, 15, .82);
+    box-shadow: 0 0 0 2px rgba(53, 53, 79, .9);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .stage-hud b { color: var(--violet); font-weight: 700; }
+  .stage-hud--tl { left: calc(var(--cell) * .45); top: calc(var(--cell) * .4); }
+  .stage-hud--tr { right: calc(var(--cell) * .45); top: calc(var(--cell) * .4); }
+  .stage-hud--tr b { color: var(--amber); }
+  .stage-hint {
+    position: absolute;
+    z-index: 7;
+    left: calc(var(--cell) * .45);
+    bottom: calc(var(--cell) * .35);
+    font-size: calc(var(--cell) * .2);
+    letter-spacing: .1em;
+    color: var(--faint);
+    pointer-events: none;
+    text-shadow: 2px 2px 0 #000;
+  }
+  .stage-hint b { color: var(--cyan); }
+
+  /* ---------- 数据条 ---------- */
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin: 30px 0 0;
+    background: var(--edge);
+    gap: 2px;
+    box-shadow: 0 0 0 2px var(--edge);
+  }
+  .meta div {
+    padding: 12px 10px;
+    background: var(--panel);
+    text-align: center;
+  }
+  .meta dt {
+    margin: 0 0 4px;
+    font-size: 9.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .meta dd {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: .02em;
+  }
+  .meta dd.accent { color: var(--violet); }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 26px 0 0;
+  }
+
+  /* ==================================================================
+     6. 前提：设计文档终端
+     ================================================================== */
+  .term { --fill: #0b0b14; --frame: var(--edge); }
+  .term-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--faint);
+    background: var(--panel2);
+    box-shadow: inset 0 -2px 0 var(--edge);
+  }
+  .term-bar .dots { display: inline-flex; gap: 4px; }
+  .term-bar .dots i { width: 6px; height: 6px; background: var(--edge-hi); display: block; }
+  .term-bar .dots i:first-child { background: var(--red); }
+  .term-bar .dots i:nth-child(2) { background: var(--amber); }
+  .term-bar .dots i:last-child { background: var(--grass); }
+  .term-body { padding: 30px 26px 32px; }
+  .term-body p {
+    margin: 0 0 6px;
+    font-size: clamp(14px, 2.1vw, 19px);
+    line-height: 1.75;
+    color: var(--ink);
+  }
+  .term-body p .v { color: var(--violet); }
+  .term-body p .c { color: var(--cyan); }
+  .term-body .cursor {
+    display: inline-block;
+    width: .58em;
+    height: 1.02em;
+    margin-left: 3px;
+    vertical-align: -.14em;
+    background: var(--violet);
+    animation: blink 1.1s steps(1, end) infinite;
+  }
+  @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  .term-note {
+    margin: 22px 0 0;
+    padding-top: 16px;
+    box-shadow: inset 0 2px 0 rgba(53, 53, 79, .5);
+    font-size: 11.5px;
+    line-height: 1.9;
+    color: var(--faint);
+  }
+  .term-note b { color: var(--dim); }
+
+  /* ==================================================================
+     7. 操作：键位卡 + 四方向真实行走帧
+     ================================================================== */
+  .howto-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .howto {
+    --fill: var(--panel);
+    --frame: var(--edge);
+    padding: 22px 20px;
+    transition: transform .18s steps(2, end), --frame .18s linear;
+  }
+  .howto:hover { transform: translateY(-4px); }
+  .howto-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .howto h3 {
+    margin: 0;
+    font-size: 13.5px;
+    letter-spacing: .06em;
+    color: var(--ink);
+  }
+  .howto h3 small {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .howto p { margin: 0; font-size: 12.5px; line-height: 1.8; color: var(--dim); }
+  .howto p + p { margin-top: 8px; }
+  .howto--hot .kcap { color: var(--red); box-shadow: 0 0 0 2px rgba(255, 77, 109, .45), inset 0 -3px 0 rgba(0, 0, 0, .55); }
+
+  /* 四方向行走演示 */
+  .dirs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .dir {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 6px 10px;
+    background: #0b0b14;
+    box-shadow: 0 0 0 2px var(--edge);
+  }
+  .dir .sprite {
+    --fw: 52px;
+    --row: 0;
+    width: var(--fw);
+    height: var(--fw);
+    background-image: url("assets/player.png");
+    background-repeat: no-repeat;
+    background-size: calc(var(--fw) * 6) calc(var(--fw) * 10);
+    background-position: 0 calc(var(--row) * var(--fw) * -1);
+    image-rendering: pixelated;
+    animation: uo-frames .5s steps(1, end) infinite;
+  }
+  .dir .sprite.flip { transform: scaleX(-1); }
+  .dir .dir-k {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--violet);
+  }
+  .dir .dir-t {
+    font-size: 9.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ==================================================================
+     8. 五张地图 = 楼层手风琴（原生 details，无 JS 也可用）
+     ================================================================== */
+  .floors { display: flex; flex-direction: column; gap: 12px; }
+
+  .floor {
+    --fill: var(--panel);
+    --frame: var(--edge);
+    transition: transform .18s steps(2, end);
+  }
+  .floor[open] { --fill: #12121e; --frame: var(--violet); }
+  .floor-head {
+    display: grid;
+    grid-template-columns: 74px minmax(150px, 1fr) minmax(0, 1.1fr) auto 16px;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 16px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .floor-head::-webkit-details-marker { display: none; }
+  .floor-head:hover { background: rgba(155, 140, 255, .05); }
+  .floor-no {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: .04em;
+    color: var(--faint);
+  }
+  .floor[open] .floor-no { color: var(--violet); }
+  .floor-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: .04em;
+  }
+  .floor-name em {
+    display: block;
+    margin-top: 3px;
+    font-style: normal;
+    font-size: 9.5px;
+    font-weight: 400;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .floor-mech { font-size: 11.5px; line-height: 1.6; color: var(--dim); }
+  .floor-keys { display: flex; gap: 4px; }
+  .floor-keys i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    font-style: normal;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--violet);
+    background: #0b0b14;
+    box-shadow: 0 0 0 1.5px var(--edge);
+  }
+  .floor-keys i.is-star { color: var(--amber); box-shadow: 0 0 0 1.5px rgba(255, 179, 71, .5); }
+  .floor-led {
+    width: 9px;
+    height: 9px;
+    background: var(--edge-hi);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .5);
+  }
+  .floor[open] .floor-led {
+    background: var(--grass);
+    box-shadow: 0 0 10px rgba(124, 195, 90, .8);
+  }
+  .floor-body {
+    padding: 4px 18px 20px;
+    animation: floor-open .28s steps(3, end);
+  }
+  @keyframes floor-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .floor-body > p { margin: 0 0 12px; font-size: 13px; line-height: 1.85; color: var(--dim); }
+  .floor-body > p:last-child { margin-bottom: 0; }
+  .floor-body code { color: var(--cyan); }
+  .floor-quote {
+    margin: 0;
+    padding: 12px 14px;
+    background: rgba(155, 140, 255, .05);
+    box-shadow: inset 3px 0 0 var(--edge-hi);
+    font-size: 12px;
+    line-height: 1.85;
+    color: var(--dim);
+  }
+  .floor-quote span {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+    letter-spacing: .1em;
+    color: var(--faint);
+  }
+
+  /* ==================================================================
+     9. 14 张动作牌 = 可点亮的像素卡匣
+     ================================================================== */
+  .cart-readout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 18px;
+    padding: 11px 14px;
+    background: #0b0b14;
+    box-shadow: 0 0 0 2px var(--edge);
+    font-size: 11.5px;
+    letter-spacing: .06em;
+    color: var(--faint);
+  }
+  .cart-readout .ro-label {
+    padding: 2px 6px;
+    font-size: 9.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--violet);
+    box-shadow: 0 0 0 1.5px rgba(155, 140, 255, .45);
+  }
+  .cart-readout .ro-val { color: var(--dim); }
+  .cart-readout .ro-val b { color: var(--ink); }
+  .cart-readout .ro-val em { font-style: normal; color: var(--cyan); }
+  .cart-readout .ro-hint { margin-left: auto; font-size: 10px; color: var(--faint); }
+  .cart-readout .ro-hint kbd {
+    font-family: inherit;
+    font-size: 10px;
+    color: var(--amber);
+    padding: 1px 4px;
+    box-shadow: 0 0 0 1px rgba(255, 179, 71, .4);
+  }
+
+  .carts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+    gap: 14px;
+  }
+  .cart {
+    --fill: var(--panel);
+    --frame: var(--edge);
+    display: block;
+    width: 100%;
+    padding: 16px 15px 14px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    color: var(--ink);
+    transition: transform .18s steps(2, end);
+  }
+  .cart:hover { transform: translateY(-5px); --frame: var(--edge-hi); }
+  .cart.is-armed {
+    --fill: #1a1628;
+    --frame: var(--violet);
+    transform: translateY(-5px);
+  }
+  .cart-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .cart-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--violet);
+    background: #0b0b14;
+    box-shadow:
+      0 0 0 2px var(--edge),
+      inset 0 -4px 0 rgba(0, 0, 0, .6),
+      inset 0 2px 0 rgba(255, 255, 255, .06);
+  }
+  .cart.is-armed .cart-key {
+    color: #0b0b14;
+    background: var(--violet);
+    box-shadow:
+      0 0 0 2px var(--violet),
+      inset 0 -4px 0 rgba(0, 0, 0, .25),
+      0 0 22px rgba(155, 140, 255, .45);
+  }
+  .cart-led {
+    width: 8px;
+    height: 8px;
+    margin-top: 3px;
+    background: var(--edge-hi);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .55);
+    transition: background .15s linear, box-shadow .15s linear;
+  }
+  .cart.is-armed .cart-led {
+    background: var(--grass);
+    box-shadow: 0 0 12px rgba(124, 195, 90, .9);
+  }
+  .cart-name {
+    display: block;
+    margin: 14px 0 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: .04em;
+    color: var(--ink);
+  }
+  .cart-tres {
+    display: block;
+    margin: 2px 0 10px;
+    font-size: 9.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .cart-cmds { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .cart-cmds i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    font-style: normal;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--cyan);
+    background: rgba(64, 224, 255, .07);
+    box-shadow: inset 0 0 0 1px rgba(64, 224, 255, .28);
+  }
+  .cart-cmds i.multi { color: var(--amber); background: rgba(255, 179, 71, .07); box-shadow: inset 0 0 0 1px rgba(255, 179, 71, .3); }
+  .cart-desc { display: block; font-size: 11.5px; line-height: 1.75; color: var(--dim); }
+  .cart-src {
+    display: block;
+    margin-top: 10px;
+    padding-top: 9px;
+    box-shadow: inset 0 1px 0 rgba(53, 53, 79, .55);
+    font-size: 9.5px;
+    line-height: 1.6;
+    letter-spacing: .02em;
+    color: var(--faint);
+    word-break: break-word;
+  }
+
+  /* ==================================================================
+     10. 不可能物体 = 纸色展板
+     ================================================================== */
+  .exhibits {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .exhibit {
+    --fill: var(--paper);
+    --frame: #443a30;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    transition: transform .2s steps(2, end);
+  }
+  .exhibit:hover { transform: translateY(-5px); }
+  .exhibit-art {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 216px;
+    padding: 0;
+    border: 0;
+    cursor: zoom-in;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(0deg, rgba(23, 19, 28, .05) 0 1px, rgba(23, 19, 28, 0) 1px 4px),
+      radial-gradient(ellipse at 50% 40%, #d8d0bd 0%, var(--paper) 62%, #bdb4a0 100%);
+    box-shadow: inset 0 0 0 1px rgba(23, 19, 28, .16), inset 0 -14px 24px rgba(23, 19, 28, .09);
+  }
+  .exhibit-art::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    box-shadow: inset 0 0 0 1px rgba(23, 19, 28, .12);
+    pointer-events: none;
+  }
+  .exhibit-art img {
+    position: relative;
+    z-index: 1;
+    width: auto;
+    max-width: 78%;
+    max-height: 168px;
+    image-rendering: pixelated;
+    filter: contrast(1.05);
+    transition: transform 1.5s cubic-bezier(.32, 0, .24, 1);
+  }
+  .exhibit:hover .exhibit-art img,
+  .exhibit.is-spin .exhibit-art img { transform: rotate(360deg); }
+  .exhibit-num {
+    position: absolute;
+    right: 14px;
+    bottom: 8px;
+    z-index: 2;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    color: rgba(23, 19, 28, .14);
+  }
+  .exhibit-meta { padding: 13px 16px 16px; }
+  .exhibit-meta h3 {
+    margin: 0 0 3px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    color: var(--ink-paper);
+  }
+  .exhibit-scene {
+    margin: 0 0 9px;
+    font-size: 9.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(23, 19, 28, .55);
+  }
+  .exhibit-meta p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.75;
+    color: #3d352c;
+  }
+  .exhibit-meta .quote {
+    margin-top: 10px;
+    padding-top: 9px;
+    box-shadow: inset 0 1px 0 rgba(23, 19, 28, .18);
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: rgba(23, 19, 28, .62);
+  }
+
+  /* 02 立方 / 03 阶梯的素材是浅色线稿（平均亮度 ~192，与纸色几乎重合），
+     翻成深色底片才看得清；和 01 三角 / 04 音叉的纸色展板正好交替成棋盘格 */
+  .exhibit--dark {
+    --fill: #0c0e16;
+    --frame: #2d3350;
+  }
+  .exhibit--dark .exhibit-art {
+    background:
+      repeating-linear-gradient(0deg, rgba(0, 0, 0, .30) 0 1px, rgba(0, 0, 0, 0) 1px 4px),
+      radial-gradient(ellipse at 50% 42%, #1d2338 0%, #121724 60%, #07090f 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(155, 140, 255, .18),
+      inset 0 0 46px rgba(155, 140, 255, .08),
+      inset 0 -14px 26px rgba(0, 0, 0, .55);
+  }
+  .exhibit--dark .exhibit-art::after {
+    box-shadow: inset 0 0 0 1px rgba(155, 140, 255, .13);
+  }
+  .exhibit--dark .exhibit-art img { filter: contrast(1.12) brightness(1.03); }
+  .exhibit--dark .exhibit-num { color: rgba(155, 140, 255, .26); }
+  .exhibit--dark .exhibit-meta h3 { color: var(--ink); }
+  .exhibit--dark .exhibit-scene { color: rgba(155, 140, 255, .62); }
+  .exhibit--dark .exhibit-meta p { color: #b9b6cf; }
+  .exhibit--dark .exhibit-meta .quote {
+    color: rgba(196, 194, 222, .60);
+    box-shadow: inset 0 1px 0 rgba(155, 140, 255, .22);
+  }
+
+  /* ==================================================================
+     11. 实机画面 = CRT 监视器
+     ================================================================== */
+  .monitors {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+  .monitor {
+    --fill: #0b0b14;
+    --frame: var(--edge);
+    grid-column: span 2;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: zoom-in;
+    transition: transform .18s steps(2, end);
+  }
+  .monitor:hover { transform: translateY(-4px); --frame: var(--violet); }
+  .monitor--wide { grid-column: span 6; }
+  .monitor-in { padding: 6px; }
+  .monitor img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    image-rendering: pixelated;
+    filter: contrast(1.06) saturate(.9);
+    transition: filter .3s linear;
+  }
+  .monitor:hover img { filter: contrast(1.12) saturate(1.08); }
+  .monitor-cap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 10px;
+    font-size: 9.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    background: var(--panel2);
+  }
+  .monitor-cap b { color: var(--violet); font-weight: 400; }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(4, 4, 9, .95);
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: min(1120px, 96vw);
+    max-height: 86vh;
+    image-rendering: pixelated;
+    box-shadow: 0 0 0 2px var(--edge), 12px 12px 0 rgba(0, 0, 0, .6);
+  }
+  .lightbox .close-hint {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ==================================================================
+     12. 开发日志
+     ================================================================== */
+  .log {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 780px;
+    box-shadow: inset 2px 0 0 var(--edge);
+    padding-left: 24px;
+    margin-left: 6px;
+  }
+  .log-item { position: relative; padding-bottom: 22px; }
+  .log-item:last-child { padding-bottom: 0; }
+  .log-item::before {
+    content: "";
+    position: absolute;
+    left: -31px;
+    top: 8px;
+    width: 10px;
+    height: 10px;
+    background: var(--bg);
+    box-shadow: 0 0 0 2px var(--violet), 0 0 12px rgba(155, 140, 255, .5);
+  }
+  .log-when {
+    margin: 0 0 5px;
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--violet);
+  }
+  .log-item p { margin: 0; font-size: 12.5px; line-height: 1.85; color: var(--dim); }
+
+  /* ==================================================================
+     13. 技术信息
+     ================================================================== */
+  .tech {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(146px, 1fr));
+    gap: 2px;
+    background: var(--edge);
+    box-shadow: 0 0 0 2px var(--edge);
+  }
+  .tech div {
+    padding: 16px 12px;
+    background: var(--panel);
+    text-align: center;
+  }
+  .tech dt {
+    margin: 0 0 6px;
+    font-size: 9px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .tech dd { margin: 0; font-size: 12px; font-weight: 700; color: var(--ink); }
+  .tech dd.accent { color: var(--violet); }
+
+  /* ==================================================================
+     14. 素材来源 / 作者的话
+     ================================================================== */
+  .credits { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+  .credits-list {
+    margin: 0;
+    padding: 20px;
+    list-style: none;
+    background: var(--panel);
+    box-shadow: 0 0 0 2px var(--edge);
+    font-size: 11.5px;
+    line-height: 2.1;
+    color: var(--dim);
+  }
+  .credits-list li { display: flex; gap: 10px; }
+  .credits-list li span {
+    flex: none;
+    width: 58px;
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding-top: 2px;
+  }
+  .credits-quote {
+    --fill: var(--panel);
+    --frame: var(--edge);
+    margin: 0;
+    padding: 24px 22px;
+    font-size: 13.5px;
+    line-height: 1.9;
+    color: var(--ink);
+  }
+  .credits-quote footer {
+    margin-top: 14px;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ==================================================================
+     15. 页脚
+     ================================================================== */
+  .foot {
+    margin-top: 24px;
+    padding: 46px 0 40px;
+    text-align: center;
+    box-shadow: inset 0 2px 0 var(--edge);
+  }
+  .foot h2 {
+    margin: 0 0 12px;
+    font-size: clamp(20px, 3.2vw, 28px);
+    color: var(--ink);
+    text-shadow: 3px 3px 0 #05050a, 1.5px 0 0 rgba(255, 77, 109, .35), -1.5px 0 0 rgba(64, 224, 255, .35);
+  }
+  .foot p { margin: 0 0 24px; font-size: 12.5px; color: var(--dim); }
+  .foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .foot-sign {
+    margin: 30px 0 0;
+    font-size: 9.5px;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .foot-sign b { color: var(--faint); font-weight: 400; }
+
+  /* ==================================================================
+     16. 响应式
+     ================================================================== */
+  @media (max-width: 940px) {
+    .floor-head {
+      grid-template-columns: 62px minmax(120px, 1fr) auto 14px;
+      row-gap: 8px;
     }
-  </style>
+    .floor-mech { grid-column: 2 / -1; font-size: 11px; }
+    .meta { grid-template-columns: repeat(3, 1fr); }
+    .credits { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 760px) {
+    body { font-size: 14px; }
+    .wrap { width: calc(100% - 26px); }
+    .sec { padding: 48px 0; }
+    .hud-mid { display: none; }
+    .hero { padding: 22px 0 4px; }
+
+    /* 棋盘改 12 列 × 8 行，仍保证瓦片与格子对齐 */
+    .stage { aspect-ratio: 12 / 8; }
+    .board { --cell: 8.3333cqw; }
+    .tex { background-size: 25% 75%; }
+    .gridlines { background-size: 8.3333% 12.5%; }
+    .cells { grid-template-columns: repeat(12, 1fr); }
+    .stage-hint { display: none; }
+
+    /* 12 列时道具改用百分比定位，避免落到棋盘外 */
+    .flag { left: 72%; top: 11%; }
+    .pick:nth-of-type(1) { left: 44%; top: 62%; }
+    .pick:nth-of-type(2) { left: 58%; top: 30%; }
+    .pick:nth-of-type(3) { left: 69%; top: 76%; }
+
+    .meta { grid-template-columns: repeat(2, 1fr); }
+    .howto-grid { grid-template-columns: 1fr; }
+    .exhibits { grid-template-columns: 1fr; }
+    .exhibit-art { height: 190px; }
+    .monitor { grid-column: span 3; }
+    .monitor--wide { grid-column: span 6; }
+    .cart-readout .ro-hint { display: none; }
+    .term-body { padding: 24px 18px 26px; }
+    .floor-body { padding: 2px 14px 16px; }
+  }
+
+  @media (max-width: 520px) {
+    .title .cn { letter-spacing: .34em; }
+    .carts { grid-template-columns: 1fr; }
+    .dirs { grid-template-columns: repeat(2, 1fr); }
+    .floor-head {
+      grid-template-columns: 54px 1fr 12px;
+      gap: 10px;
+      padding: 13px 12px;
+    }
+    .floor-keys { grid-column: 2 / -1; }
+    .floor-led { grid-column: 3; grid-row: 1; }
+    .floor-no { font-size: 17px; }
+    .log { padding-left: 18px; }
+    .log-item::before { left: -25px; }
+    .foot-links { flex-direction: column; }
+    .foot-links .btn { justify-content: center; }
+    .monitor { grid-column: span 6; }
+    .exhibit-art { height: 168px; }
+    .meta div { padding: 10px 8px; }
+  }
+
+  /* ==================================================================
+     17. 降低动效：关闭全部动画/过渡，内容保持完整可读
+     ================================================================== */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    html.js-anim .reveal { opacity: 1; transform: none; }
+    .cell:hover { transform: none; }
+    .cart:hover, .cart.is-armed, .howto:hover, .exhibit:hover, .monitor:hover { transform: none; }
+    .exhibit:hover .exhibit-art img,
+    .exhibit.is-spin .exhibit-art img { transform: none; }
+    .holo { opacity: .3; }
+    .dust i { display: none; }
+    .title { text-shadow: 5px 5px 0 #04040a; }
+  }
+
+
+</style>
 </head>
 <body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <!-- CRT 覆盖层（纯装饰） -->
+  <div class="crt" aria-hidden="true">
+    <i class="scan"></i>
+    <i class="sweep"></i>
+    <i class="chroma"></i>
+    <i class="vig"></i>
+  </div>
+
   <div class="wrap">
-    <div class="topbar">
-      <a class="back" href="../../index.html">返回作品集</a>
-      <span class="tag">IMPOSSIBLE / PIXEL / GODOT 4.3</span>
-      <a href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">itch.io</a>
-    </div>
+    <header class="hud">
+      <a class="hud-back" href="../../index.html">返回作品集</a>
+      <span class="hud-mid"><b>UNREAL OBJECTS</b> // PIXEL BOARD</span>
+      <nav class="hud-nav" aria-label="外部链接">
+        <a href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">itch.io</a>
+        <a href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">github</a>
+      </nav>
+    </header>
 
-    <!-- Hero -->
-    <section class="hero">
-      <p class="kicker reveal">Top-Down Puzzle · Pixel Art · 2025</p>
-      <svg class="impossible-hero reveal" viewBox="0 0 200 200" fill="none" aria-hidden="true">
-        <!-- Penrose Triangle -->
-        <g stroke="#9b8cff" stroke-width="13" stroke-linejoin="round" fill="none">
-          <path d="M100 28 L168 152 L32 152 Z" />
-          <path d="M100 28 L126 78 L74 78 Z" fill="#9b8cff" stroke="none" />
-        </g>
-        <g stroke="#40e0ff" stroke-width="2.5" fill="none" opacity="0.7">
-          <path d="M100 28 L168 152 L32 152 Z" />
-        </g>
-        <circle cx="100" cy="28" r="4" fill="#ff4d6d" />
-        <circle cx="168" cy="152" r="4" fill="#40e0ff" />
-        <circle cx="32" cy="152" r="4" fill="#ffb347" />
-      </svg>
-      <h1 class="pixel reveal">UNREAL <span class="o">OBJECTS</span><span class="cn">不 可 能 物 体</span></h1>
-      <p class="sub reveal">围绕"不可能物体"的俯视像素解谜。<b>二维成立，三维冲突</b>——眼睛相信的结构，空间未必承认。</p>
-      <div class="meta-bar reveal">
-        <div class="item">平台 <b>Windows</b></div>
-        <div class="item">引擎 <b>Godot 4.3</b></div>
-        <div class="item">关卡 <b>5</b></div>
-        <div class="item">发布 <b>2025.03.31</b></div>
-        <div class="item">大小 <b>85 MB</b></div>
-      </div>
-      <div class="cover-frame reveal">
-        <img src="cover.jpg" alt="UnReal Objects 标题界面：彭罗斯三角 logo 与 Start Game / Exit Game 菜单" />
-        <span class="label">// title screen</span>
-      </div>
-    </section>
+    <main id="main">
+      <!-- ============ 01 HERO ============ -->
+      <section class="hero" aria-labelledby="hero-h">
+        <p class="boot reveal">
+          &gt; boot_splash <b>Objects/Triangle/Triangle.png</b> · engine <i>Godot 4.3</i> · build 1.0.0.0
+        </p>
 
-    <!-- 前提 -->
-    <section class="premise reveal">
-      <p>不可能物体是在现实世界中，<span class="v">不可能客观存在</span>的事物，</p>
-      <p>只会在<span class="c">二维世界</span>存在的一种图形。</p>
-      <p>这些图形通过"欺骗"大脑的透视处理机制，</p>
-      <p>展现了<span class="v">二维与三维逻辑的冲突</span>。</p>
-      <p class="note">放下习惯性的空间直觉——玩家在棋盘格上移动一步，<br>屏幕上的位移却可能同时朝三个方向发生。</p>
-    </section>
+        <h1 class="title reveal" id="hero-h">
+          UNREAL <span class="o">OBJECTS</span>
+          <span class="cn">不 可 能 物 体</span>
+        </h1>
 
-    <!-- 操作方式 -->
-    <section class="howto sec">
-      <div class="sec-head reveal">
-        <p class="kicker">// HOW TO PLAY</p>
-        <h2 class="pixel">操作：一步一错觉</h2>
-        <p>WASD 走格子 · Space 撤销 · 特殊键触发不可能位移</p>
-      </div>
-      <div class="key-grid">
-        <div class="key-card reveal">
-          <span class="key-cap">W A S D</span>
-          <h3>方向移动</h3>
-          <p>每个键让角色沿棋盘格走一格：上 / 左 / 下 / 右。绿色与棕色相间的草地格子是你的全部舞台。</p>
-        </div>
-        <div class="key-card reveal">
-          <span class="key-cap">Space</span>
-          <h3>撤销一步</h3>
-          <p>走错了？空格回退上一步。游戏内置了完整的步骤记录（源码中该动作名为 <span style="color:var(--violet)">uodo</span>），允许你反复试错。</p>
-        </div>
-        <div class="key-card reveal">
-          <span class="keycap key-cap impossible">N</span>
-          <h3 class="impossible">不可能位移</h3>
-          <p>某些格子上的特殊键会同时朝多个方向移动——例如 <b>N = 上+1 右+1 下+1</b>。一步走出三个方向，空间关系当场崩塌。</p>
-        </div>
-        <div class="key-card reveal">
-          <span class="key-cap">U / Q</span>
-          <h3>触发机关</h3>
-          <p>走到特定格子会浮现 <b>U</b> 等按键标记。按下后角色执行一次违反透视的位移，穿过花苞障碍、抵达红旗。</p>
-        </div>
-      </div>
-    </section>
+        <p class="tagline reveal">
+          一款不依赖直觉的俯视像素解谜。<b>二维成立，三维冲突</b>——捡起字母牌，
+          按下它，角色就沿着那条"不存在"的路径走过去。
+        </p>
 
-    <!-- 不可能物体图鉴 -->
-    <section class="sec catalog">
-      <div class="sec-head reveal">
-        <p class="kicker">// CATALOG</p>
-        <h2 class="pixel">四种不可能物体</h2>
-        <p>源码 Objects/ 目录下的四个场景 · 构成全部关卡</p>
-      </div>
-      <div class="catalog-grid">
-        <article class="obj-card reveal" tabindex="0">
-          <span class="num">01</span>
-          <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round">
-            <path d="M36 8 L64 58 L8 58 Z" />
-            <path d="M36 8 L48 30 L24 30 Z" fill="currentColor" stroke="none" />
-          </svg>
-          <h3>彭罗斯三角形</h3>
-          <p class="scene">Objects/Triangle</p>
-          <p>由三个直角连接的条形构成，看似闭合的三角形，实际无法在三维空间中存在。它也是游戏的启动画面与图标。</p>
-        </article>
-        <article class="obj-card reveal" tabindex="0">
-          <span class="num">02</span>
-          <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4">
-            <path d="M16 18 L56 18 L56 54 L16 54 Z" />
-            <path d="M16 18 L36 36 L56 18" />
-            <path d="M16 54 L36 36" />
-            <path d="M56 54 L36 36" />
-          </svg>
-          <h3>不可能立方体</h3>
-          <p class="scene">Objects/Cube</p>
-          <p>立方体的边缘连接方式违反透视规律，部分棱角看似同时朝前和朝后。</p>
-        </article>
-        <article class="obj-card reveal" tabindex="0">
-          <span class="num">03</span>
-          <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
-            <path d="M10 62 L10 50 L22 50 L22 38 L34 38 L34 26 L46 26 L46 14 L58 14" />
-            <path d="M10 62 L58 62" />
-          </svg>
-          <h3>埃舍尔阶梯</h3>
-          <p class="scene">Objects/Stair</p>
-          <p>无限循环的阶梯，始终向上或向下却回到原点，违背重力法则。</p>
-        </article>
-        <article class="obj-card reveal" tabindex="0">
-          <span class="num">04</span>
-          <svg class="icon" viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
-            <path d="M18 14 L18 40 M18 40 L10 50 M18 40 L26 50" />
-            <path d="M54 14 L54 44 M46 14 L46 44 L62 44 L62 14" />
-          </svg>
-          <h3>恶魔音叉</h3>
-          <p class="scene">Objects/Fork</p>
-          <p>物体末端看似同时具有三个和两个分叉，无法确定其真实结构。</p>
-        </article>
-      </div>
-    </section>
+        <!-- 棋盘舞台 -->
+        <div class="stage px reveal" role="img"
+             aria-label="像素棋盘舞台：主角站在 plains.png 铺成的格子上，右上角是缓慢旋转的彭罗斯三角，另一侧是终点旗">
+          <div class="board" id="board">
+            <div class="tex" aria-hidden="true"></div>
+            <div class="gridlines" aria-hidden="true"></div>
+            <div class="veil" aria-hidden="true"></div>
+            <div class="cells" id="cells" aria-hidden="true"></div>
 
-    <!-- 截图 -->
-    <section class="sec media">
-      <div class="sec-head reveal">
-        <p class="kicker">// MEDIA</p>
-        <h2 class="pixel">实机画面</h2>
-        <p>点击放大 · Esc 关闭</p>
-      </div>
-      <div class="media-grid">
-        <button class="shot reveal" type="button" aria-label="放大截图 1：棋盘格与方向键 D">
-          <img src="screenshot-01.jpg" alt="UnReal Objects 截图：绿色棕色棋盘格上的像素角色与红旗，黑色按键 S/W/A/D，底部显示 D = Right+1" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图 2：Space 撤销提示">
-          <img src="screenshot-02.jpg" alt="UnReal Objects 截图：青色提示文字 Space to undo the previous step，底部排列 D/S/A/W 四个方向键" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图 3：N 键三方向不可能位移">
-          <img src="screenshot-03.jpg" alt="UnReal Objects 截图：花苞障碍围成的复杂关卡，角色站在中央，按键 U，底部 N = Up+1 Right+1 Down+1" loading="lazy" />
-        </button>
-      </div>
-    </section>
+            <div class="dust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 
-    <!-- 技术信息 -->
-    <section class="sec reveal">
-      <div class="info-grid">
-        <div class="info-cell">
-          <p class="label">引擎</p>
-          <p class="value accent">Godot 4.3</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">平台</p>
-          <p class="value">itch.io · Windows</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">类型</p>
-          <p class="value">俯视像素解谜</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">关卡数</p>
-          <p class="value">5（0 – 4）</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">版本</p>
-          <p class="value">v1.0.0.0</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">渲染</p>
-          <p class="value">像素吸附 · Nearest</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">字体</p>
-          <p class="value">VonwaonBitmap 16px</p>
-        </div>
-        <div class="info-cell">
-          <p class="label">开发</p>
-          <p class="value">Gove</p>
-        </div>
-      </div>
-    </section>
+            <img class="holo" src="assets/triangle.png" alt="缓慢旋转的彭罗斯三角（Triangle.png，也是游戏启动画面与窗口图标）" />
+            <img class="flag" src="assets/flag.png" alt="关卡终点旗（Flag.png）" />
 
-    <!-- 底部 -->
-    <section class="bottom">
-      <h2 class="pixel reveal">下载体验</h2>
-      <p class="reveal">在 itch.io 免费下载 Windows 版（85 MB），或查看 GitHub 源码。</p>
-      <div class="links reveal">
-        <a class="primary" href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">在 itch.io 下载 -></a>
-        <a href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">GitHub 源码 -></a>
-        <a href="../../index.html">返回作品集 -></a>
+            <span class="pick" style="--c:8; --r:4" aria-hidden="true">A</span>
+            <span class="pick" style="--c:11; --r:2" aria-hidden="true">D</span>
+            <span class="pick" style="--c:13; --r:5" aria-hidden="true">S</span>
+
+            <div class="player" id="player" aria-hidden="true"></div>
+
+            <div class="stage-hud stage-hud--tl">
+              <span>floor</span><b id="stage-floor">F01 · 三角</b>
+            </div>
+            <div class="stage-hud stage-hud--tr">
+              <span>grid</span><b id="stage-grid">64 px</b>
+            </div>
+            <div class="stage-hint">点击格子 → 主角走过去 · 空格 <b>= 撤销</b></div>
+          </div>
+        </div>
+
+        <dl class="meta reveal">
+          <div><dt>平台</dt><dd>Windows · Android</dd></div>
+          <div><dt>引擎</dt><dd class="accent">Godot 4.3</dd></div>
+          <div><dt>地图</dt><dd>5</dd></div>
+          <div><dt>动作牌</dt><dd class="accent">14</dd></div>
+          <div><dt>版本</dt><dd>1.0.0.0</dd></div>
+        </dl>
+
+        <div class="cta reveal">
+          <a class="btn btn--primary" href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">在 itch.io 下载 →</a>
+          <a class="btn" href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">GitHub 源码 →</a>
+        </div>
+      </section>
+      <!-- ============ 02 前提 ============ -->
+      <section class="sec" aria-labelledby="premise-h">
+        <div class="term px reveal">
+          <div class="term-bar">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>design_doc / UnReal Objects.md</span>
+          </div>
+          <div class="term-body">
+            <h2 id="premise-h" class="sr-only">设计前提</h2>
+            <p>不可能物体是在现实世界中，<span class="v">不可能客观存在</span>的事物，</p>
+            <p>只会在<span class="c">二维世界</span>存在的一种图形。</p>
+            <p>这些图形通过"欺骗"大脑的透视处理机制，</p>
+            <p>展现了<span class="v">二维与三维逻辑的冲突</span>。<span class="cursor" aria-hidden="true"></span></p>
+            <p class="term-note">
+              ——以上为设计文档《UnReal Objects.md》的开篇原文。<br />
+              游戏把这段文字做成了可以走进去的<b>棋盘格</b>：格子是二维的，走法却按三维空间写。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 03 操作 ============ -->
+      <section class="sec" aria-labelledby="howto-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 03 <b>· HOW TO PLAY</b></p>
+          <h2 id="howto-h">操作：捡牌，然后按下它</h2>
+          <p class="sub">走格子用 W A S D · 撤销用空格 · 动作牌用对应的字母键</p>
+        </div>
+
+        <div class="howto-grid">
+          <article class="howto px reveal">
+            <div class="howto-top">
+              <span class="kcap kcap--wide">W A S D</span>
+              <h3>四方向移动<small>GameManager.SIZE = 64 px</small></h3>
+            </div>
+            <p>W 上、A 左、S 下、D 右，每次走一格。角色用 RayCast2D 试探前方，
+              有墙就走不动——这是唯一"守规矩"的移动方式。</p>
+          </article>
+
+          <article class="howto px reveal">
+            <div class="howto-top">
+              <span class="kcap">Space</span>
+              <h3>撤销上一步<small>input: uodo → player.undo()</small></h3>
+            </div>
+            <p>输入映射名为 <code>uodo</code>，按下后调用 <code>player.undo()</code>，
+              把刚才那一步整段倒放回去。动作牌走得越长，撤销倒放得越久。</p>
+          </article>
+
+          <article class="howto px reveal">
+            <div class="howto-top">
+              <span class="kcap kcap--wide">Shift+Ctrl+Space</span>
+              <h3>调试模式<small>input: debug</small></h3>
+            </div>
+            <p>源码中保留的 <code>debug</code> 输入映射，用于直接灌入预设动作列表，
+              跳过拾取流程。相关代码目前处于注释状态。</p>
+          </article>
+
+          <article class="howto px reveal howto--hot">
+            <div class="howto-top">
+              <span class="kcap">A – Z</span>
+              <h3>字母动作牌<small>Actions/Tres/*.tres</small></h3>
+            </div>
+            <p>地图上散落着字母牌，走上去即拾取。每个字母被绑成快捷键，按下后角色
+              依次执行它记录的一串方向命令——这是唯一能走出"不可能路径"的方式。</p>
+          </article>
+        </div>
+
+        <div class="dirs reveal" aria-hidden="true">
+          <div class="dir"><span class="sprite" style="--row:5"></span><span class="dir-k">W</span><span class="dir-t">W_Walk</span></div>
+          <div class="dir"><span class="sprite flip" style="--row:4"></span><span class="dir-k">A</span><span class="dir-t">D_Walk × flip</span></div>
+          <div class="dir"><span class="sprite" style="--row:3"></span><span class="dir-k">S</span><span class="dir-t">S_Walk</span></div>
+          <div class="dir"><span class="sprite" style="--row:4"></span><span class="dir-k">D</span><span class="dir-t">D_Walk</span></div>
+        </div>
+      </section>
+      <!-- ============ 04 五张地图 ============ -->
+      <section class="sec" aria-labelledby="floors-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 04 <b>· FLOORS</b></p>
+          <h2 id="floors-h">五张地图，四种不可能物体</h2>
+          <p class="sub">Maps/0.tscn – Maps/4.tscn · 展开一层看它的机制、可用牌与提示原文</p>
+        </div>
+
+        <div class="floors">
+          <details class="floor px reveal" name="uo-floor" data-floor="0" open>
+            <summary class="floor-head">
+              <span class="floor-no">F00</span>
+              <span class="floor-name">未命名<em>Maps/0.tscn</em></span>
+              <span class="floor-mech">教学关 · 只有两张牌</span>
+              <span class="floor-keys"><i>A</i><i>D</i></span>
+              <span class="floor-led" aria-hidden="true"></span>
+            </summary>
+            <div class="floor-body">
+              <p>整个地图只有两块动作牌：<b>A</b>（Left+1）与 <b>D</b>（Right+1），起点在 (416, 352)。
+                这是让玩家先理解"按字母 = 走一步"的入门格。</p>
+              <blockquote class="floor-quote">"通常你不会在这里，除非有 bug"<span>0.tscn 内唯一的提示区域（L215-216）</span></blockquote>
+            </div>
+          </details>
+
+          <details class="floor px reveal" name="uo-floor" data-floor="1">
+            <summary class="floor-head">
+              <span class="floor-no">F01</span>
+              <span class="floor-name">三角<em>Triangle</em></span>
+              <span class="floor-mech">入门关 · 彭罗斯三角形</span>
+              <span class="floor-keys"><i>A</i><i>D</i><i>S</i><i>W</i><i class="is-star">★1</i></span>
+              <span class="floor-led" aria-hidden="true"></span>
+            </summary>
+            <div class="floor-body">
+              <p>四张基础牌 <b>A / D / S / W</b> 组成最初的四个方向，本关共 11 个提示区域，
+                一路教到"秘密通道"。<b>Flag2</b> 是隐藏终点，<code>star_flag = 1</code>，位置 (1248, -96)
+                —— 在地图边界之外，只能靠违背直觉的位移抵达。</p>
+              <blockquote class="floor-quote">"站着！我让你动了吗！？" → "哇，秘密通道" → "空格 撤消上一步"<span>1.tscn 提示序列（L237-288）</span></blockquote>
+            </div>
+          </details>
+
+          <details class="floor px reveal" name="uo-floor" data-floor="2">
+            <summary class="floor-head">
+              <span class="floor-no">F02</span>
+              <span class="floor-name">立方<em>Cube</em></span>
+              <span class="floor-mech">不可能立方体 · 棱角同时朝前和朝后</span>
+              <span class="floor-keys"><i>D</i><i>J</i><i>Q</i><i>T</i><i class="is-star">★2</i></span>
+              <span class="floor-led" aria-hidden="true"></span>
+            </summary>
+            <div class="floor-body">
+              <p>牌组换成 <b>Q</b>（上1左1）、<b>T</b>（右3下1）、<b>J</b>（下3左1）与 <b>D</b>。
+                三个"斜向"动作让格子上的前后关系开始打架，13 个提示区域一路追问同一个问题。
+                隐藏终点 <code>star_flag = 2</code> 在 (2336, 1312)。</p>
+              <blockquote class="floor-quote">"刚才你为什么不直接向左走呢？" → "我觉得你可能被骗了" → "死路一条"<span>2.tscn 提示序列（L237-298）</span></blockquote>
+            </div>
+          </details>
+
+          <details class="floor px reveal" name="uo-floor" data-floor="3">
+            <summary class="floor-head">
+              <span class="floor-no">F03</span>
+              <span class="floor-name">阶梯<em>Stair</em></span>
+              <span class="floor-mech">埃舍尔阶梯 · 上下却回到原点</span>
+              <span class="floor-keys"><i>G</i><i>N</i><i>S</i><i>U</i><i class="is-star">★3</i></span>
+              <span class="floor-led" aria-hidden="true"></span>
+            </summary>
+            <div class="floor-body">
+              <p>本关有 <b>N</b>（上1右1下1）、<b>G</b>（左1下2右3上4）、<b>U</b>（下1左2上2）与 <b>S</b>。
+                G 与 U 的长串命令会绕一圈回到附近，正是"无限循环阶梯"的机制化身。
+                隐藏终点 <code>star_flag = 3</code> 在 (1120, 800)。</p>
+              <blockquote class="floor-quote">"看，两个终点" → "猜猜你为什么总是见我？" → "哈哈哈"<span>3.tscn 提示序列（L237-273）</span></blockquote>
+            </div>
+          </details>
+
+          <details class="floor px reveal" name="uo-floor" data-floor="4">
+            <summary class="floor-head">
+              <span class="floor-no">F04</span>
+              <span class="floor-name">音叉<em>Fork</em></span>
+              <span class="floor-mech">恶魔音叉 · 追逐战</span>
+              <span class="floor-keys"><i>A</i><i>E</i><i>I</i><i>O</i><i>Q</i><i>Z</i><i class="is-star">★4</i></span>
+              <span class="floor-led" aria-hidden="true"></span>
+            </summary>
+            <div class="floor-body">
+              <p>唯一带敌人的关卡：14 个红色的 <b>Dust</b>（"恶魔"）每 5 秒随机朝一个空方向走一格，
+                碰到玩家即判负。可用牌为 <b>A / E / I / O / Q / Z</b>，其中 <b>Z</b> 是"右1左1右1"
+                ——一次净位移一格，但中途的往返让追击者算不准。
+                隐藏终点 <code>star_flag = 4</code> 在 (416, -608)。</p>
+              <blockquote class="floor-quote">"当心魔鬼" → "那边有很多恶魔" → "感谢游玩 （2025.3.30 by Gove）"<span>4.tscn 提示序列（L252-298）</span></blockquote>
+            </div>
+          </details>
+        </div>
+      </section>
+      <!-- ============ 05 14 个动作 ============ -->
+      <section class="sec" aria-labelledby="actions-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 05 <b>· 14 ACTIONS</b></p>
+          <h2 id="actions-h">全部动作牌</h2>
+          <p class="sub">Actions/Tres/*.tres · 每条命令对应 player.gd 中的一次 64 像素位移</p>
+        </div>
+
+        <div class="cart-readout reveal">
+          <span class="ro-label">inserted</span>
+          <span class="ro-val" id="ro-val" role="status" aria-live="polite">— 点一张卡匣，或直接按它的字母键 —</span>
+          <span class="ro-hint">按 <kbd>A</kbd>–<kbd>Z</kbd> 点亮 · <kbd>Space</kbd> 撤销</span>
+        </div>
+
+        <div class="carts">
+          <button class="cart px reveal" type="button" data-key="A" data-name="Left+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">A</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Left+1</span>
+            <span class="cart-tres">A.tres</span>
+            <span class="cart-cmds"><i>A</i></span>
+            <span class="cart-desc">向左 1 格。基础方向牌之一。</span>
+            <span class="cart-src">commands = ["A"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="D" data-name="Right+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">D</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Right+1</span>
+            <span class="cart-tres">D.tres</span>
+            <span class="cart-cmds"><i>D</i></span>
+            <span class="cart-desc">向右 1 格。基础方向牌之一。</span>
+            <span class="cart-src">commands = ["D"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="W" data-name="Up+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">W</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Up+1</span>
+            <span class="cart-tres">W.tres</span>
+            <span class="cart-cmds"><i>W</i></span>
+            <span class="cart-desc">向上 1 格。基础方向牌之一。</span>
+            <span class="cart-src">commands = ["W"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="S" data-name="Down+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">S</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Down+1</span>
+            <span class="cart-tres">S.tres</span>
+            <span class="cart-cmds"><i>S</i></span>
+            <span class="cart-desc">向下 1 格。基础方向牌之一。</span>
+            <span class="cart-src">commands = ["S"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="Q" data-name="Up+1 / Left+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">Q</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Up+1 / Left+1</span>
+            <span class="cart-tres">Q.tres</span>
+            <span class="cart-cmds"><i class="multi">W</i><i class="multi">A</i></span>
+            <span class="cart-desc">斜向左上：先上 1 格再左 1 格。两步走出一个对角线。</span>
+            <span class="cart-src">commands = ["W", "A"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="E" data-name="Down+1 / Right+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">E</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Down+1 / Right+1</span>
+            <span class="cart-tres">E.tres</span>
+            <span class="cart-cmds"><i class="multi">S</i><i class="multi">D</i></span>
+            <span class="cart-desc">斜向右下：先下 1 格再右 1 格，与 Q 互为反向。</span>
+            <span class="cart-src">commands = ["S", "D"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="N" data-name="Up+1 / Right+1 / Down+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">N</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Up+1 / Right+1 / Down+1</span>
+            <span class="cart-tres">N.tres</span>
+            <span class="cart-cmds"><i class="multi">W</i><i class="multi">D</i><i class="multi">S</i></span>
+            <span class="cart-desc">上、右、下各 1 格——净效果只是向右一格，但中途画出了一个"折返"的折线。</span>
+            <span class="cart-src">commands = ["W", "D", "S"]</span>
+          </button>
+          <button class="cart px reveal" type="button" data-key="I" data-name="Down+2 / Up+2" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">I</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Down+2 / Up+2</span>
+            <span class="cart-tres">I.tres</span>
+            <span class="cart-cmds"><i class="multi">S</i><i class="multi">S</i><i class="multi">W</i><i class="multi">W</i></span>
+            <span class="cart-desc">先下 2 格再上 2 格。如果中间没有阻挡，人会回到原地；但如果中途撞墙，就永远回不来。</span>
+            <span class="cart-src">commands = ["S", "S", "W", "W"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="J" data-name="Down+3 / Left+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">J</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Down+3 / Left+1</span>
+            <span class="cart-tres">J.tres</span>
+            <span class="cart-cmds"><i class="multi">S</i><i class="multi">S</i><i class="multi">S</i><i class="multi">A</i></span>
+            <span class="cart-desc">向下 3 格再向左 1 格，一记长距离的拐角位移。</span>
+            <span class="cart-src">commands = ["S", "S", "S", "A"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="T" data-name="Right+3 / Down+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">T</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Right+3 / Down+1</span>
+            <span class="cart-tres">T.tres</span>
+            <span class="cart-cmds"><i class="multi">D</i><i class="multi">D</i><i class="multi">D</i><i class="multi">S</i></span>
+            <span class="cart-desc">向右 3 格再向下 1 格，与 J 构成另一侧的拐角。</span>
+            <span class="cart-src">commands = ["D", "D", "D", "S"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="U" data-name="Down+1 / Left+2 / Up+2" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">U</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Down+1 / Left+2 / Up+2</span>
+            <span class="cart-tres">U.tres</span>
+            <span class="cart-cmds"><i class="multi">S</i><i class="multi">A</i><i class="multi">A</i><i class="multi">W</i><i class="multi">W</i></span>
+            <span class="cart-desc">下 1、左 2、上 2。走完的落点在起点的左上方两格处，中间却先往下绕了一圈。</span>
+            <span class="cart-src">commands = ["S", "A", "A", "W", "W"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="O" data-name="Right+2 / Down+2 / Left+2 / Up+2" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">O</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Right+2 / Down+2 / Left+2 / Up+2</span>
+            <span class="cart-tres">O.tres</span>
+            <span class="cart-cmds"><i class="multi">D</i><i class="multi">D</i><i class="multi">S</i><i class="multi">S</i><i class="multi">A</i><i class="multi">A</i><i class="multi">W</i><i class="multi">W</i></span>
+            <span class="cart-desc">完整绕行一圈，回到起点。名字里的 O 就是那条闭环——只有在能穿过"不可能棱角"时才闭合得上。</span>
+            <span class="cart-src">commands = ["D", "D", "S", "S", "A", "A", "W", "W"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="G" data-name="Left+1 / Down+2 / Right+3 / Up+4" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">G</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Left+1 / Down+2 / Right+3 / Up+4</span>
+            <span class="cart-tres">G.tres</span>
+            <span class="cart-cmds"><i class="multi">A</i><i class="multi">S</i><i class="multi">S</i><i class="multi">D</i><i class="multi">D</i><i class="multi">D</i><i class="multi">W</i><i class="multi">W</i><i class="multi">W</i><i class="multi">W</i></span>
+            <span class="cart-desc">全游戏最长的命令串，共 10 步：左 1 → 下 2 → 右 3 → 上 4。净位移回到原点上方一格，过程却是一个螺旋。</span>
+            <span class="cart-src">commands = ["A", "S", "S", "D", "D", "D", "W", "W", "W", "W"]</span>
+          </button>
+
+          <button class="cart px reveal" type="button" data-key="Z" data-name="Right+1 / Left+1 / Right+1" aria-pressed="false">
+            <span class="cart-top"><span class="cart-key">Z</span><span class="cart-led" aria-hidden="true"></span></span>
+            <span class="cart-name">Right+1 / Left+1 / Right+1</span>
+            <span class="cart-tres">Z.tres</span>
+            <span class="cart-cmds"><i class="multi">D</i><i class="multi">A</i><i class="multi">D</i></span>
+            <span class="cart-desc">右 1、左 1、右 1——原地抖动三次，最终净位移只有一格。看起来毫无意义，却是甩开恶魔的关键。</span>
+            <span class="cart-src">commands = ["D", "A", "D"]</span>
+          </button>
+
+        </div>
+      </section>
+      <!-- ============ 06 不可能物体 ============ -->
+      <section class="sec" aria-labelledby="catalog-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 06 <b>· CATALOG</b></p>
+          <h2 id="catalog-h">四种不可能物体</h2>
+          <p class="sub">Objects/ 目录下的四份素材 · 定义引自设计文档原文 · 点图让它转一圈</p>
+        </div>
+
+        <div class="exhibits">
+          <article class="exhibit px reveal">
+            <button class="exhibit-art" type="button" aria-label="让彭罗斯三角形缓慢旋转一圈">
+              <img src="assets/triangle.png" alt="彭罗斯三角形（Triangle.png）：三段直角条形构成的闭合三角" />
+              <span class="exhibit-num" aria-hidden="true">01</span>
+            </button>
+            <div class="exhibit-meta">
+              <h3>彭罗斯三角形</h3>
+              <p class="exhibit-scene">Objects/Triangle · boot_splash</p>
+              <p>由三个直角连接的条形构成，看似闭合的三角形，但实际无法在三维空间中存在。</p>
+              <p class="quote">同时也是游戏的启动画面与窗口图标（project.godot 的 boot_splash/image 与 config/icon 都指向它）。</p>
+            </div>
+          </article>
+
+          <article class="exhibit exhibit--dark px reveal">
+            <button class="exhibit-art" type="button" aria-label="让不可能立方体缓慢旋转一圈">
+              <img src="assets/cube.webp" alt="不可能立方体（Cube.webp）：等轴测角度摆放的立方体，同一根竖棱同时被画成正面和背面，棱的接法在三维空间里闭合不了" />
+              <span class="exhibit-num" aria-hidden="true">02</span>
+            </button>
+            <div class="exhibit-meta">
+              <h3>不可能立方体</h3>
+              <p class="exhibit-scene">Objects/Cube · 关卡 2「立方」</p>
+              <p>立方体的边缘连接方式违反透视规律，部分棱角看似同时朝前和朝后。</p>
+              <p class="quote">对应第 2 关的关卡图标（level_menu.tscn 中 Name = "Cube" / CName = "立方"）。</p>
+            </div>
+          </article>
+
+          <article class="exhibit exhibit--dark px reveal">
+            <button class="exhibit-art" type="button" aria-label="让埃舍尔阶梯缓慢旋转一圈">
+              <img src="assets/stair.webp" alt="埃舍尔阶梯（Stair.webp）：等轴测角度画出的四段阶梯围成闭合回路，每一级看着都在向上，走完一圈却回到起点" />
+              <span class="exhibit-num" aria-hidden="true">03</span>
+            </button>
+            <div class="exhibit-meta">
+              <h3>埃舍尔阶梯</h3>
+              <p class="exhibit-scene">Objects/Stair · 关卡 3「阶梯」</p>
+              <p>无限循环的阶梯，始终向上或向下却回到原点，违背重力法则。</p>
+              <p class="quote">对应第 3 关的关卡图标（level_menu.tscn 中 Name = "Stair" / CName = "阶梯"）。</p>
+            </div>
+          </article>
+
+          <article class="exhibit px reveal">
+            <button class="exhibit-art" type="button" aria-label="让恶魔音叉缓慢旋转一圈">
+              <img src="assets/fork.png" alt="恶魔音叉（Fork.png）的黑白线稿：末端看似同时有三个和两个分叉" />
+              <span class="exhibit-num" aria-hidden="true">04</span>
+            </button>
+            <div class="exhibit-meta">
+              <h3>恶魔音叉</h3>
+              <p class="exhibit-scene">Objects/Fork · 关卡 4「音叉」</p>
+              <p>物体末端看似同时具有三个和两个分叉，无法确定其真实结构。</p>
+              <p class="quote">对应第 4 关的关卡图标（level_menu.tscn 中 Name = "Fork" / CName = "音叉"）；本关的 14 个红色敌人也叫 "Dust"。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+      <!-- ============ 07 实机画面 ============ -->
+      <section class="sec" aria-labelledby="media-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 07 <b>· MEDIA</b></p>
+          <h2 id="media-h">实机画面</h2>
+          <p class="sub">点击任意一张放大 · Esc 关闭</p>
+        </div>
+
+        <div class="monitors">
+          <button class="monitor monitor--wide px reveal" type="button" aria-label="放大标题画面">
+            <span class="monitor-in">
+              <img src="cover.jpg" alt="UnReal Objects 标题画面：彭罗斯三角图标与 Start Game / Exit Game 菜单，右下角署名 By Gove" loading="lazy" decoding="async" />
+            </span>
+            <span class="monitor-cap"><span>标题画面</span><b>cover.jpg</b></span>
+          </button>
+
+          <button class="monitor px reveal" type="button" aria-label="放大截图 1：棋盘格与方向键 D">
+            <span class="monitor-in">
+              <img src="screenshot-01.jpg" alt="截图：绿色与棕色棋盘格上的像素角色与红旗，黑色按键 S/W/A/D，底部显示 D = Right+1" loading="lazy" decoding="async" />
+            </span>
+            <span class="monitor-cap"><span>棋盘与按键</span><b>01</b></span>
+          </button>
+
+          <button class="monitor px reveal" type="button" aria-label="放大截图 2：Space 撤销提示">
+            <span class="monitor-in">
+              <img src="screenshot-02.jpg" alt="截图：青色提示文字 Space to undo the previous step，底部排列 D/S/A/W 四个方向键" loading="lazy" decoding="async" />
+            </span>
+            <span class="monitor-cap"><span>Space 撤销</span><b>02</b></span>
+          </button>
+
+          <button class="monitor px reveal" type="button" aria-label="放大截图 3：N 键的三方向位移">
+            <span class="monitor-in">
+              <img src="screenshot-03.jpg" alt="截图：障碍围成的复杂关卡，角色站在中央，按键 U，底部显示 N = Up+1 Right+1 Down+1" loading="lazy" decoding="async" />
+            </span>
+            <span class="monitor-cap"><span>N 的三段位移</span><b>03</b></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ 08 开发日志 ============ -->
+      <section class="sec" aria-labelledby="dev-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 08 <b>· BUILD LOG</b></p>
+          <h2 id="dev-h">四天做完的 GameJam 作品</h2>
+          <p class="sub">摘自设计文档「三. 开发日志」，仅提炼实现层面的节点</p>
+        </div>
+
+        <div class="log">
+          <div class="log-item reveal">
+            <p class="log-when">2025.03.28 · 22:00</p>
+            <p><b>立项。</b>展开想象、设计游戏、新建项目；一小时内搭出简易 UI，随后继续打磨 UI 与玩法雏形。</p>
+          </div>
+          <div class="log-item reveal">
+            <p class="log-when">2025.03.29 · 09:30</p>
+            <p><b>框架与命令模式。</b>搭建整体游戏框架、实现命令模式（也就是今天页面里这套"动作牌 → 命令串 → 逐格位移"的结构）；下午完成 Player 动画逻辑，随后制作更多可拾取物。</p>
+          </div>
+          <div class="log-item reveal">
+            <p class="log-when">2025.03.29 · 20:30 – 23:00</p>
+            <p><b>关卡落地。</b>完成前两关的设计和搭建，当晚又完成第三关；夜里做细节调整、加入提示。</p>
+          </div>
+          <div class="log-item reveal">
+            <p class="log-when">2025.03.30 · 15:30</p>
+            <p><b>第四关。</b>设计、制作并测试第四关——也就是唯一带 14 个"恶魔"的追逐关；随后增加并修改提示互动。</p>
+          </div>
+          <div class="log-item reveal">
+            <p class="log-when">2025.03.30 · 21:30 – 23:00</p>
+            <p><b>双语与导出。</b>实现中英双语文本（页面上这些提示语的原文都来自 Ctip_str / tip_str 两个字段），23 点后开始导出调试。</p>
+          </div>
+          <div class="log-item reveal">
+            <p class="log-when">2025.03.31 · 13:30</p>
+            <p><b>发布。</b>研究上传游戏，作品上线 itch.io。作者落款：<b>Thanks for playing! — 2025/3/31 By Gove</b></p>
+          </div>
+        </div>
+      </section>
+      <!-- ============ 09 技术信息 ============ -->
+      <section class="sec" aria-labelledby="tech-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 09 <b>· TECH</b></p>
+          <h2 id="tech-h">技术信息</h2>
+          <p class="sub">全部取自 project.godot、export_presets.cfg 与 player.tscn</p>
+        </div>
+
+        <dl class="tech reveal">
+          <div><dt>引擎</dt><dd class="accent">Godot 4.3</dd></div>
+          <div><dt>渲染后端</dt><dd>Mobile</dd></div>
+          <div><dt>平台</dt><dd>Windows · Android</dd></div>
+          <div><dt>地图</dt><dd>5（0 – 4）</dd></div>
+          <div><dt>动作牌</dt><dd>14（A–Z 子集）</dd></div>
+          <div><dt>不可能物体</dt><dd>4</dd></div>
+          <div><dt>网格尺寸</dt><dd>64 px / 格</dd></div>
+          <div><dt>逐帧动画</dt><dd class="accent">12 fps</dd></div>
+          <div><dt>纹理过滤</dt><dd>Nearest</dd></div>
+          <div><dt>像素吸附</dt><dd>transforms + vertices</dd></div>
+          <div><dt>字体</dt><dd>VonwaonBitmap-16px</dd></div>
+          <div><dt>语言</dt><dd>中文 / English</dd></div>
+          <div><dt>存档</dt><dd>user://savegame.dat</dd></div>
+          <div><dt>版本</dt><dd>1.0.0.0</dd></div>
+          <div><dt>开发</dt><dd>Gove</dd></div>
+        </dl>
+      </section>
+
+      <!-- ============ 10 素材来源 ============ -->
+      <section class="sec" aria-labelledby="credits-h">
+        <div class="sec-head reveal">
+          <p class="kicker">// 10 <b>· CREDITS</b></p>
+          <h2 id="credits-h">素材来源与作者的话</h2>
+          <p class="sub">引自设计文档「四. 素材来源」与「五. 作者的话」</p>
+        </div>
+
+        <div class="credits">
+          <ul class="credits-list reveal">
+            <li><span>texture</span>Mystic Woods（game-endeavor.itch.io/mystic-woods）与互联网素材</li>
+            <li><span>audio</span>audiodown.com/tosound</li>
+            <li><span>font</span>VonwaonBitmap-16px</li>
+            <li><span>jam</span>Li Game Academy Craft 2（itch.io Game Jam）</li>
+          </ul>
+
+          <blockquote class="credits-quote px reveal">
+            一款解谜的游戏, 一些不存在的物体。
+            <footer>Thanks for playing! — 2025/3/31 By Gove</footer>
+          </blockquote>
+        </div>
+      </section>
+
+
+
+
+
+
+    </main>
+
+    <footer class="foot">
+      <h2 class="reveal">下载体验</h2>
+      <p class="reveal">在 itch.io 免费下载 Windows 版，或查看 GitHub 源码。</p>
+      <div class="foot-links reveal">
+        <a class="btn btn--primary" href="https://gove.itch.io/unreal-objects" target="_blank" rel="noreferrer">itch.io 下载 →</a>
+        <a class="btn" href="https://github.com/Gove2004/UnReal-Objects" target="_blank" rel="noreferrer">GitHub 源码 →</a>
+        <a class="btn" href="../../index.html">返回作品集 →</a>
       </div>
-      <p class="sign">UNREAL OBJECTS — GOVE / GODOT 4.3 · 2025</p>
-    </section>
+      <p class="foot-sign">UnReal Objects — Gove / Godot 4.3 · 2025 <b>· 14 actions / 5 maps / 4 objects</b></p>
+    </footer>
   </div>
 
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="截图放大查看">
-    <img id="lightbox-img" src="" alt="" />
-    <span class="close-hint">ESC / 点击遮罩关闭</span>
+  <!-- Lightbox：初始不设 src，关闭时清空 -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="画面放大查看" tabindex="-1">
+    <img id="lightbox-img" alt="" hidden />
+    <span class="close-hint">Esc / 点击遮罩关闭</span>
   </div>
 
-  <script>
-    (function () {
-      // 滚动浮现
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) {
-            en.target.classList.add('in');
-            io.unobserve(en.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+<script>
+(function () {
+  'use strict';
 
-      // 物体卡片点击旋转图标
-      document.querySelectorAll('.obj-card').forEach(function (card) {
-        function spin() {
-          var icon = card.querySelector('.icon');
-          if (!icon) return;
-          icon.style.transition = 'transform 0.8s ease';
-          icon.style.transform = 'rotate(360deg) scale(1.1)';
-          setTimeout(function () {
-            icon.style.transition = '';
-            icon.style.transform = '';
-          }, 800);
+  var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reduce = !!(mq && mq.matches);
+
+  /* ---------- 1. 滚动浮现（渐进增强） ---------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+
+  function revealAll() {
+    revealEls.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  if (!reduce && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('js-anim');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in');
+          io.unobserve(en.target);
         }
-        card.addEventListener('click', spin);
-        card.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); spin(); }
-        });
       });
+    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    revealEls.forEach(function (el) { io.observe(el); });
+    window.setTimeout(revealAll, 2600);
+  } else {
+    revealAll();
+  }
 
-      // Hero 彭罗斯三角点击也转一圈
-      var heroTri = document.querySelector('.impossible-hero');
-      if (heroTri) {
-        heroTri.setAttribute('tabindex', '0');
-        heroTri.setAttribute('role', 'button');
-        heroTri.setAttribute('aria-label', '旋转的彭罗斯三角形');
-        heroTri.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            heroTri.style.animation = 'none';
-            heroTri.style.transform = 'rotate(720deg)';
-            setTimeout(function () {
-              heroTri.style.transform = '';
-              heroTri.style.animation = '';
-            }, 900);
-          }
-        });
-      }
+  /* ---------- 2. 棋盘：生成格子 / 网格读数 / 点击移动主角 ---------- */
+  var board = document.getElementById('board');
+  var cellsLayer = document.getElementById('cells');
+  var player = document.getElementById('player');
+  var stageGrid = document.getElementById('stage-grid');
+  var stageFloor = document.getElementById('stage-floor');
 
-      // Lightbox
-      var overlay = document.getElementById('lightbox');
-      var big = document.getElementById('lightbox-img');
-      var shots = document.querySelectorAll('.shot');
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
-      function openLightbox(shot) {
-        var img = shot.querySelector('img');
-        big.src = img.src;
-        big.alt = img.alt;
-        overlay.classList.add('open');
+  function gridCols() {
+    if (!cellsLayer) return 18;
+    var cs = window.getComputedStyle(cellsLayer).gridTemplateColumns;
+    if (!cs) return 18;
+    var parts = cs.split(' ').filter(function (s) { return s.length; });
+    return parts.length || 18;
+  }
+
+  function gridRows(cols) {
+    if (!board) return 7;
+    var r = board.getBoundingClientRect();
+    if (!r.width) return 7;
+    return Math.max(1, Math.round(cols * r.height / r.width));
+  }
+
+  if (cellsLayer) {
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < 18 * 7; i++) {
+      var cell = document.createElement('i');
+      cell.className = 'cell';
+      frag.appendChild(cell);
+    }
+    cellsLayer.appendChild(frag);
+
+    cellsLayer.addEventListener('mouseover', function (e) {
+      var t = e.target;
+      if (!t || t.className !== 'cell' || !stageGrid) return;
+      var idx = Array.prototype.indexOf.call(cellsLayer.children, t);
+      var cols = gridCols();
+      stageGrid.textContent = 'X' + pad2(idx % cols) + ' Y' + pad2(Math.floor(idx / cols));
+    });
+
+    cellsLayer.addEventListener('mouseout', function () {
+      if (stageGrid) stageGrid.textContent = '64 px';
+    });
+
+    var lastCol = 4;
+    var walkTimer = 0;
+
+    cellsLayer.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || t.className !== 'cell' || !player) return;
+
+      var idx = Array.prototype.indexOf.call(cellsLayer.children, t);
+      var cols = gridCols();
+      var rows = gridRows(cols);
+      var col = idx % cols;
+      var row = Math.floor(idx / cols);
+      if (row >= rows) return;
+
+      /* 脚底对齐到格子下沿：精灵框高 2.1 格，脚在 0.896 处 */
+      player.style.setProperty('--pc', String(col + 0.5));
+      player.style.setProperty('--pr', String(row + 1 - 1.88));
+
+      if (col > lastCol) {
+        player.style.setProperty('--row', '4');           /* D_Walk */
+        player.classList.remove('is-left');
+      } else if (col < lastCol) {
+        player.style.setProperty('--row', '4');
+        player.classList.add('is-left');
+      } else {
+        player.style.setProperty('--row', '3');           /* S_Walk */
       }
-      function closeLightbox() {
-        overlay.classList.remove('open');
+      lastCol = col;
+
+      window.clearTimeout(walkTimer);
+      walkTimer = window.setTimeout(function () {
+        player.style.setProperty('--row', '0');           /* S_Idle */
+      }, 470);
+    });
+  }
+
+  /* ---------- 3. 楼层：展开时同步舞台读数与地上的字母牌 ---------- */
+  var FLOOR_INFO = [
+    { label: 'F00 · 未命名', keys: ['A', 'D'] },
+    { label: 'F01 · 三角', keys: ['A', 'D', 'S'] },
+    { label: 'F02 · 立方', keys: ['D', 'J', 'Q'] },
+    { label: 'F03 · 阶梯', keys: ['G', 'N', 'S'] },
+    { label: 'F04 · 音叉', keys: ['A', 'E', 'Z'] }
+  ];
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.pick'));
+
+  function syncFloor(i) {
+    var info = FLOOR_INFO[i];
+    if (!info) return;
+    if (stageFloor) stageFloor.textContent = info.label;
+    picks.forEach(function (p, n) {
+      if (n < info.keys.length) {
+        p.textContent = info.keys[n];
+        p.style.opacity = '1';
+      } else {
+        p.style.opacity = '0';
       }
-      shots.forEach(function (s) {
-        s.addEventListener('click', function () { openLightbox(s); });
-      });
-      overlay.addEventListener('click', closeLightbox);
-      window.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && overlay.classList.contains('open')) closeLightbox();
-      });
-    })();
-  </script>
+    });
+  }
+
+  var floors = Array.prototype.slice.call(document.querySelectorAll('.floor'));
+  floors.forEach(function (f, i) {
+    f.addEventListener('toggle', function () {
+      if (!f.open) return;
+      /* 兼容不支持 details[name] 的浏览器：手动互斥 */
+      floors.forEach(function (other) { if (other !== f) other.open = false; });
+      syncFloor(i);
+    });
+  });
+
+  /* ---------- 4. 14 张卡匣：点亮 / 按字母键 / 空格撤销 ---------- */
+  var carts = Array.prototype.slice.call(document.querySelectorAll('.cart'));
+  var roVal = document.getElementById('ro-val');
+  var byKey = {};
+  var armed = [];
+
+  carts.forEach(function (c) { byKey[c.getAttribute('data-key')] = c; });
+
+  function cmdString(c) {
+    var chips = c.querySelectorAll('.cart-cmds i');
+    var out = '';
+    for (var n = 0; n < chips.length; n++) out += chips[n].textContent;
+    return out;
+  }
+
+  function readout(html) { if (roVal) roVal.innerHTML = html; }
+
+  function arm(c) {
+    if (!c) return;
+    if (armed.indexOf(c) === -1) armed.push(c);
+    c.classList.add('is-armed');
+    c.setAttribute('aria-pressed', 'true');
+    readout('<b>' + c.getAttribute('data-key') + '</b> → ' + c.getAttribute('data-name') +
+            ' · <em>' + cmdString(c).length + ' 步</em> · commands = [' + cmdString(c) + ']');
+  }
+
+  function disarmLast() {
+    var c = armed.pop();
+    if (!c) return false;
+    c.classList.remove('is-armed');
+    c.setAttribute('aria-pressed', 'false');
+    readout(armed.length
+      ? '撤销 1 步 · 已点亮 ' + armed.length + ' 张'
+      : '— 已全部撤销（uodo）—');
+    return true;
+  }
+
+  carts.forEach(function (c) {
+    c.addEventListener('click', function () { arm(c); });
+  });
+
+  function cartsInView() {
+    var host = document.querySelector('.carts');
+    if (!host) return false;
+    var r = host.getBoundingClientRect();
+    return r.top < window.innerHeight * 0.85 && r.bottom > 80;
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+
+    var tag = (e.target && e.target.tagName ? e.target.tagName : '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+    /* 空格 = 撤销（对应游戏里的 uodo），只在动作区可见且确实有东西可撤时接管 */
+    if (e.key === ' ' || e.key === 'Spacebar') {
+      var onButton = (document.activeElement && document.activeElement.tagName === 'BUTTON');
+      if (!onButton && armed.length && cartsInView()) {
+        disarmLast();
+        e.preventDefault();
+      }
+      return;
+    }
+
+    if (e.key && e.key.length === 1) {
+      var cart = byKey[e.key.toUpperCase()];
+      if (cart) arm(cart);
+    }
+  });
+
+  /* ---------- 5. 展板：点击让不可能图形缓慢转一圈 ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.exhibit-art'), function (btn) {
+    btn.addEventListener('click', function () {
+      if (reduce) return;
+      var art = btn.querySelector('img, svg');
+      if (!art || typeof art.animate !== 'function') return;
+      art.animate(
+        [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }],
+        { duration: 1600, easing: 'cubic-bezier(.32,0,.24,1)' }
+      );
+    });
+  });
+
+  /* ---------- 6. Lightbox（含焦点管理） ---------- */
+  var overlay = document.getElementById('lightbox');
+  var big = document.getElementById('lightbox-img');
+  var shots = Array.prototype.slice.call(document.querySelectorAll('.monitor'));
+  var lastFocused = null;
+
+  function openLightbox(shot) {
+    if (!overlay || !big) return;
+    var img = shot.querySelector('img');
+    if (!img) return;
+    lastFocused = document.activeElement;
+    big.src = img.currentSrc || img.src;
+    big.alt = img.alt || '';
+    big.hidden = false;
+    overlay.classList.add('open');
+    overlay.focus();
+  }
+
+  function closeLightbox() {
+    if (!overlay || !overlay.classList.contains('open')) return;
+    overlay.classList.remove('open');
+    big.removeAttribute('src');
+    big.hidden = true;
+    big.alt = '';
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    lastFocused = null;
+  }
+
+  shots.forEach(function (s) {
+    s.addEventListener('click', function () { openLightbox(s); });
+  });
+
+  if (overlay) {
+    overlay.addEventListener('click', closeLightbox);
+    overlay.addEventListener('keydown', function (e) {
+      if (e.key === 'Tab') { e.preventDefault(); overlay.focus(); }
+    });
+  }
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+})();
+</script>
+
 </body>
 </html>

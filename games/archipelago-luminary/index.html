@@ -4,1175 +4,2521 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Archipelago Luminary · 阿奇佩拉戈：北落之光 | Gove</title>
-  <meta name="description" content="Archipelago Luminary：极简 2D 塔防。黑白战场中颜色是稀世珍宝。14 关从最后庇护所反攻至失去的领土。Steam ¥11。" />
+  <meta name="description" content="Archipelago Luminary：极简 2D 塔防。黑白战场上颜色是稀世珍宝。14 关反攻、14 座炮塔、14 种敌人、42 件关键物，从最后的净土到阿奇佩拉戈之北。Steam ¥11。" />
   <style>
+    /* ==========================================================
+       01 · 设计令牌
+       ========================================================== */
     :root {
-      --bg: #06080a;
-      --bg-soft: #0b0f14;
-      --bg-panel: #0e1319;
-      --ink: #e7ecf2;
-      --ink-dim: #9aa3ad;
-      --faint: #4a525c;
+      --bg: #05060a;
+      --bg-2: #080a0f;
+      --panel: #0a0c11;
+      --panel-2: #0d1016;
+      --ink: #eef1f4;
+      --ink-2: #a4adb8;
+      --ink-3: #5b6470;
+      --ink-4: #3a414b;
       --gold: #f0c674;
-      --gold-dim: rgba(240, 198, 116, .28);
-      --gold-faint: rgba(240, 198, 116, .06);
-      --crimson: #ef4444;
-      --crimson-dim: rgba(239, 68, 68, .28);
-      --line: rgba(231, 236, 242, 0.1);
-      --line-strong: rgba(231, 236, 242, 0.18);
-      --grid: rgba(231, 236, 242, 0.045);
-      --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --gold-2: #f8dfab;
+      --gold-a: rgba(240, 198, 116, .34);
+      --gold-b: rgba(240, 198, 116, .12);
+      --gold-c: rgba(240, 198, 116, .05);
+      --red: #e2483d;
+      --red-a: rgba(226, 72, 61, .34);
+      --red-b: rgba(226, 72, 61, .10);
+      --line: rgba(255, 255, 255, .085);
+      --line-2: rgba(255, 255, 255, .17);
+      --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+      --wrap: 1120px;
     }
 
+    /* ==========================================================
+       02 · 基础重置
+       ========================================================== */
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg);
+      /* 氛围层：极淡金色辉光 + 冷白纸感，仍是黑白为主 */
+      background:
+        radial-gradient(1180px 620px at 50% -14%, rgba(240, 198, 116, .085), transparent 62%),
+        radial-gradient(860px 520px at 88% 22%, rgba(240, 198, 116, .038), transparent 58%),
+        radial-gradient(720px 480px at 8% 68%, rgba(214, 224, 236, .030), transparent 62%),
+        radial-gradient(900px 560px at 50% 104%, rgba(255, 255, 255, .018), transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
       color: var(--ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.7;
+      font-family: var(--sans);
+      line-height: 1.72;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* 战场坐标网格背景 */
+    /* 裂纹石纹 + 细噪点：静止层，无动画 */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
+      opacity: .12;
       background-image:
-        linear-gradient(var(--grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(circle at 50% 25%, black, transparent 85%);
-      -webkit-mask-image: radial-gradient(circle at 50% 25%, black, transparent 85%);
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(112deg, rgba(255, 255, 255, .016) 0 1px, transparent 1px 132px),
+        repeating-linear-gradient(23deg, rgba(255, 255, 255, .011) 0 1px, transparent 1px 208px);
+      background-size: 160px 160px, auto, auto;
+      background-repeat: repeat, repeat, repeat;
+    }
+
+    /* 四角压暗，收拢视线 */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(138% 112% at 50% 38%, transparent 40%, rgba(0, 0, 0, .62) 100%);
     }
 
     a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-    button { font-family: inherit; }
+    img { display: block; max-width: 100%; height: auto; }
+    button { font-family: inherit; color: inherit; }
+    h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
+    ul, ol { padding: 0; list-style: none; }
+
+    ::selection { background: var(--gold); color: var(--bg); }
 
     .wrap {
       position: relative;
       z-index: 1;
-      width: min(1080px, calc(100% - 48px));
+      width: min(var(--wrap), calc(100% - 48px));
       margin: 0 auto;
     }
 
-    .mono { font-family: var(--mono); }
+    .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
-    /* ========== 顶部导航 ========== */
+    /* 无障碍跳转 */
+    .skip {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 300;
+      background: var(--gold);
+      color: var(--bg);
+      padding: 10px 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .skip:focus { left: 8px; top: 8px; }
+
+    /* ==========================================================
+       03 · CRT 扫描线 + 网格覆盖
+       ========================================================== */
+    .crt {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(180deg,
+          rgba(0, 0, 0, .34) 0 1px,
+          rgba(0, 0, 0, 0) 1px 3px),
+        radial-gradient(130% 100% at 50% 0%, rgba(240, 198, 116, .045), transparent 58%);
+      opacity: .55;
+    }
+    .crt::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      /* 与战场同构的 2:1 等距格律（±26.57°），而非正交方网格 */
+      background:
+        repeating-linear-gradient(63.4deg,
+          rgba(255, 255, 255, .035) 0 1px, transparent 1px 62px),
+        repeating-linear-gradient(116.6deg,
+          rgba(255, 255, 255, .035) 0 1px, transparent 1px 62px);
+      mask-image: radial-gradient(circle at 50% 28%, #000, transparent 76%);
+      -webkit-mask-image: radial-gradient(circle at 50% 28%, #000, transparent 76%);
+    }
+
+    /* ==========================================================
+       04 · .px 像素硬边框（阶梯切角 + 3px 边 + 硬投影）
+       ========================================================== */
+    .px {
+      --px-c: 6px;
+      --px-fill: var(--panel);
+      --px-edge: #2b313b;
+      position: relative;
+      isolation: isolate;
+      filter: drop-shadow(5px 5px 0 rgba(0, 0, 0, .5));
+    }
+    .px::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border: 3px solid transparent;
+      background:
+        linear-gradient(var(--px-fill), var(--px-fill)) padding-box,
+        linear-gradient(var(--px-edge), var(--px-edge)) border-box;
+      clip-path: polygon(
+        0 calc(2 * var(--px-c)),
+        var(--px-c) calc(2 * var(--px-c)),
+        var(--px-c) var(--px-c),
+        calc(2 * var(--px-c)) var(--px-c),
+        calc(2 * var(--px-c)) 0,
+        calc(100% - 2 * var(--px-c)) 0,
+        calc(100% - 2 * var(--px-c)) var(--px-c),
+        calc(100% - var(--px-c)) var(--px-c),
+        calc(100% - var(--px-c)) calc(2 * var(--px-c)),
+        100% calc(2 * var(--px-c)),
+        100% calc(100% - 2 * var(--px-c)),
+        calc(100% - var(--px-c)) calc(100% - 2 * var(--px-c)),
+        calc(100% - var(--px-c)) calc(100% - var(--px-c)),
+        calc(100% - 2 * var(--px-c)) calc(100% - var(--px-c)),
+        calc(100% - 2 * var(--px-c)) 100%,
+        calc(2 * var(--px-c)) 100%,
+        calc(2 * var(--px-c)) calc(100% - var(--px-c)),
+        var(--px-c) calc(100% - var(--px-c)),
+        var(--px-c) calc(100% - 2 * var(--px-c)),
+        0 calc(100% - 2 * var(--px-c))
+      );
+    }
+    .px--gold { --px-edge: var(--gold-a); --px-fill: #0b0d12; }
+    .px--red { --px-edge: var(--red-a); }
+    .px--flat { filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, .45)); }
+
+    /* ==========================================================
+       05 · 顶栏 HUD
+       ========================================================== */
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 20;
+      z-index: 40;
+      padding: 14px 0;
+      background: linear-gradient(180deg, rgba(5, 6, 10, .97) 62%, rgba(5, 6, 10, 0));
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: .1em;
+    }
+    .topbar .wrap {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 0;
-      background: linear-gradient(180deg, rgba(6, 8, 10, 0.96) 60%, rgba(6, 8, 10, 0));
-      font-size: 12px;
-      letter-spacing: 0.08em;
+      gap: 16px;
     }
     .topbar a {
-      color: var(--ink-dim);
-      transition: color .25s ease;
+      color: var(--ink-2);
+      transition: color .22s ease;
+      white-space: nowrap;
+    }
+    .topbar a:hover,
+    .topbar a:focus-visible { color: var(--gold); outline: none; }
+    .topbar .back::before { content: "< "; color: var(--gold); }
+    .topbar .tag {
+      color: var(--ink-3);
+      font-size: 10px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .topbar .tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold-a);
+    }
+    .topbar .steam::after { content: " ↗"; color: var(--gold); }
+
+    /* ==========================================================
+       06 · 通用排版
+       ========================================================== */
+    .kicker {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .kicker::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .sec { padding: 76px 0; position: relative; }
+    .sec-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 18px;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--line);
+    }
+    .sec-head h2 {
+      font-family: var(--mono);
+      font-size: clamp(20px, 3.2vw, 30px);
+      font-weight: 700;
+      letter-spacing: .01em;
+      line-height: 1.2;
+      margin-top: 10px;
+    }
+    .sec-head h2 em { font-style: normal; color: var(--gold); }
+    .sec-idx {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--ink-3);
+      white-space: nowrap;
+      padding-bottom: 4px;
+    }
+    .sec-idx b { color: var(--gold); font-weight: 700; }
+
+    /* ==========================================================
+       07 · 滚动浮现
+       ========================================================== */
+    .rv {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .rv.in { opacity: 1; transform: none; }
+
+    /* ==========================================================
+       08 · Hero
+       ========================================================== */
+    .hero { padding: 34px 0 20px; }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+      gap: 52px;
+      align-items: center;
+      padding: 26px 0 44px;
+    }
+
+    .hero-copy .kicker { margin-bottom: 22px; }
+
+    .hero h1 {
+      font-family: var(--mono);
+      font-size: clamp(30px, 5.4vw, 62px);
+      font-weight: 700;
+      line-height: 1.02;
+      letter-spacing: -.02em;
+      text-transform: uppercase;
+    }
+    .hero h1 span { color: var(--gold); }
+    .hero .cn {
+      margin-top: 16px;
+      font-family: var(--mono);
+      font-size: clamp(13px, 1.9vw, 16px);
+      letter-spacing: .28em;
+      color: var(--ink-2);
+    }
+    .hero .lede {
+      margin-top: 22px;
+      max-width: 46ch;
+      font-size: clamp(14px, 1.7vw, 16px);
+      line-height: 1.9;
+      color: var(--ink-2);
+    }
+    .hero .lede b { color: var(--gold); font-weight: 600; }
+
+    /* 封面画框 */
+    .keyart { position: relative; padding: 10px; background: var(--bg-2); }
+    .keyart img {
+      width: 100%;
+      aspect-ratio: 616 / 353;
+      object-fit: cover;
+      filter: grayscale(1) contrast(1.12) brightness(.96);
+    }
+    .keyart .ka-tag {
+      position: absolute;
+      left: 10px;
+      bottom: -11px;
+      padding: 2px 8px;
+      background: var(--gold);
+      color: var(--bg);
+      font-family: var(--mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    /* 统计条 */
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 30px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .stats .st {
+      padding: 12px 18px 12px 0;
+      margin-right: 18px;
+      border-right: 1px solid var(--line);
       font-family: var(--mono);
     }
-    .topbar a:hover, .topbar a:focus-visible { color: var(--gold); outline: none; }
-    .topbar .back::before { content: "<- "; }
-    .topbar .tag {
-      color: var(--faint);
+    .stats .st:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+    .stats .st b {
+      display: block;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.2;
+    }
+    .stats .st span {
+      display: block;
+      font-size: 9.5px;
+      letter-spacing: .18em;
       text-transform: uppercase;
+      color: var(--ink-3);
+      margin-top: 3px;
+    }
+
+    /* ==========================================================
+       09 · 战场舞台（外框 + HUD 条）
+       ========================================================== */
+    .stage { margin-top: 8px; }
+    .stage-hint {
+      display: none;
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-align: center;
+    }
+
+    .stage-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 0 10px;
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: .2em;
-    }
-
-    /* ========== Hero ========== */
-    .hero {
-      padding: 56px 0 40px;
-      text-align: center;
-    }
-    .hero .kicker {
-      font-family: var(--mono);
-      color: var(--faint);
-      font-size: 11px;
-      letter-spacing: 0.32em;
       text-transform: uppercase;
-      margin: 0 0 28px;
+      color: var(--ink-3);
     }
-
-    /* 封面主视觉 */
-    .keyart {
-      width: 100%;
-      max-width: 560px;
-      margin: 0 auto 28px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-      background: var(--bg-soft);
-    }
-    .keyart img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      filter: grayscale(1) contrast(1.08);
-    }
-    .keyart::after {
+    .stage-bar .lbl { display: inline-flex; align-items: center; gap: 8px; }
+    .stage-bar .lbl::before {
       content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 4px;
-      box-shadow: inset 0 0 0 1px rgba(240,198,116,.08);
-      pointer-events: none;
+      width: 5px;
+      height: 5px;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
     }
 
-    /* 等距战场动画 */
-    .battlefield {
-      position: relative;
-      width: 100%;
-      max-width: 620px;
-      aspect-ratio: 16 / 8;
-      margin: 0 auto 36px;
+    .hud {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      margin-top: 10px;
+      background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 4px;
-      background: #04060a;
+      border-top: 2px solid var(--gold-a);
+      font-family: var(--mono);
+      font-size: 11.5px;
       overflow: hidden;
     }
-    /* 等距菱形网格 */
-    .battlefield .iso-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(30deg, transparent 49.2%, rgba(231,236,242,.09) 49.6%, rgba(231,236,242,.09) 50.4%, transparent 50.8%),
-        linear-gradient(150deg, transparent 49.2%, rgba(231,236,242,.09) 49.6%, rgba(231,236,242,.09) 50.4%, transparent 50.8%);
-      background-size: 46px 27px;
-      background-position: center;
+    .hud-read {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 11px 16px;
+      min-width: 0;
+      flex: 1 1 auto;
+      color: var(--ink-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    /* 敌人行进路径 */
-    .battlefield .path {
-      position: absolute;
-      left: -5%;
-      right: -5%;
-      top: 55%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(239,68,68,.25) 20%, rgba(239,68,68,.25) 80%, transparent);
-      transform: translateY(-50%);
+    .hud-read .hr-name { color: var(--gold); font-weight: 700; letter-spacing: .08em; }
+    .hud-read .hr-cost { color: var(--ink-2); }
+    .hud-read .hr-role { color: var(--ink-3); }
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      border-left: 1px solid var(--line);
     }
-    /* 炮塔 */
-    .bf-turret {
-      position: absolute;
-      width: 26px; height: 26px;
-      transform: translate(-50%, -50%);
-      z-index: 2;
+    .hud-stats span {
+      padding: 11px 14px;
+      border-right: 1px solid var(--line);
+      color: var(--ink-3);
+      letter-spacing: .08em;
+      white-space: nowrap;
     }
-    .bf-turret .orb {
-      width: 100%; height: 100%;
-      border-radius: 50%;
-      border: 1.5px solid var(--ink);
+    .hud-stats span:last-child { border-right: 0; }
+    .hud-stats b { color: var(--gold); font-weight: 700; }
+    .hud-stats .hearts { color: var(--red); letter-spacing: .12em; }
+
+    /* ==========================================================
+       10 · 等距战场
+       ========================================================== */
+    .board {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1000 / 560;
+      overflow: hidden;
       background:
-        radial-gradient(circle at 38% 35%, rgba(231,236,242,.25), transparent 60%),
-        rgba(231,236,242,.06);
-      position: relative;
+        radial-gradient(115% 88% at 50% 4%, #0c1017 0%, #06080d 52%, #04050a 100%);
+      border: 1px solid var(--line);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, .02),
+        inset 0 -60px 90px -50px rgba(0, 0, 0, .9),
+        0 24px 60px -30px rgba(0, 0, 0, .9);
+      isolation: isolate;
     }
-    .bf-turret .orb::after {
-      content: "";
+
+    /* 等距网格（SVG pattern，随画布缩放） */
+    .board-grid {
       position: absolute;
-      top: 50%; left: 50%;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--ink);
-      transform: translate(-50%, -50%);
-      opacity: .7;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      mask-image: radial-gradient(118% 96% at 50% 46%, #000 34%, transparent 88%);
+      -webkit-mask-image: radial-gradient(118% 96% at 50% 46%, #000 34%, transparent 88%);
+      animation: gridBreathe 9s ease-in-out infinite;
     }
-    /* 炮管瞄准线 */
-    .bf-turret .barrel {
+    @keyframes gridBreathe {
+      0%, 100% { opacity: .82; }
+      50% { opacity: 1; }
+    }
+
+    /* 行进路线 */
+    .board-route {
       position: absolute;
-      top: 50%; left: 50%;
-      width: 16px; height: 1.5px;
-      background: var(--ink);
-      transform-origin: left center;
-      animation: aim 3.4s ease-in-out infinite;
-      opacity: .8;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
     }
-    @keyframes aim {
-      0%, 100% { transform: rotate(-25deg); }
-      50% { transform: rotate(35deg); }
+    .route-base {
+      fill: none;
+      stroke: rgba(255, 255, 255, .10);
+      stroke-width: 14;
+      stroke-linecap: square;
     }
-    .bf-turret.t2 .barrel { animation-delay: -1.2s; animation-duration: 4s; }
-    .bf-turret.t3 .barrel { animation-delay: -2.1s; animation-duration: 3s; }
+    .route-line {
+      fill: none;
+      stroke: rgba(240, 198, 116, .42);
+      stroke-width: 1.6;
+      stroke-dasharray: 12 10;
+      animation: dashRun 2.6s linear infinite;
+    }
+    @keyframes dashRun { to { stroke-dashoffset: -44; } }
 
     /* 敌人 */
-    .bf-enemy {
+    .enemy { fill: #fff; }
+    .enemy--gold { fill: var(--gold); }
+    .enemy--dim { fill: rgba(255, 255, 255, .55); }
+
+    /* 炮塔：真实精灵 + 真实地块 */
+    .tw {
       position: absolute;
-      top: 55%;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(255,255,255,.6);
-      animation: march 7s linear infinite;
+      left: var(--x);
+      top: var(--y);
+      width: 9.4%;
+      aspect-ratio: 2 / 1;
+      transform: translate(-50%, -50%);
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      z-index: 3;
+      transition: z-index 0s;
+    }
+    .tw:focus-visible { outline: none; }
+
+    /* 地块：tiles.webp 的 Point 单元格（2×3 精灵表） */
+    .tw-plat {
+      position: absolute;
+      inset: 0;
+      background-image: url(assets/tiles.webp);
+      background-size: 200% 300%;
+      background-position: 100% 0;
+      opacity: .5;
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    .tw-spr {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 130%;
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      background-image: var(--spr);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .85));
+      transition: transform .3s cubic-bezier(.2, .8, .3, 1), filter .3s ease;
+      pointer-events: none;
+    }
+    /* 瞄准扫描线 */
+    .tw-aim {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 26%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0));
+      transform-origin: 0 50%;
+      animation: aimScan var(--aim, 4s) ease-in-out infinite;
+      animation-delay: var(--aimd, 0s);
+      pointer-events: none;
+    }
+    @keyframes aimScan {
+      0%, 100% { transform: rotate(-38deg); opacity: .25; }
+      50% { transform: rotate(38deg); opacity: .8; }
+    }
+
+    .tw:hover, .tw:focus-visible { z-index: 6; }
+    .tw:hover .tw-plat,
+    .tw:focus-visible .tw-plat { opacity: .95; transform: scale(1.06); }
+    .tw:hover .tw-spr,
+    .tw:focus-visible .tw-spr {
+      transform: translateX(-50%) translateY(-6%) scale(1.07);
+      filter:
+        drop-shadow(0 6px 10px rgba(0, 0, 0, .9))
+        drop-shadow(0 0 10px rgba(240, 198, 116, .75));
+    }
+    .tw:focus-visible .tw-plat {
+      outline: 1px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    /* 点缀地块：Ban（禁建）/ Wall（最后的净土） */
+    .tile-mark {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: 7.4%;
+      aspect-ratio: 2 / 1;
+      transform: translate(-50%, -50%);
+      background-image: url(assets/tiles.webp);
+      background-size: 200% 300%;
+      opacity: .3;
+      pointer-events: none;
+    }
+    .tile-mark--ban { background-position: 100% 50%; }
+    .tile-mark--wall { background-position: 0 100%; opacity: .42; }
+
+    /* 雷达扫描 */
+    .board-radar {
+      position: absolute;
+      left: 27%;
+      top: 54%;
+      width: 44%;
+      aspect-ratio: 1;
+      background: conic-gradient(from 0deg,
+        rgba(240, 198, 116, .22),
+        rgba(240, 198, 116, .04) 22%,
+        rgba(240, 198, 116, 0) 46%);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, .55) 58%, transparent 76%);
+      -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0, 0, 0, .55) 58%, transparent 76%);
+      animation: radarSweep 11s linear infinite;
+      opacity: .6;
+      pointer-events: none;
       z-index: 1;
     }
-    .bf-enemy.e2 { animation-delay: -2.3s; animation-duration: 8.5s; width: 8px; height: 8px; }
-    .bf-enemy.e3 { animation-delay: -4.8s; animation-duration: 6s; width: 12px; height: 12px; }
-    @keyframes march {
-      from { left: -3%; opacity: 0; }
-      8% { opacity: 1; }
-      92% { opacity: 1; }
-      to { left: 101%; opacity: 0; }
+    @keyframes radarSweep {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
-    /* 金色火花——战场上稀有的颜色 */
-    .bf-spark {
+    /* 波次脉冲 */
+    .board-wave {
       position: absolute;
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 10px var(--gold), 0 0 20px var(--gold-dim);
-      animation: spark 3s ease-in-out infinite;
-      z-index: 3;
+      right: 4%;
+      top: 62%;
+      width: 9%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(240, 198, 116, .55);
+      animation: wavePulse 4.6s ease-out infinite;
+      pointer-events: none;
+      z-index: 2;
     }
-    @keyframes spark {
-      0%, 100% { opacity: 0; transform: scale(.4); }
-      40% { opacity: 1; transform: scale(1.3); }
-      60% { opacity: .8; transform: scale(1); }
+    .board-wave:nth-of-type(2) { animation-delay: 2.3s; }
+    @keyframes wavePulse {
+      0% { transform: rotate(45deg) scale(.18); opacity: 0; }
+      14% { opacity: .85; }
+      100% { transform: rotate(45deg) scale(4.2); opacity: 0; }
     }
 
-    /* 资源数字角标（致敬实机 UI） */
-    .bf-resource {
+    /* 金色火花（star_09 / spark_07） */
+    .spark {
       position: absolute;
-      top: 10px; left: 12px;
-      font-family: var(--mono);
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--gold);
-      z-index: 4;
-      text-shadow: 0 0 12px var(--gold-dim);
-    }
-    .bf-speed {
-      position: absolute;
-      top: 8px; right: 10px;
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: 1px solid var(--line-strong);
-      background: rgba(6,8,10,.7);
-      color: var(--ink);
-      font-family: var(--mono);
-      font-size: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 4;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-family: var(--mono);
-      font-size: clamp(26px, 5.5vw, 52px);
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: 0.02em;
-      line-height: 1.15;
-    }
-    .hero h1 .gold { color: var(--gold); }
-    .hero .cn {
-      margin: 14px 0 0;
-      font-family: var(--mono);
-      font-size: clamp(13px, 2vw, 16px);
-      color: var(--ink-dim);
-      letter-spacing: 0.15em;
-    }
-    .hero .sub {
-      margin: 20px auto 0;
-      max-width: 620px;
-      color: var(--ink-dim);
-      font-size: clamp(14px, 2vw, 16.5px);
-      line-height: 1.85;
-    }
-    .hero .sub b { color: var(--gold); font-weight: 600; }
-
-    /* 信息条 */
-    .meta-bar {
-      margin: 32px auto 0;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      overflow: hidden;
-      width: fit-content;
-      max-width: 100%;
-      font-family: var(--mono);
-    }
-    .meta-bar .item {
-      padding: 10px 18px;
-      font-size: 12px;
-      color: var(--ink-dim);
-      border-right: 1px solid var(--line);
-      white-space: nowrap;
-    }
-    .meta-bar .item:last-child { border-right: none; }
-    .meta-bar .item b { color: var(--gold); font-weight: 600; }
-
-    /* ========== 滚动浮现 ========== */
-    .reveal {
+      left: var(--x);
+      top: var(--y);
+      width: var(--w, 2.6%);
+      aspect-ratio: 1;
+      background-image: url(assets/star_09.webp);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: sepia(1) saturate(4.5) hue-rotate(-14deg) brightness(1.25)
+              drop-shadow(0 0 8px rgba(240, 198, 116, .85));
       opacity: 0;
-      transform: translateY(26px);
-      transition: opacity .8s ease, transform .8s ease;
+      animation: twinkle var(--t, 4.4s) ease-in-out infinite;
+      animation-delay: var(--td, 0s);
+      pointer-events: none;
+      z-index: 5;
     }
-    .reveal.in { opacity: 1; transform: none; }
+    .spark--streak {
+      width: var(--w, 5.5%);
+      aspect-ratio: 192 / 38;
+      background-image: url(assets/spark_07.webp);
+      animation-name: streak;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(.5) rotate(0deg); }
+      35% { opacity: 1; transform: scale(1.15) rotate(12deg); }
+      62% { opacity: .65; transform: scale(.95) rotate(-6deg); }
+    }
+    @keyframes streak {
+      0%, 100% { opacity: 0; transform: translateX(-14%) scaleX(.6); }
+      45% { opacity: .9; transform: translateX(0) scaleX(1); }
+    }
 
-    /* ========== 章节标题 ========== */
-    .section-head {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .section-head .kicker {
+    /* 战场角标 */
+    .board-cap {
+      position: absolute;
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.3em;
+      font-size: 9px;
+      letter-spacing: .22em;
       text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 12px;
+      color: var(--ink-3);
+      pointer-events: none;
+      z-index: 7;
     }
-    .section-head h2 {
-      margin: 0;
-      font-family: var(--mono);
-      font-size: clamp(22px, 3.6vw, 32px);
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .section-head p {
-      margin: 10px 0 0;
-      color: var(--ink-dim);
-      font-size: 14px;
-    }
+    .board-cap--tl { left: 12px; top: 10px; }
+    .board-cap--tr { right: 12px; top: 10px; color: var(--gold); }
+    .board-cap--bl { left: 12px; bottom: 10px; }
+    .board-cap--br { right: 12px; bottom: 10px; }
 
-    /* ========== 故事区 ========== */
-    .story { padding: 60px 0; }
-    .story-body { max-width: 680px; margin: 0 auto; }
-    .story p {
-      margin: 0 0 22px;
-      font-size: clamp(15px, 2vw, 17.5px);
+    /* ==========================================================
+       11 · 故事 / 传输日志
+       ========================================================== */
+    .log { max-width: 760px; }
+    .log p {
+      font-size: clamp(15px, 1.9vw, 17.5px);
       line-height: 2;
       color: var(--ink);
+      margin-bottom: 24px;
     }
-    .story p .gold { color: var(--gold); }
-    .story p .crimson { color: var(--crimson); }
+    .log p .gold { color: var(--gold); }
+    .log p .red { color: var(--red); }
 
-    .story-fragment {
-      margin: 32px 0;
-      padding: 22px 26px;
-      border-left: 2px solid var(--gold-dim);
-      background: var(--gold-faint);
-      border-radius: 0 6px 6px 0;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--ink-dim);
-      line-height: 1.85;
+    .frag {
+      margin: 30px 0;
+      padding: 20px 24px;
+      --px-fill: #080a0f;
+      --px-edge: rgba(240, 198, 116, .26);
     }
-    .story-fragment .label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 10px;
-    }
-    .story-fragment + .story-fragment {
-      border-left-color: var(--crimson-dim);
-      background: rgba(239,68,68,.04);
-    }
-    .story-fragment + .story-fragment .label { color: var(--crimson); }
-
-    /* ========== 反攻路线 ========== */
-    .campaign { padding: 60px 0; }
-    .campaign-track {
-      position: relative;
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 40px 0 20px;
-    }
-    .campaign-line {
-      position: absolute;
-      top: 50px;
-      left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--crimson-dim), var(--gold-dim) 60%, var(--gold));
-    }
-    .campaign-nodes {
+    .frag .frag-lbl {
       display: flex;
-      justify-content: space-between;
-      position: relative;
-    }
-    .camp-node {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 10px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      transition: transform .25s;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
     }
-    .camp-node:hover, .camp-node:focus-visible { transform: translateY(-4px); outline: none; }
-    .camp-node .dot {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--ink-dim);
-      background: var(--bg);
-      transition: all .25s;
-    }
-    .camp-node.start .dot {
-      border-color: var(--crimson);
-      background: var(--crimson);
-      box-shadow: 0 0 14px var(--crimson-dim);
-    }
-    .camp-node.end .dot {
-      border-color: var(--gold);
+    .frag .frag-lbl::before {
+      content: "";
+      width: 5px;
+      height: 5px;
       background: var(--gold);
-      box-shadow: 0 0 14px var(--gold-dim);
+      box-shadow: 0 0 8px var(--gold-a);
     }
-    .camp-node:hover .dot, .camp-node:focus-visible .dot { transform: scale(1.3); }
-    .camp-node .label {
+    .frag .frag-body {
       font-family: var(--mono);
-      font-size: 10px;
-      color: var(--faint);
-      letter-spacing: .05em;
-      white-space: nowrap;
+      font-size: 12.5px;
+      line-height: 2.05;
+      color: var(--ink-2);
+      white-space: pre-line;
     }
-    .camp-node.start .label { color: var(--crimson); }
-    .camp-node.end .label { color: var(--gold); }
-    .campaign-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      font-family: var(--mono);
-      font-size: 12px;
-    }
-    .campaign-labels .start { color: var(--crimson); }
-    .campaign-labels .end { color: var(--gold); }
-    .campaign-note {
-      text-align: center;
-      margin-top: 28px;
-      color: var(--faint);
-      font-size: 13px;
-      font-family: var(--mono);
-    }
+    .frag--red { --px-edge: rgba(226, 72, 61, .3); }
+    .frag--red .frag-lbl { color: var(--red); }
+    .frag--red .frag-lbl::before { background: var(--red); box-shadow: 0 0 8px var(--red-a); }
 
-    /* ========== 军备图鉴 ========== */
-    .armory { padding: 60px 0; }
-    .armory-grid {
+    /* ==========================================================
+       12 · 战役 · 14 关常驻卡片（全部可见，无折叠）
+       ========================================================== */
+    .levels {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(318px, 1fr));
+      gap: 16px;
+      align-items: start;
     }
-    .armory-panel {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: var(--bg-soft);
-      padding: 26px;
+    .lv {
+      --px-c: 5px;
+      padding: 16px 18px;
+      transition: transform .28s ease;
     }
-    .armory-panel .panel-head {
+    .lv:hover { transform: translateY(-3px); }
+
+    .lv-head {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
+      align-items: baseline;
+      gap: 10px;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
       border-bottom: 1px solid var(--line);
     }
-    .armory-panel .panel-icon {
-      width: 34px; height: 34px;
-      border-radius: 4px;
-      display: flex;
+    .lv-no {
+      font-family: var(--mono);
+      font-size: 34px;
+      font-weight: 700;
+      line-height: .9;
+      letter-spacing: -.04em;
+      color: var(--gold);
+      flex: 0 0 auto;
+    }
+    .lv-code {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .06em;
+      color: var(--ink-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lv-tag {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    .lv-title {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .lv .poem {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.95;
+      color: var(--ink-2);
+      white-space: pre-line;
+      padding-left: 11px;
+      border-left: 1px solid var(--gold-a);
+    }
+
+    /* 关卡诗折叠：无 JS 时全文常显；JS 生效后收成 4 行 */
+    .lv[data-clamp="on"]:not(.is-open) .poem {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      max-height: 7.8em; /* 4 行 × 1.95 行高，作为 line-clamp 的兜底 */
+      overflow: hidden;
+    }
+    .lv-more {
+      display: none;
       align-items: center;
       justify-content: center;
+      gap: 7px;
+      margin-top: 12px;
+      /* 触摸目标：min-height 保证 ≥36px，移动端不至于点不中 */
+      min-height: 36px;
+      padding: 9px 14px;
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--ink-2);
       font-family: var(--mono);
-      font-size: 16px;
-      flex-shrink: 0;
+      font-size: 10.5px;
+      letter-spacing: .14em;
+      cursor: pointer;
+      transition: color .2s ease, border-color .2s ease;
     }
-    .armory-panel.turrets .panel-icon { border: 1px solid var(--line-strong); color: var(--ink); }
-    .armory-panel.enemies .panel-icon { border: 1px solid var(--crimson-dim); color: var(--crimson); }
-    .armory-panel h3 {
-      margin: 0;
+    .lv[data-clamp="on"] .lv-more { display: inline-flex; }
+    .lv-more:hover { color: var(--gold); border-color: var(--gold); }
+    .lv-more:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+      color: var(--gold);
+    }
+    .lv-more-ico {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid currentColor;
+      transition: transform .2s ease;
+    }
+    .lv.is-open .lv-more-ico { transform: rotate(180deg); }
+    .lv-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 13px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+    }
+    .lv-meta span {
+      border: 1px solid var(--line);
+      padding: 3px 7px;
+      color: var(--ink-3);
+      letter-spacing: .06em;
+    }
+    .lv-meta span b { color: var(--gold); font-weight: 700; }
+
+    .camp-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 26px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .camp-foot .c-start { color: var(--red); }
+    .camp-foot .c-end { color: var(--gold); }
+
+    /* ==========================================================
+       13 · 军备图鉴 · 14 座炮塔
+       ========================================================== */
+    .towers {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+      gap: 14px;
+    }
+    .tw-card {
+      --px-c: 5px;
+      padding: 14px 14px 12px;
+      transition: transform .28s ease;
+    }
+    .tw-card:hover { transform: translateY(-3px); }
+    .tw-card .tc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .18em;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+    .tw-card .tc-idx { color: var(--ink-4); }
+    .tw-card .tc-spr {
+      width: 58px;
+      height: 58px;
+      margin: 2px auto 8px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, .12));
+      transition: filter .3s ease, transform .3s ease;
+    }
+    .tw-card:hover .tc-spr {
+      transform: scale(1.07);
+      filter: drop-shadow(0 0 10px rgba(240, 198, 116, .6));
+    }
+    .tw-card .tc-name {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--ink);
+      letter-spacing: .04em;
+    }
+    .tw-card .tc-cost {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-family: var(--mono);
+      color: var(--gold);
+    }
+    .tw-card .tc-cost b { font-size: 17px; font-weight: 700; }
+    .tw-card .tc-cost i {
+      font-style: normal;
+      font-size: 10px;
+      color: var(--ink-3);
+    }
+    .tw-card .tc-role {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, .1);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--ink-3);
+      text-align: center;
+      min-height: 15px;
+    }
+
+    .armory-note {
+      margin-top: 22px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.9;
+      color: var(--ink-3);
+    }
+    .armory-note b { color: var(--gold); font-weight: 700; }
+
+    /* ==========================================================
+       14 · 威胁图鉴 · 8 类敌人能力
+       ========================================================== */
+    .threats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+    .th {
+      --px-c: 5px;
+      display: flex;
+      gap: 14px;
+      padding: 14px;
+      align-items: flex-start;
+      transition: transform .28s ease;
+    }
+    .th:hover { transform: translateY(-3px); }
+    .th-ico {
+      flex: 0 0 auto;
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(226, 72, 61, .35));
+      opacity: .92;
+    }
+    .th-body { min-width: 0; flex: 1 1 auto; }
+    .th-name {
       font-family: var(--mono);
       font-size: 15px;
       font-weight: 700;
+      color: var(--ink);
+      letter-spacing: .01em;
+      line-height: 1.3;
     }
-    .armory-panel .count {
-      margin-left: auto;
+    .th-en {
+      display: block;
+      margin-top: 4px;
       font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .armory-panel.turrets .count { color: var(--ink); }
-    .armory-panel.enemies .count { color: var(--crimson); }
-
-    .armory-desc {
-      margin: 0 0 16px;
-      font-size: 13.5px;
-      color: var(--ink-dim);
-      line-height: 1.8;
-    }
-    .armory-desc .gold { color: var(--gold); }
-
-    /* 实机可见的炮塔卡牌 */
-    .turret-cards {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .turret-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      background: var(--bg-panel);
-    }
-    .turret-card .t-icon {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      border: 1.5px solid var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      position: relative;
-    }
-    .turret-card .t-icon.orb {
-      background: radial-gradient(circle at 40% 35%, rgba(231,236,242,.3), transparent 65%);
-    }
-    .turret-card .t-icon.orb::after {
+    .th-en::before {
       content: "";
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--ink);
-      opacity: .7;
+      display: inline-block;
+      width: 10px;
+      height: 1px;
+      background: var(--red);
+      vertical-align: middle;
+      margin-right: 7px;
+      opacity: .8;
     }
-    .turret-card .t-icon.eye::before {
-      content: "";
-      width: 14px; height: 2px;
-      background: var(--ink);
-      border-radius: 2px;
+    .th-desc {
+      margin-top: 5px;
+      font-size: 12.5px;
+      line-height: 1.72;
+      color: var(--ink-2);
     }
-    .turret-card .t-icon.eye::after {
-      content: "";
-      position: absolute;
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--ink);
-    }
-    .turret-card .t-name {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--ink-dim);
-      line-height: 1.4;
-    }
-    .turret-card .t-cost {
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--gold);
-    }
-    .turret-card.locked {
-      opacity: .45;
-      border-style: dashed;
-    }
-    .turret-card.locked .t-icon {
-      border-color: var(--crimson);
-      border-style: solid;
-    }
-    .turret-card.locked .t-icon::before {
-      content: "✕";
-      color: var(--crimson);
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .turret-card.locked .t-icon.orb::after,
-    .turret-card.locked .t-icon.eye::after { display: none; }
+    .th-desc b { color: var(--ink); font-weight: 600; }
 
-    .enemy-list {
+    .enemy-roster {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
     }
-    .enemy-tag {
-      padding: 6px 12px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
+    .enemy-roster .er-lbl {
+      width: 100%;
       font-family: var(--mono);
-      font-size: 11px;
-      color: var(--ink-dim);
-      transition: all .25s;
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
     }
-    .enemy-tag:hover {
-      border-color: var(--crimson-dim);
-      color: var(--crimson);
-      background: rgba(239,68,68,.06);
+    .enemy-roster .er-lbl b { color: var(--gold); }
+    .enemy-roster span.er {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--ink-2);
+      transition: border-color .25s, color .25s, background .25s;
+    }
+    .enemy-roster span.er:hover {
+      border-color: var(--red-a);
+      color: var(--red);
+      background: var(--red-b);
     }
 
-    /* ========== 美术与叙事 ========== */
-    .art-narrative { padding: 60px 0; }
-    .an-grid {
+    /* ==========================================================
+       15 · 美术与叙事
+       ========================================================== */
+    .craft {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
     }
-    .an-card {
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: var(--bg-soft);
-      transition: border-color .35s;
+    .cf {
+      --px-c: 5px;
+      padding: 24px 22px;
+      transition: transform .3s ease;
     }
-    .an-card:hover { border-color: var(--gold-dim); }
-    .an-card .an-icon {
-      font-size: 26px;
+    .cf:hover { transform: translateY(-3px); }
+    .cf-mark {
+      width: 34px;
+      height: 34px;
       margin-bottom: 14px;
-      color: var(--gold);
-      font-family: var(--mono);
+      background-image: var(--mark);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: sepia(1) saturate(4) hue-rotate(-12deg) brightness(1.2);
+      opacity: .8;
     }
-    .an-card h3 {
-      margin: 0 0 10px;
+    .cf h3 {
       font-family: var(--mono);
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 700;
+      letter-spacing: .02em;
+      margin-bottom: 10px;
     }
-    .an-card p {
-      margin: 0;
-      font-size: 14px;
-      color: var(--ink-dim);
+    .cf p {
+      font-size: 13.5px;
       line-height: 1.85;
+      color: var(--ink-2);
     }
-    .an-card p .gold { color: var(--gold); }
+    .cf p .gold { color: var(--gold); }
 
-    /* ========== 截图 ========== */
-    .media { padding: 50px 0; }
-    .media-grid {
+    /* ==========================================================
+       16 · 截图
+       ========================================================== */
+    .shots {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
     .shot {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      cursor: pointer;
-      background: var(--bg-soft);
-      padding: 0;
-      transition: border-color .25s, transform .25s;
+      --px-c: 5px;
+      padding: 8px;
+      background: none;
+      border: 0;
+      cursor: zoom-in;
+      text-align: left;
+      transition: transform .3s ease;
     }
-    .shot:hover, .shot:focus-visible {
-      border-color: var(--gold-dim);
-      transform: translateY(-3px);
-      outline: none;
-    }
+    .shot:hover, .shot:focus-visible { transform: translateY(-3px); outline: none; }
     .shot img {
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      filter: grayscale(.25) contrast(1.05);
-      transition: filter .4s, transform .4s;
+      filter: grayscale(.55) contrast(1.06);
+      transition: filter .4s ease;
     }
-    .shot:hover img, .shot:focus-visible img {
-      filter: grayscale(0) contrast(1.1);
-      transform: scale(1.03);
+    .shot:hover img, .shot:focus-visible img { filter: grayscale(0) contrast(1.1); }
+    .shot .sh-cap {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 4px 2px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
     }
+    .shot .sh-cap em { font-style: normal; color: var(--gold); }
 
-    /* ========== 信息栏 ========== */
-    .info-grid {
-      padding: 50px 0;
+    /* ==========================================================
+       17 · 规格表
+       ========================================================== */
+    .specs {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 1px;
       background: var(--line);
       border: 1px solid var(--line);
-      border-radius: 6px;
-      overflow: hidden;
     }
-    .info-cell {
+    .sp {
       background: var(--bg);
-      padding: 20px;
-      text-align: center;
+      padding: 16px 14px;
+      transition: background .3s ease;
     }
-    .info-cell .label {
+    .sp:hover { background: var(--panel); }
+    .sp .sp-k {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.2em;
+      font-size: 9px;
+      letter-spacing: .2em;
       text-transform: uppercase;
-      color: var(--faint);
-      margin: 0 0 8px;
+      color: var(--ink-3);
+      margin-bottom: 6px;
     }
-    .info-cell .value {
-      font-size: 13.5px;
-      color: var(--ink);
+    .sp .sp-v {
+      font-size: 13px;
       font-weight: 600;
-      margin: 0;
-    }
-    .info-cell .value.gold { color: var(--gold); }
-
-    /* ========== 底部 ========== */
-    .bottom {
-      padding: 60px 0 50px;
-      text-align: center;
-    }
-    .bottom h2 {
-      margin: 0 0 14px;
-      font-family: var(--mono);
-      font-size: clamp(22px, 3.6vw, 30px);
       color: var(--ink);
+      line-height: 1.5;
     }
-    .bottom p {
-      margin: 0 0 28px;
-      color: var(--ink-dim);
+    .sp .sp-v.gold { color: var(--gold); }
+
+    /* ==========================================================
+       18 · CTA / 页脚
+       ========================================================== */
+    .cta { padding: 72px 0 40px; text-align: center; }
+    .cta h2 {
+      font-family: var(--mono);
+      font-size: clamp(22px, 3.6vw, 34px);
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .cta h2 em { font-style: normal; color: var(--gold); }
+    .cta p {
+      margin: 14px auto 30px;
+      max-width: 52ch;
       font-size: 14px;
+      color: var(--ink-2);
     }
-    .bottom .links {
-      display: inline-flex;
-      gap: 12px;
+    .cta-links {
+      display: flex;
       flex-wrap: wrap;
+      gap: 12px;
       justify-content: center;
     }
-    .bottom .links a {
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 13px 24px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      color: var(--ink);
+      gap: 10px;
+      padding: 13px 22px;
       font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
+      font-size: 11.5px;
+      letter-spacing: .12em;
       text-transform: uppercase;
-      transition: all .25s;
+      color: var(--ink);
+      border: 1px solid var(--line-2);
+      background: var(--panel);
+      transition: all .25s ease;
     }
-    .bottom .links a:hover, .bottom .links a:focus-visible {
+    .btn:hover, .btn:focus-visible {
       border-color: var(--gold);
       color: var(--gold);
-      background: var(--gold-faint);
+      background: var(--gold-c);
       outline: none;
     }
-    .bottom .links a.primary {
+    .btn--primary {
+      background: var(--gold);
       border-color: var(--gold);
       color: var(--bg);
-      background: var(--gold);
       font-weight: 700;
     }
-    .bottom .links a.primary:hover, .bottom .links a.primary:focus-visible {
-      background: #f5d48a;
-      box-shadow: 0 0 40px rgba(240,198,116,.25);
+    .btn--primary:hover, .btn--primary:focus-visible {
+      background: var(--gold-2);
       color: var(--bg);
-    }
-    .bottom .sign {
-      margin-top: 36px;
-      color: var(--faint);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
+      box-shadow: 0 0 34px rgba(240, 198, 116, .3);
     }
 
-    /* ========== Lightbox ========== */
-    .lightbox {
+    .foot {
+      padding: 30px 0 46px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .foot a:hover, .foot a:focus-visible { color: var(--gold); outline: none; }
+
+    /* ==========================================================
+       19 · Lightbox
+       ========================================================== */
+    .lb {
       position: fixed;
       inset: 0;
-      z-index: 100;
+      z-index: 200;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: rgba(0,0,0,.94);
+      background: rgba(2, 3, 5, .96);
       cursor: zoom-out;
     }
-    .lightbox.open { display: flex; }
-    .lightbox img {
-      max-width: min(1000px, 96vw);
-      max-height: 88vh;
-      border-radius: 6px;
-      box-shadow: 0 30px 100px rgba(0,0,0,.6);
+    .lb.open { display: flex; }
+    .lb img {
+      max-width: min(1040px, 94vw);
+      max-height: 86vh;
+      width: auto;
+      height: auto;
+      border: 1px solid var(--line-2);
     }
-    .lightbox .lb-close {
+    .lb-close {
       position: absolute;
-      top: 20px; right: 24px;
+      top: 18px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
       background: none;
-      border: none;
-      color: var(--ink-dim);
-      font-size: 28px;
-      cursor: pointer;
+      border: 1px solid var(--line-2);
+      color: var(--ink-2);
       font-family: var(--mono);
+      font-size: 16px;
       line-height: 1;
+      cursor: pointer;
     }
-    .lightbox .lb-close:hover, .lightbox .lb-close:focus-visible { color: var(--gold); outline: none; }
+    .lb-close:hover, .lb-close:focus-visible {
+      color: var(--gold);
+      border-color: var(--gold);
+      outline: none;
+    }
 
-    /* ========== 响应式 ========== */
-    @media (max-width: 860px) {
-      .armory-grid, .an-grid { grid-template-columns: 1fr; }
-      .media-grid { grid-template-columns: 1fr 1fr; }
-      .campaign-nodes { flex-wrap: wrap; gap: 24px 16px; justify-content: center; }
-      .campaign-line { display: none; }
-      .campaign-labels { justify-content: center; gap: 20px; }
+    /* ==========================================================
+       20 · 响应式断点
+       ========================================================== */
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 30px; }
+      .keyart { order: -1; max-width: 460px; }
+      .levels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .craft { grid-template-columns: 1fr; }
+      .hud { flex-wrap: wrap; }
+      .hud-read { flex: 1 1 100%; border-bottom: 1px solid var(--line); }
+      .hud-stats { border-left: 0; width: 100%; justify-content: space-between; }
     }
-    @media (max-width: 520px) {
-      .media-grid { grid-template-columns: 1fr; }
-      .meta-bar { border-radius: 6px; width: 100%; }
-      .meta-bar .item {
-        border-right: none;
-        border-bottom: 1px solid var(--line);
-        width: 100%;
-        text-align: center;
+
+    @media (max-width: 720px) {
+      .wrap { width: calc(100% - 32px); }
+      .sec { padding: 52px 0; }
+      .hero { padding: 20px 0 8px; }
+      .hero-grid { padding: 10px 0 30px; }
+      .stats .st { padding: 10px 14px 10px 0; margin-right: 14px; }
+      .stats .st b { font-size: 16px; }
+      .levels { grid-template-columns: 1fr; gap: 12px; }
+      .shots { grid-template-columns: 1fr; }
+      .towers { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+      .threats { grid-template-columns: 1fr; }
+      .sec-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .sec-idx { padding-bottom: 0; }
+      .topbar .tag { display: none; }
+      /* 战场：小屏横向可滑动，保持等距构图比例 */
+      .stage-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
       }
-      .meta-bar .item:last-child { border-bottom: none; }
-      .hero { padding: 36px 0 30px; }
+      .stage-scroll .board { width: 660px; max-width: none; }
+      .stage-scroll .hud { width: 660px; max-width: none; }
+      .stage-hint { display: block; }
     }
 
+    @media (max-width: 480px) {
+      .hero h1 { font-size: clamp(26px, 8.4vw, 40px); }
+      .hud-read { font-size: 10.5px; gap: 8px; }
+      .hud-stats span { padding: 9px 10px; font-size: 10px; }
+      .foot { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ==========================================================
+       21 · prefers-reduced-motion 降级
+       ========================================================== */
     @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
       *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
         animation: none !important;
+        transition: none !important;
       }
-      .reveal { opacity: 1; transform: none; }
+      .rv { opacity: 1 !important; transform: none !important; }
+      /* 动效关闭后：敌人与火花这类纯装饰元素不再移动，直接隐藏，避免定格在半途 */
+      .enemy-motion,
+      .spark,
+      .board-radar,
+      .board-wave,
+      .tw-aim,
+      .route-line { display: none !important; }
+      .route-base { stroke: rgba(255, 255, 255, .14); }
+      .board-grid { opacity: 1 !important; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- 顶部导航 -->
-    <div class="topbar">
+  <a class="skip" href="#main">跳到主要内容</a>
+  <noscript>
+    <style>
+      .rv { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
+  <div class="crt" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap">
       <a class="back" href="../../index.html">返回作品集</a>
-      <span class="tag">TOWER DEFENSE · 14 LEVELS</span>
-      <a href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">Steam</a>
+      <span class="tag">Isometric Tower Defense</span>
+      <a class="steam" href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">Steam</a>
     </div>
+  </header>
 
-    <!-- Hero -->
-    <section class="hero">
-      <p class="kicker reveal">MINIMALIST 2D TOWER DEFENSE · STEAM · 2025.05.29</p>
-
-      <div class="keyart reveal">
-        <img src="cover.jpg" alt="Archipelago Luminary 封面：黑白裂纹石纹背景上的白色锚形徽标" />
-      </div>
-
-      <div class="battlefield reveal" aria-hidden="true">
-        <div class="iso-grid"></div>
-        <div class="path"></div>
-        <div class="bf-resource">27</div>
-        <div class="bf-speed">1.0X</div>
-        <!-- 炮塔 -->
-        <div class="bf-turret" style="top:32%;left:22%;">
-          <div class="orb"></div>
-          <div class="barrel"></div>
-        </div>
-        <div class="bf-turret t2" style="top:68%;left:38%;">
-          <div class="orb"></div>
-          <div class="barrel"></div>
-        </div>
-        <div class="bf-turret t3" style="top:30%;left:62%;">
-          <div class="orb"></div>
-          <div class="barrel"></div>
-        </div>
-        <div class="bf-turret t2" style="top:70%;left:78%;">
-          <div class="orb"></div>
-          <div class="barrel"></div>
-        </div>
-        <!-- 敌人推进 -->
-        <div class="bf-enemy"></div>
-        <div class="bf-enemy e2"></div>
-        <div class="bf-enemy e3"></div>
-        <!-- 金色火花 -->
-        <div class="bf-spark" style="top:28%;left:45%;animation-delay:.4s;"></div>
-        <div class="bf-spark" style="top:62%;left:55%;animation-delay:1.6s;"></div>
-        <div class="bf-spark" style="top:40%;left:72%;animation-delay:2.4s;"></div>
-      </div>
-
-      <h1 class="reveal">ARCHIPELAGO <span class="gold">LUMINARY</span></h1>
-      <p class="cn reveal">阿奇佩拉戈 · 北落之光</p>
-      <p class="sub reveal">极简 2D 塔防。在近乎无色的战场上部署炮塔、管理资源、抵御波次——<b>颜色是稀世珍宝，直到它淹没战场</b>。14 关反攻，从最后庇护所到失去的领土。</p>
-
-      <div class="meta-bar reveal">
-        <div class="item"><b>Steam</b> · ¥11</div>
-        <div class="item">发行 <b>2025.05.29</b></div>
-        <div class="item"><b>14</b> 关 / 地图</div>
-        <div class="item"><b>14</b> 成就</div>
-        <div class="item"><b>8</b> 语言</div>
-      </div>
-    </section>
-
-    <!-- 故事 -->
-    <section class="story">
-      <div class="section-head reveal">
-        <p class="kicker">// Story</p>
-        <h2>北方王国的黄昏</h2>
-      </div>
-      <div class="story-body">
-        <p class="reveal">一夜，<span class="gold">一束光</span>落入北海。从那一刻起，无尽的怪物从深处涌出。</p>
-        <p class="reveal">北方王国的人们一步步撤退，直到只剩下最后的庇护所——直到<span class="gold">人类建造了第一座炮塔</span>……</p>
-
-        <div class="story-fragment reveal">
-          <div class="label">// FRAGMENT 01 · 词源</div>
-          "Archipelago"源自希腊语，意为"散落的群岛"——映射这个破碎的世界。"Luminary"意为"发光体"——照亮核心谜团。拼凑碎片叙事与关键物品，重建被遗忘的真相。
-        </div>
-
-        <p class="reveal">跨越 <span class="gold">14 张地图</span>，从简单的通道到错综复杂的路径，一步步逼近神之所在。第四关名为<span class="gold">「独角兽」</span>——在黑白棋盘上，它是第一抹值得记住的形状。</p>
-
-        <div class="story-fragment reveal">
-          <div class="label">// FRAGMENT 02 · 设计原点</div>
-          本作灵感来自《Plants vs. Zombies》。开发者 Gove 将其前作"💩-masterpiece"《LightingForYou》的塔防骨架，重构为 stark 黑白美学下的军事极简试炼。
-        </div>
-
-        <p class="reveal">在 stark 黑白美学中，颜色成为稀世珍宝——直到它淹没战场。</p>
-      </div>
-    </section>
-
-    <!-- 反攻路线 -->
-    <section class="campaign">
-      <div class="section-head reveal">
-        <p class="kicker">// Campaign</p>
-        <h2>14 关反攻路线</h2>
-        <p>从最后庇护所，一步步收复失去的领土</p>
-      </div>
-      <div class="campaign-track reveal">
-        <div class="campaign-line"></div>
-        <div class="campaign-nodes">
-          <button class="camp-node start" type="button" aria-label="第 1 关：最后庇护所"><div class="dot"></div><div class="label">01</div></button>
-          <button class="camp-node" type="button" aria-label="第 4 关：独角兽"><div class="dot"></div><div class="label">04</div></button>
-          <button class="camp-node" type="button" aria-label="第 7 关"><div class="dot"></div><div class="label">07</div></button>
-          <button class="camp-node" type="button" aria-label="第 10 关"><div class="dot"></div><div class="label">10</div></button>
-          <button class="camp-node end" type="button" aria-label="第 14 关：Luminary 真相"><div class="dot"></div><div class="label">14</div></button>
-        </div>
-      </div>
-      <div class="campaign-labels reveal">
-        <span class="start">◂ 最后庇护所</span>
-        <span class="end">失去的领土 · Luminary 真相 ▸</span>
-      </div>
-      <p class="campaign-note reveal">每关平均 10 分钟以内（如果一切顺利），无强制推进——随时可玩。</p>
-    </section>
-
-    <!-- 军备与敌情 -->
-    <section class="armory">
-      <div class="section-head reveal">
-        <p class="kicker">// Armory</p>
-        <h2>军备与敌情</h2>
-        <p>炮塔成本逐级递增，迫使你在有限资源间做出艰难取舍</p>
-      </div>
-      <div class="armory-grid">
-        <div class="armory-panel turrets reveal">
-          <div class="panel-head">
-            <div class="panel-icon">▣</div>
-            <h3>炮塔图鉴</h3>
-            <span class="count">14+</span>
-          </div>
-          <p class="armory-desc">融合经典设计与递增成本。从战场实机可见的炮塔栏位中，你能辨认出<span class="gold">缠绕球炮塔</span>与<span class="gold">眼形侦察炮塔</span>，以及若干待解锁的锁定槽位——每一座炮塔的部署都是一次资源赌博。</p>
-          <div class="turret-cards">
-            <div class="turret-card">
-              <div class="t-icon orb"></div>
-              <div>
-                <div class="t-name">缠绕球炮塔</div>
-                <div class="t-cost">50</div>
-              </div>
-            </div>
-            <div class="turret-card">
-              <div class="t-icon eye"></div>
-              <div>
-                <div class="t-name">眼形炮塔</div>
-                <div class="t-cost">20</div>
-              </div>
-            </div>
-            <div class="turret-card locked">
-              <div class="t-icon"></div>
-              <div>
-                <div class="t-name">待解锁</div>
-                <div class="t-cost" style="color:var(--crimson);">LOCKED</div>
-              </div>
-            </div>
-            <div class="turret-card locked">
-              <div class="t-icon"></div>
-              <div>
-                <div class="t-name">待解锁</div>
-                <div class="t-cost" style="color:var(--crimson);">LOCKED</div>
-              </div>
+  <main id="main">
+    <div class="wrap">
+      <!-- ==================== HERO ==================== -->
+      <section class="hero">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="kicker rv">Minimal Isometric Tower Defense</p>
+            <h1 class="rv">Archipelago <br /><span>Luminary</span></h1>
+            <p class="cn rv">阿奇佩拉戈 · 北落之光</p>
+            <p class="lede rv">
+              极简 2D 塔防。在近乎无色的等距战场上部署炮塔、管理资源、抵御波次——
+              <b>颜色是稀世珍宝，直到它淹没战场</b>。14 关反攻，从最后的净土到阿奇佩拉戈之北。
+            </p>
+            <div class="stats rv">
+              <div class="st"><b>14</b><span>关卡</span></div>
+              <div class="st"><b>14</b><span>炮塔</span></div>
+              <div class="st"><b>14</b><span>敌人</span></div>
+              <div class="st"><b>42</b><span>关键物</span></div>
+              <div class="st"><b>9</b><span>语言</span></div>
+              <div class="st"><b>¥11</b><span>Steam</span></div>
             </div>
           </div>
+
+          <figure class="keyart px rv">
+            <img src="cover.jpg" width="616" height="353" alt="Archipelago Luminary 封面：黑白裂纹石纹背景上的白色锚形徽标" />
+            <figcaption class="ka-tag">Key Art</figcaption>
+          </figure>
         </div>
 
-        <div class="armory-panel enemies reveal">
-          <div class="panel-head">
-            <div class="panel-icon">●</div>
-            <h3>敌情简报</h3>
-            <span class="count">10+</span>
+        <!-- ==================== 等距战场 ==================== -->
+        <div class="stage rv">
+          <div class="stage-bar">
+            <span class="lbl">等距战场 · Isometric Field</span>
+            <span>悬停炮塔 · 读取真实造价</span>
           </div>
-          <p class="armory-desc">每一种敌人变体都有独特能力，在越来越疯狂的波次中推进——胜利悬于一线。它们从北海深处涌出，沿着你布防的路径逼近最后的庇护所。</p>
-          <div class="enemy-list">
-            <span class="enemy-tag">深海涌出 · 无尽波次</span>
-            <span class="enemy-tag">独特能力 × 10+ 变体</span>
-            <span class="enemy-tag">波次逐渐疯狂</span>
-            <span class="enemy-tag">胜利悬于一线</span>
-            <span class="enemy-tag">沿路径推进</span>
-            <span class="enemy-tag">逼近最后庇护所</span>
+
+          <div class="stage-scroll">
+            <div class="board" id="board">
+              <!-- 等距网格（真实 tiles.webp 菱形格律，SVG pattern 随画布缩放） -->
+              <svg class="board-grid" viewBox="0 0 1000 560" aria-hidden="true" focusable="false">
+                <defs>
+                  <pattern id="isoFill" width="128" height="64" patternUnits="userSpaceOnUse" x="64" y="32">
+                    <path d="M64 0 L128 32 L64 64 L0 32 Z" fill="#ffffff" fill-opacity=".022" />
+                  </pattern>
+                  <pattern id="isoLine" width="128" height="64" patternUnits="userSpaceOnUse">
+                    <path d="M64 0 L128 32 L64 64 L0 32 Z" fill="none" stroke="#ffffff" stroke-opacity=".09" stroke-width="1" />
+                  </pattern>
+                </defs>
+                <rect width="1000" height="560" fill="url(#isoFill)" />
+                <rect width="1000" height="560" fill="url(#isoLine)" />
+              </svg>
+
+              <div class="board-radar" aria-hidden="true"></div>
+              <div class="board-wave" aria-hidden="true"></div>
+              <div class="board-wave" aria-hidden="true"></div>
+
+              <!-- 行进路线 + 敌人 -->
+              <svg class="board-route" viewBox="0 0 1000 560" aria-hidden="true" focusable="false">
+                <defs>
+                  <path id="routePath" d="M-40 250 L180 350 L400 250 L620 350 L840 250 L1060 350" />
+                </defs>
+                <use href="#routePath" class="route-base" />
+                <use href="#routePath" class="route-line" />
+                <g class="enemy-motion">
+                  <polygon points="0,-7 7,0 0,7 -7,0" class="enemy">
+                    <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" begin="0s"><mpath href="#routePath" /></animateMotion>
+                  </polygon>
+                  <polygon points="0,-6 6,0 0,6 -6,0" class="enemy enemy--dim">
+                    <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" begin="-2.8s"><mpath href="#routePath" /></animateMotion>
+                  </polygon>
+                  <polygon points="0,-8 8,0 0,8 -8,0" class="enemy">
+                    <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" begin="-5.6s"><mpath href="#routePath" /></animateMotion>
+                  </polygon>
+                  <polygon points="0,-5 5,0 0,5 -5,0" class="enemy enemy--dim">
+                    <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" begin="-8.4s"><mpath href="#routePath" /></animateMotion>
+                  </polygon>
+                  <polygon points="0,-7 7,0 0,7 -7,0" class="enemy enemy--gold">
+                    <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" begin="-11.2s"><mpath href="#routePath" /></animateMotion>
+                  </polygon>
+                </g>
+              </svg>
+
+              <!-- 点缀地块：Ban（禁建）/ Wall（最后的净土） -->
+              <div class="tile-mark tile-mark--ban" style="--x:32%;--y:61%" aria-hidden="true"></div>
+              <div class="tile-mark tile-mark--ban" style="--x:70%;--y:39%" aria-hidden="true"></div>
+              <div class="tile-mark tile-mark--wall" style="--x:94.5%;--y:64%" aria-hidden="true"></div>
+
+              <!-- 金色火花 -->
+              <div class="spark" style="--x:18%;--y:26%;--w:2.4%;--t:4.6s;--td:0s" aria-hidden="true"></div>
+              <div class="spark" style="--x:58%;--y:15%;--w:1.8%;--t:5.4s;--td:1.2s" aria-hidden="true"></div>
+              <div class="spark" style="--x:34%;--y:63%;--w:2.8%;--t:4.2s;--td:2.1s" aria-hidden="true"></div>
+              <div class="spark" style="--x:76%;--y:74%;--w:2.2%;--t:5s;--td:.6s" aria-hidden="true"></div>
+              <div class="spark spark--streak" style="--x:42%;--y:47%;--w:7%;--t:6s;--td:3s" aria-hidden="true"></div>
+
+              <span class="board-cap board-cap--tl">最后的净土 · Sector 01</span>
+              <span class="board-cap board-cap--tr">Wave 14</span>
+              <span class="board-cap board-cap--bl">14 Towers Deployed</span>
+              <span class="board-cap board-cap--br">阿奇佩拉戈之北</span>
+
+              <!-- 14 座炮塔：真实精灵沿防线排布 -->
+              <button class="tw" type="button" style="--x:9%;--y:19.6%;--spr:url(assets/tower-00.webp);--aim:4.2s;--aimd:0s"
+                data-name="奇点" data-base="20" data-inc="20" data-role="远程点射"
+                aria-label="奇点，基础造价 20，每座递增 20，远程点射">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:23%;--y:30.4%;--spr:url(assets/tower-01.webp);--aim:5s;--aimd:-.6s"
+                data-name="所有物" data-base="0" data-inc="10" data-role="每 4 秒产 5 金"
+                aria-label="所有物，基础造价 0，每座递增 10，每 4 秒产 5 金">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:37%;--y:19.6%;--spr:url(assets/tower-02.webp);--aim:3.6s;--aimd:-1.4s"
+                data-name="蛋糕" data-base="25" data-inc="25" data-role=""
+                aria-label="蛋糕，基础造价 25，每座递增 25">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:51%;--y:30.4%;--spr:url(assets/tower-03.webp);--aim:4.6s;--aimd:-2.1s"
+                data-name="独角兽" data-base="30" data-inc="30" data-role="激光"
+                aria-label="独角兽，基础造价 30，每座递增 30，激光">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:65%;--y:19.6%;--spr:url(assets/tower-04.webp);--aim:5.4s;--aimd:-.3s"
+                data-name="讨厌" data-base="50" data-inc="50" data-role="范围溅射"
+                aria-label="讨厌，基础造价 50，每座递增 50，范围溅射">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:79%;--y:30.4%;--spr:url(assets/tower-05.webp);--aim:4s;--aimd:-1.8s"
+                data-name="社会学" data-base="20" data-inc="20" data-role=""
+                aria-label="社会学，基础造价 20，每座递增 20">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:93%;--y:19.6%;--spr:url(assets/tower-06.webp);--aim:4.8s;--aimd:-2.6s"
+                data-name="奇迹" data-base="25" data-inc="75" data-role="随机升级友军"
+                aria-label="奇迹，基础造价 25，每座递增 75，随机升级友军">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:9%;--y:78.6%;--spr:url(assets/tower-07.webp);--aim:3.8s;--aimd:-.9s"
+                data-name="海" data-base="33" data-inc="33" data-role="膨胀弹"
+                aria-label="海，基础造价 33，每座递增 33，膨胀弹">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:23%;--y:89.3%;--spr:url(assets/tower-08.webp);--aim:5.2s;--aimd:-1.5s"
+                data-name="我死后" data-base="33" data-inc="33" data-role=""
+                aria-label="我死后，基础造价 33，每座递增 33">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:37%;--y:78.6%;--spr:url(assets/tower-09.webp);--aim:4.4s;--aimd:-2.4s"
+                data-name="三段论" data-base="40" data-inc="40" data-role="高伤慢速"
+                aria-label="三段论，基础造价 40，每座递增 40，高伤慢速">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:51%;--y:89.3%;--spr:url(assets/tower-10.webp);--aim:4.9s;--aimd:-.4s"
+                data-name="门" data-base="0" data-inc="1" data-role="回本"
+                aria-label="门，基础造价 0，每座递增 1，回本">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:65%;--y:78.6%;--spr:url(assets/tower-11.webp);--aim:3.4s;--aimd:-2.9s"
+                data-name="预告片" data-base="50" data-inc="50" data-role=""
+                aria-label="预告片，基础造价 50，每座递增 50">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:79%;--y:89.3%;--spr:url(assets/tower-12.webp);--aim:5.6s;--aimd:-1.1s"
+                data-name="世界线" data-base="0" data-inc="1000" data-role="秒杀"
+                aria-label="世界线，基础造价 0，每座递增 1000，秒杀">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+              <button class="tw" type="button" style="--x:93%;--y:78.6%;--spr:url(assets/tower-13.webp);--aim:4.1s;--aimd:-2.2s"
+                data-name="矩阵" data-base="0" data-inc="1" data-role="连线"
+                aria-label="矩阵，基础造价 0，每座递增 1，连线">
+                <span class="tw-plat" aria-hidden="true"></span>
+                <span class="tw-aim" aria-hidden="true"></span>
+                <span class="tw-spr" aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <!-- HUD 读取条 -->
+            <div class="hud">
+              <div class="hud-read" id="hudRead" aria-live="polite">
+                <span class="hr-name">就绪</span>
+                <span class="hr-cost">悬停任意炮塔 · 读取真实名称与造价</span>
+              </div>
+              <div class="hud-stats" aria-hidden="true">
+                <span>Gold <b>333</b></span>
+                <span><b>1.0X</b></span>
+                <span class="hearts">♥♥♥</span>
+              </div>
+            </div>
+          </div>
+          <p class="stage-hint">← 横向滑动查看完整战场 →</p>
+        </div>
+      </section>
+
+      <!-- ==================== 故事 ==================== -->
+      <section class="sec" id="story">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">01 — Transmission Log</p>
+            <h2>一粒光坠入北方的海底</h2>
+          </div>
+          <span class="sec-idx"><b>14</b> 关 · <b>42</b> 件关键物</span>
+        </div>
+
+        <div class="log">
+          <p class="rv">一夜，<span class="gold">一粒光</span>坠入北方的海底。从那一刻起，无尽的怪物从深处涌出。</p>
+          <p class="rv">北方王国的人们一步步撤退，直到只剩下最后的净土——<span class="gold">直到人类建起第一座炮塔</span>……</p>
+
+          <div class="frag px rv">
+            <div class="frag-lbl">关键物 01 · 两点一线</div>
+            <div class="frag-body">一条笔直的线
+自亘古
+穿透现在
+直至永恒
+有人说
+有人说
+也有人说
+无知无罪无用
+无端的恶意由此滋生
+人生
+沿着整个海岸线
+直到最后的净土</div>
+          </div>
+
+          <p class="rv">跨越 <span class="gold">14 个关卡</span>，从简单的通道到错综复杂的路径，一步步逼近神之所在。故事不止于战斗——<span class="gold">42 件关键物</span>散落在关卡之间，每关三星，每星随机拾得一件，拼凑出被遗忘的真相。</p>
+
+          <div class="frag px rv">
+            <div class="frag-lbl">关键物 42 · 自然论</div>
+            <div class="frag-body">无关紧要，自然自己协调，不需要代理，人类太把自己当回事。</div>
+          </div>
+
+          <p class="rv">第四关名为<span class="gold">「他们讨厌我，我也讨厌他们」</span>；最后一关<span class="gold">「灵光一闪，诸般皆无」</span>——在阿奇佩拉戈之北，存留的人们最终还是选择战胜。</p>
+
+          <div class="frag frag--red px rv">
+            <div class="frag-lbl">设计原点</div>
+            <div class="frag-body">本作灵感来自《Plants vs. Zombies》。开发者的前作《LightingForYou》是一部叙事冒险作品；本作从零搭建塔防骨架，把叙事交给关键物与四行诗，而不是对白。两作的牵连写在名字里：前作 14 个关卡的代号（奇点、所有物、蛋糕、独角兽、讨厌、社会学、奇迹、海、我死后、三段论、门、预告片、世界线、矩阵）在这里成了 14 座炮塔的名字，而前作每一关的那句独白，也几乎原样变成了本作的关卡标题。</div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 美术与叙事 -->
-    <section class="art-narrative">
-      <div class="section-head reveal">
-        <p class="kicker">// Art &amp; Narrative</p>
-        <h2>美术与叙事</h2>
-      </div>
-      <div class="an-grid">
-        <div class="an-card reveal">
-          <div class="an-icon">◐</div>
-          <h3>黑白美学</h3>
-          <p>在 stark 黑白美学中，<span class="gold">颜色成为稀世珍宝</span>。玩家在几乎无色的等距网格战场上作战——白色炮塔、黑色棋盘、黄色资源数字——直到关键时刻颜色淹没战场。每一抹色彩都有其重量。</p>
+      <!-- ==================== 战役 ==================== -->
+      <section class="sec" id="campaign">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">02 — Campaign</p>
+            <h2>14 关反攻路线</h2>
+          </div>
+          <span class="sec-idx">14 关全部可见 · 真实关卡诗可展开</span>
         </div>
-        <div class="an-card reveal">
-          <div class="an-icon">◈</div>
-          <h3>碎片叙事</h3>
-          <p>故事不直接讲述，而是通过<span class="gold">关键物品与散落的 lore 碎片</span>逐渐拼凑。Lore hunters 可以在战场细节中重建被遗忘的真相，揭开 Luminary 的核心谜团。14 枚 Steam 成就本身即是叙事碎片。</p>
+
+        <div class="levels">
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">01</span>
+              <span class="lv-code">&lt;奇点&gt;</span>
+              <span class="lv-tag">Map 01</span>
+            </div>
+            <h3 class="lv-title">灵光一闪，诸般皆有</h3>
+            <p class="poem">一条笔直的线
+自亘古
+穿透现在
+直至永恒
+有人说
+有人说
+也有人说
+无知无罪无用
+无端的恶意由此滋生
+人生
+沿着整个海岸线
+直到最后的净土</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>333</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>1</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">02</span>
+              <span class="lv-code">&lt;所有物&gt;</span>
+              <span class="lv-tag">Map 02</span>
+            </div>
+            <h3 class="lv-title">静下来，微光如呼吸</h3>
+            <p class="poem">破碎的几何体悬浮于废墟之上
+同他引以为傲的领土一样
+人类被深埋其中
+等待一切威胁隐喻
+等待一切躁动心宁
+等到最后
+在尽头
+一个光照不到的拐角</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>33</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>2</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">03</span>
+              <span class="lv-code">&lt;蛋糕&gt;</span>
+              <span class="lv-tag">Map 03</span>
+            </div>
+            <h3 class="lv-title">好想吃，好想吃，好想吃</h3>
+            <p class="poem">重建日
+不真实存在的三角方碑
+所有人都喜欢笑着
+糖胚里流出燃烧的黑
+浇筑倒悬的
+切剖底层的
+拾起融化的身手
+我好像在哪里见过
+&lt;你&gt;的诞生</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>33</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>3</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">04</span>
+              <span class="lv-code">&lt;独角兽&gt;</span>
+              <span class="lv-tag">Map 04</span>
+            </div>
+            <h3 class="lv-title">我刚好有一只，借你玩玩</h3>
+            <p class="poem">并非借口
+不是理由
+玻璃做的迷宫永远也困不住
+即便涂满喜欢的颜色
+除非谁又在其中看到了自己
+毕竟连瞳孔也记不住
+所有纸做的事
+诱捕那些害虫的兽</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>0</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>4</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">05</span>
+              <span class="lv-code">&lt;讨厌&gt;</span>
+              <span class="lv-tag">Map 05</span>
+            </div>
+            <h3 class="lv-title">他们讨厌我，我也讨厌他们</h3>
+            <p class="poem">不必多言
+当熔岩凝固成棋盘
+彼此都再难以下手
+这里的每一块碎片
+并非是在刻意强调
+勋章与花和谁
+那些说不出口的话
+那些最后成为哑巴的人</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>33</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>5</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">06</span>
+              <span class="lv-code">&lt;社会学&gt;</span>
+              <span class="lv-tag">Map 06</span>
+            </div>
+            <h3 class="lv-title">我想静静，但母亲电脑不让</h3>
+            <p class="poem">与日出无关的时候
+与月落无关的地方
+液态的记忆无法长存
+至今却仍有人谈论日月的美丽
+即便从未见过真实
+大家也在幻想
+还不懂吗
+曾有一粒光落此地</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>70</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">07</span>
+              <span class="lv-code">&lt;奇迹&gt;</span>
+              <span class="lv-tag">Map 07</span>
+            </div>
+            <h3 class="lv-title">小时候的奇迹轻而易举</h3>
+            <p class="poem">标签和标本
+上述玻璃成为容器
+血管里长出两钟幼虫
+树叶在夹层中枯败
+书页里流淌着泥沙
+那些如星星般数目的
+终将如星星般闪耀
+现在
+如星星般黯然无光</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>40</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">08</span>
+              <span class="lv-code">&lt;海&gt;</span>
+              <span class="lv-tag">Map 08</span>
+            </div>
+            <h3 class="lv-title">你知道我说的不止是海</h3>
+            <p class="poem">接下来
+睁开眼
+按照做
+想象雪山
+想象雨林
+再想象太阳
+闭上眼
+直到记忆自深海里涌来
+此刻是从未见过的珍奇罗列
+睁开眼
+很难不去再去想象</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>33</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">09</span>
+              <span class="lv-code">&lt;我死后&gt;</span>
+              <span class="lv-tag">Map 09</span>
+            </div>
+            <h3 class="lv-title">尽管仍然年轻，但这也说不准</h3>
+            <p class="poem">一种不痛的方法
+一些必要的牺牲
+一群无辜的生命
+还在担心什么
+犹豫同光粒般永恒
+不用保持这个姿势
+不必反复按下按钮
+做&lt;你&gt;想做的事
+以一种更疯狂的形态</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>50</b></span>
+              <span>无自动收益</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">10</span>
+              <span class="lv-code">&lt;三段论&gt;</span>
+              <span class="lv-tag">Map 10</span>
+            </div>
+            <h3 class="lv-title">山正在来</h3>
+            <p class="poem">真相
+至少从落水的那一刻起
+直到现在人们偶尔还会讨论
+流星般的轨迹
+究竟要如何牵制
+又如何吸引
+纯粹理性的化身闭上第三只眼
+整个世界都变得触手可及</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>10</b></span>
+              <span>自动 <b>+1</b>/秒</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">11</span>
+              <span class="lv-code">&lt;门&gt;</span>
+              <span class="lv-tag">Map 11</span>
+            </div>
+            <h3 class="lv-title">通道或者隔阂，这是一个问题</h3>
+            <p class="poem">亲爱的
+不必开门
+一点题外话罢
+即便我们还隔着一片海的距离
+墙
+墙外的人形变幻莫测
+墙外的声音扑簌迷离
+所以我说
+人的一生应该还是要多开门看看才行</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>3333</b></span>
+              <span>自动 <b>+10</b>/秒</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">12</span>
+              <span class="lv-code">&lt;预告片&gt;</span>
+              <span class="lv-tag">Map 12</span>
+            </div>
+            <h3 class="lv-title">在过去，预言家看到了未来</h3>
+            <p class="poem">闭口不谈短暂与永恒的联系
+时间自始自终
+都是最开始的线
+早有人料到这场灾难
+三角形们清理世界的诟病
+所有不同版本的故事
+快进到同一个结局</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>34</b></span>
+              <span>无自动收益</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">13</span>
+              <span class="lv-code">&lt;世界线&gt;</span>
+              <span class="lv-tag">Map 13</span>
+            </div>
+            <h3 class="lv-title">龙不吃青草与肉，蛇只吃自己的手</h3>
+            <p class="poem">另一个&lt;你&gt;
+倒三角的神
+闭眼掷下
+一粒光
+一矢中的
+一处世界的根源
+和它的蛀虫们
+现在暴露无遗</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>0</b></span>
+              <span>无自动收益</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
+          <article class="lv px rv">
+            <div class="lv-head">
+              <span class="lv-no">14</span>
+              <span class="lv-code">&lt;矩阵&gt;</span>
+              <span class="lv-tag">Map 14</span>
+            </div>
+            <h3 class="lv-title">另一位观察者阻止了你的访问</h3>
+            <p class="poem">阿奇佩拉戈之北
+存留的人们最终还是选择战胜
+一个通俗故事的结局
+没有一点想象的余地
+在&lt;你&gt;回收光粒之前
+再看最后一眼
+北落之光</p>
+            <button class="lv-more" type="button" aria-expanded="false">
+              <span class="lv-more-txt">展开全文</span>
+              <span class="lv-more-ico" aria-hidden="true"></span>
+            </button>
+            <div class="lv-meta">
+              <span>起始黄金 <b>0</b></span>
+              <span>自动 <b>+50</b>/秒</span>
+              <span>可用炮塔 <b>6</b> 座</span>
+            </div>
+          </article>
         </div>
-      </div>
-    </section>
 
-    <!-- 截图 -->
-    <section class="media">
-      <div class="section-head reveal">
-        <p class="kicker">// Screenshots</p>
-        <h2>实机画面</h2>
-      </div>
-      <div class="media-grid">
-        <button class="shot reveal" type="button" aria-label="放大截图 1：实机战斗画面">
-          <img src="screenshot-01.jpg" alt="Archipelago Luminary 实机战斗：黑色等距网格战场上部署了白色圆形炮塔，左侧显示炮塔选择栏与黄色资源数字，顶部有生命值红心和 1.0X 速度控制" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图 2：游戏徽标（低分辨率）">
-          <img src="screenshot-02.jpg" alt="Archipelago Luminary 徽标：黑白三角形锚形图案（低分辨率素材）" loading="lazy" />
-        </button>
-        <button class="shot reveal" type="button" aria-label="放大截图 3：标题画面">
-          <img src="screenshot-03.jpg" alt="Archipelago Luminary 标题画面：黑白裂纹石纹背景上的白色锚形徽标与游戏名" loading="lazy" />
-        </button>
-      </div>
-    </section>
+        <div class="camp-foot rv">
+          <span class="c-start">◂ 最后的净土</span>
+          <span>每关平均 10 分钟以内（如果一切顺利），无强制推进——随时可玩。</span>
+          <span class="c-end">阿奇佩拉戈之北 · 北落之光 ▸</span>
+        </div>
+      </section>
 
-    <!-- 信息栏 -->
-    <section class="info-grid reveal">
-      <div class="info-cell">
-        <p class="label">平台</p>
-        <p class="value">Steam · PC</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">价格</p>
-        <p class="value gold">¥ 11.00</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">发行日期</p>
-        <p class="value">2025.05.29</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">类型</p>
-        <p class="value">塔防 / 策略 / 极简</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">关卡 / 地图</p>
-        <p class="value">14 关</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">成就</p>
-        <p class="value">14 个 Steam 成就</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">语言</p>
-        <p class="value">8 种（含简中）</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">灵感来源</p>
-        <p class="value">Plants vs. Zombies</p>
-      </div>
-      <div class="info-cell">
-        <p class="label">开发 / 发行</p>
-        <p class="value">Gove</p>
-      </div>
-    </section>
+      <!-- ==================== 军备图鉴 ==================== -->
+      <section class="sec" id="armory">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">03 — Armory</p>
+            <h2>14 座炮塔 · <em>真实造价</em></h2>
+          </div>
+          <span class="sec-idx">成本随已建数量递增</span>
+        </div>
 
-    <!-- 底部 -->
-    <section class="bottom">
-      <h2 class="reveal">加入反攻</h2>
-      <p class="reveal">在 Steam 购买，从最后庇护所开始，一步步揭开 Luminary 的真相。</p>
-      <div class="links reveal">
-        <a class="primary" href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">在 Steam 购买 ¥11 -></a>
-        <a href="https://www.bilibili.com/video/BV1b97HzqEkS/" target="_blank" rel="noreferrer">Bilibili 演示 -></a>
-        <a href="../../index.html">返回作品集 -></a>
-      </div>
-      <p class="sign">ARCHIPELAGO LUMINARY — GOVE · 2025 · STEAM</p>
-    </section>
+        <div class="towers">
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">00</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-00.webp" width="192" height="192" alt="奇点 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">奇点</div>
+            <div class="tc-cost"><b>20</b><i>+ 20</i></div>
+            <div class="tc-role">远程点射</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">01</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-01.webp" width="192" height="192" alt="所有物 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">所有物</div>
+            <div class="tc-cost"><b>0</b><i>+ 10</i></div>
+            <div class="tc-role">每 4 秒产 5 金</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">02</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-02.webp" width="192" height="192" alt="蛋糕 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">蛋糕</div>
+            <div class="tc-cost"><b>25</b><i>+ 25</i></div>
+            <div class="tc-role"></div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">03</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-03.webp" width="192" height="192" alt="独角兽 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">独角兽</div>
+            <div class="tc-cost"><b>30</b><i>+ 30</i></div>
+            <div class="tc-role">激光</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">04</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-04.webp" width="192" height="192" alt="讨厌 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">讨厌</div>
+            <div class="tc-cost"><b>50</b><i>+ 50</i></div>
+            <div class="tc-role">范围溅射</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">05</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-05.webp" width="192" height="192" alt="社会学 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">社会学</div>
+            <div class="tc-cost"><b>20</b><i>+ 20</i></div>
+            <div class="tc-role"></div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">06</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-06.webp" width="192" height="192" alt="奇迹 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">奇迹</div>
+            <div class="tc-cost"><b>25</b><i>+ 75</i></div>
+            <div class="tc-role">随机升级友军</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">07</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-07.webp" width="192" height="192" alt="海 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">海</div>
+            <div class="tc-cost"><b>33</b><i>+ 33</i></div>
+            <div class="tc-role">膨胀弹</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">08</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-08.webp" width="192" height="192" alt="我死后 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">我死后</div>
+            <div class="tc-cost"><b>33</b><i>+ 33</i></div>
+            <div class="tc-role"></div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">09</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-09.webp" width="192" height="192" alt="三段论 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">三段论</div>
+            <div class="tc-cost"><b>40</b><i>+ 40</i></div>
+            <div class="tc-role">高伤慢速</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">10</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-10.webp" width="192" height="192" alt="门 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">门</div>
+            <div class="tc-cost"><b>0</b><i>+ 1</i></div>
+            <div class="tc-role">回本</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">11</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-11.webp" width="192" height="192" alt="预告片 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">预告片</div>
+            <div class="tc-cost"><b>50</b><i>+ 50</i></div>
+            <div class="tc-role"></div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">12</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-12.webp" width="192" height="192" alt="世界线 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">世界线</div>
+            <div class="tc-cost"><b>0</b><i>+ 1000</i></div>
+            <div class="tc-role">秒杀</div>
+          </article>
+
+          <article class="tw-card px rv">
+            <div class="tc-top"><span class="tc-idx">13</span><span>Turret</span></div>
+            <img class="tc-spr" src="assets/tower-13.webp" width="192" height="192" alt="矩阵 炮塔图标" loading="lazy" decoding="async" />
+            <div class="tc-name">矩阵</div>
+            <div class="tc-cost"><b>0</b><i>+ 1</i></div>
+            <div class="tc-role">连线</div>
+          </article>
+        </div>
+
+        <p class="armory-note rv">
+          造价格式为 <b>基础 + 每座递增</b>。全部 14 座炮塔都以哲学名词命名，各自只做一件事；每座炮塔有且仅有一次升级。
+          建造时左键选中炮塔后点击地块，右键拖动视野、滚轮缩放，时间可在 0 / 0.5 / 1 / 1.5 / 2 倍间循环切换。
+        </p>
+      </section>
+
+      <!-- ==================== 威胁图鉴 ==================== -->
+      <section class="sec" id="threats">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">04 — Threat Index</p>
+            <h2>8 类能力 · <em>14 种敌人</em></h2>
+          </div>
+          <span class="sec-idx">图标取自游戏内能力标记</span>
+        </div>
+
+        <div class="threats">
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-normal.webp" width="128" height="128" alt="增血能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">增血<span class="th-en">Health</span></div>
+              <p class="th-desc">生命提升至 <b>150%</b>，与加速同源。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-speed.webp" width="128" height="128" alt="加速能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">加速<span class="th-en">Speed</span></div>
+              <p class="th-desc">速度提升至 <b>150%</b>，冲线更快。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-hunter.webp" width="128" height="128" alt="猎手能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">猎手<span class="th-en">Hunter</span></div>
+              <p class="th-desc">死亡时摧毁范围内 <b>3 格</b>的炮塔。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-imm.webp" width="128" height="128" alt="减伤能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">减伤<span class="th-en">Damage Immunity</span></div>
+              <p class="th-desc">伤害免疫 <b>33%</b>，与加速同体。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-immmunty.webp" width="128" height="128" alt="回血能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">回血<span class="th-en">Heal</span></div>
+              <p class="th-desc">每秒为范围内友军恢复 <b>5 点</b>生命，范围 <b>3</b>。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-speed-hurt.webp" width="128" height="128" alt="受伤闪现能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">受伤闪现<span class="th-en">Hurt Teleport</span></div>
+              <p class="th-desc">每次受伤向前瞬移 <b>1 格</b>，冷却 <b>1 秒</b>。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-split.webp" width="128" height="128" alt="复活能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">复活<span class="th-en">Revive</span></div>
+              <p class="th-desc">死亡后延迟 <b>5 秒</b>，分裂出 <b>1 个</b>复制体。</p>
+            </div>
+          </article>
+
+          <article class="th px px--red rv">
+            <img class="th-ico" src="assets/enemy-summ.webp" width="128" height="128" alt="召唤能力图标" loading="lazy" decoding="async" />
+            <div class="th-body">
+              <div class="th-name">召唤<span class="th-en">Summon</span></div>
+              <p class="th-desc">死亡时召唤新的普通敌人。</p>
+            </div>
+          </article>
+        </div>
+
+        <p class="armory-note rv">
+          另有<b>伪免疫</b>：每 5 秒静止 1 秒，期间完全免伤（与减伤共用同一能力标记）。
+          14 种敌人各有独特能力，在越来越疯狂的波次中推进——胜利悬于一线。
+        </p>
+
+        <div class="enemy-roster rv">
+          <div class="er-lbl">14 种敌人 · <b>各有名称与专属描述</b></div>
+          <span class="er">万物的钟点时</span>
+          <span class="er">我与我自己</span>
+          <span class="er">美味食物的下巴</span>
+          <span class="er">一份生物目击报告</span>
+          <span class="er">想触碰又收回的手</span>
+          <span class="er">现在轮到谁</span>
+          <span class="er">向上下坠</span>
+          <span class="er">随之沉沦于深蓝</span>
+          <span class="er">所有的目光注视着</span>
+          <span class="er">当风吹过心间</span>
+          <span class="er">开关的可能性探讨</span>
+          <span class="er">消失的第十天夜里</span>
+          <span class="er">逃离一个时代的悲剧</span>
+          <span class="er">被困在十字中央</span>
+        </div>
+      </section>
+
+      <!-- ==================== 美术与叙事 ==================== -->
+      <section class="sec" id="craft">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">05 — Art &amp; Narrative</p>
+            <h2>黑白是底，<em>颜色是珍宝</em></h2>
+          </div>
+          <span class="sec-idx">9 语言 · 240 条文案</span>
+        </div>
+
+        <div class="craft">
+          <article class="cf px rv">
+            <div class="cf-mark" style="--mark:url(assets/circle_01.webp)" aria-hidden="true"></div>
+            <h3>黑白美学</h3>
+            <p>在<span class="gold">黑白分明的美学</span>中，<span class="gold">颜色成为稀世珍宝</span>。玩家在几乎无色的等距网格战场上作战——白色炮塔、黑色棋盘、金色资源数字——直到关键时刻颜色淹没战场。每一抹色彩都有其重量。</p>
+          </article>
+
+          <article class="cf px rv">
+            <div class="cf-mark" style="--mark:url(assets/symbol_01.webp)" aria-hidden="true"></div>
+            <h3>碎片叙事</h3>
+            <p>故事不直接讲述，而是通过<span class="gold">关键物与四行诗</span>逐渐拼凑：42 件关键物各有名称与描述，14 座炮塔各有基础与升级两首四行诗，14 种敌人各有描述。剧情猎手可以在这些碎片中重建被遗忘的真相，揭开 Luminary 的核心谜团。</p>
+          </article>
+
+          <article class="cf px rv">
+            <div class="cf-mark" style="--mark:url(assets/symbol_02.webp)" aria-hidden="true"></div>
+            <h3>九种语言</h3>
+            <p>语言表覆盖<span class="gold">简体中文、繁體中文、English、日本語、한국어、Русский、Français、Deutsch、Español</span> 九种，每种各 240 条文案，逐条独立翻译（仅「Archipelago」「光子」等少数专名在各语言中写法相同）。首次启动时会读取 Steam 客户端语言并自动切换，也可在设置中循环切换。</p>
+          </article>
+
+          <article class="cf px rv">
+            <div class="cf-mark" style="--mark:url(assets/star_09.webp)" aria-hidden="true"></div>
+            <h3>极简操作</h3>
+            <p>左键选中炮塔后点击地块建造；右键拖动视野、滚轮缩放，右键点击炮塔或敌人聚焦查看；时间可在<span class="gold">0 / 0.5 / 1 / 1.5 / 2 倍</span>间循环切换。生命最多承受三次伤害，每次点击红心会随机升级一座已建炮塔，但代价是一点生命。</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==================== 截图 ==================== -->
+      <section class="sec" id="shots">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">06 — Capture</p>
+            <h2>实机画面</h2>
+          </div>
+          <span class="sec-idx">点击放大</span>
+        </div>
+
+        <div class="shots">
+          <button class="shot px rv" type="button" aria-label="放大截图：实机战斗画面">
+            <img src="screenshot-01.jpg" width="1920" height="1080" alt="Archipelago Luminary 实机战斗：黑色等距网格战场上部署了白色圆形炮塔，左侧显示炮塔选择栏与金色资源数字，顶部有生命值红心和 1.0X 速度控制" loading="lazy" decoding="async" />
+            <span class="sh-cap"><span>Battlefield</span><em>01</em></span>
+          </button>
+
+          <button class="shot px rv" type="button" aria-label="放大截图：标题画面">
+            <img src="screenshot-03.jpg" width="460" height="215" alt="Archipelago Luminary 标题画面：黑白裂纹石纹背景上的白色锚形徽标与游戏名" loading="lazy" decoding="async" />
+            <span class="sh-cap"><span>Title Screen</span><em>02</em></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== 规格表 ==================== -->
+      <section class="sec" id="specs">
+        <div class="sec-head rv">
+          <div>
+            <p class="kicker">07 — Spec Sheet</p>
+            <h2>作品规格</h2>
+          </div>
+          <span class="sec-idx">steam_appid <b>3744990</b></span>
+        </div>
+
+        <div class="specs rv">
+          <div class="sp"><div class="sp-k">平台</div><div class="sp-v">Steam · PC</div></div>
+          <div class="sp"><div class="sp-k">价格</div><div class="sp-v gold">¥ 11.00</div></div>
+          <div class="sp"><div class="sp-k">发行日期</div><div class="sp-v">2025.05.29</div></div>
+          <div class="sp"><div class="sp-k">类型</div><div class="sp-v">塔防 / 策略 / 极简</div></div>
+          <div class="sp"><div class="sp-k">关卡 / 地图</div><div class="sp-v">14 关 / 15 张地图</div></div>
+          <div class="sp"><div class="sp-k">炮塔 / 敌人</div><div class="sp-v">14 座 / 14 种</div></div>
+          <div class="sp"><div class="sp-k">关键物</div><div class="sp-v">42 件</div></div>
+          <div class="sp"><div class="sp-k">成就</div><div class="sp-v">15 个 Steam 成就</div></div>
+          <div class="sp"><div class="sp-k">语言</div><div class="sp-v">9 种（含简中）</div></div>
+          <div class="sp"><div class="sp-k">灵感来源</div><div class="sp-v">Plants vs. Zombies</div></div>
+          <div class="sp"><div class="sp-k">开发 / 发行</div><div class="sp-v">Gove</div></div>
+          <div class="sp"><div class="sp-k">引擎</div><div class="sp-v">Unity 6000.0.59f2</div></div>
+        </div>
+      </section>
+
+      <!-- ==================== CTA ==================== -->
+      <section class="cta">
+        <h2 class="rv">加入反攻 <em>· Join the Counterattack</em></h2>
+        <p class="rv">在 Steam 购买，从最后的净土开始，一步步揭开 Luminary 的真相。</p>
+        <div class="cta-links rv">
+          <a class="btn btn--primary" href="https://store.steampowered.com/app/3744990/Archipelago_Luminary/" target="_blank" rel="noreferrer">在 Steam 购买 ¥11 →</a>
+          <a class="btn" href="https://www.bilibili.com/video/BV1b97HzqEkS/" target="_blank" rel="noreferrer">Bilibili 演示 →</a>
+          <a class="btn" href="../../index.html">返回作品集 →</a>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>Archipelago Luminary — Gove · 2025 · Steam</span>
+        <span><a href="../../index.html">← 返回作品集</a></span>
+      </footer>
+    </div>
+  </main>
+
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="截图放大查看">
+    <button class="lb-close" type="button" id="lbClose" aria-label="关闭">✕</button>
+    <img id="lbImg" alt="放大的游戏截图" width="1920" height="1080" />
   </div>
-
-  <!-- Lightbox -->
-  <div class="lightbox" role="dialog" aria-modal="true" aria-label="截图放大查看">
-    <button class="lb-close" type="button" aria-label="关闭">✕</button>
-    <img src="" alt="放大的游戏截图" />
-  </div>
-
   <script>
     (function () {
-      // 滚动浮现
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) {
-            en.target.classList.add('in');
-            io.unobserve(en.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      'use strict';
 
-      // Lightbox
-      var overlay = document.querySelector('.lightbox');
-      var big = overlay.querySelector('img');
-      var closeBtn = overlay.querySelector('.lb-close');
+      /* ---------- 1. 滚动浮现 ---------- */
+      var rvEls = document.querySelectorAll('.rv');
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) {
+              en.target.classList.add('in');
+              io.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        Array.prototype.forEach.call(rvEls, function (el) { io.observe(el); });
+        // 兜底：观察器若因异常或环境限制而未触发，2.4 秒后强制全部可见，避免整页空白
+        window.setTimeout(function () {
+          Array.prototype.forEach.call(rvEls, function (el) { el.classList.add('in'); });
+        }, 2400);
+      } else {
+        Array.prototype.forEach.call(rvEls, function (el) { el.classList.add('in'); });
+      }
+
+      /* ---------- 3. 战场炮塔读数（真实名称 + 真实造价） ---------- */
+      var read = document.getElementById('hudRead');
+      var board = document.getElementById('board');
+      var towers = document.querySelectorAll('.tw');
+
+      if (read) {
+        var idleHTML = read.innerHTML;
+
+        var showTower = function (el) {
+          var name = el.getAttribute('data-name') || '';
+          var base = el.getAttribute('data-base') || '0';
+          var inc = el.getAttribute('data-inc') || '0';
+          var role = el.getAttribute('data-role') || '';
+          var html = '<span class="hr-name">' + name + '</span>' +
+                     '<span class="hr-cost">基础 ' + base + ' · 递增 ' + inc + '</span>';
+          if (role) {
+            html += '<span class="hr-role">' + role + '</span>';
+          }
+          read.innerHTML = html;
+        };
+
+        Array.prototype.forEach.call(towers, function (t) {
+          t.addEventListener('mouseenter', function () { showTower(t); });
+          t.addEventListener('focus', function () { showTower(t); });
+          t.addEventListener('click', function () { showTower(t); });
+        });
+
+        if (board) {
+          board.addEventListener('mouseleave', function () {
+            read.innerHTML = idleHTML;
+          });
+        }
+      }
+
+      /* ---------- 4. Lightbox ---------- */
+      var lb = document.getElementById('lb');
+      var lbImg = document.getElementById('lbImg');
+      var lbClose = document.getElementById('lbClose');
       var lastTrigger = null;
 
-      function openLB(src, alt) {
-        big.src = src;
-        big.alt = alt || '放大的游戏截图';
-        overlay.classList.add('open');
-      }
-      function closeLB() {
-        overlay.classList.remove('open');
-        if (lastTrigger) { lastTrigger.focus(); lastTrigger = null; }
-      }
+      if (lb && lbImg && lbClose) {
+        var openLB = function (src, alt, trigger) {
+          lastTrigger = trigger || null;
+          lbImg.setAttribute('src', src);
+          lbImg.setAttribute('alt', alt || '放大的游戏截图');
+          lb.classList.add('open');
+          lbClose.focus();
+        };
 
-      document.querySelectorAll('.shot').forEach(function (s) {
-        s.addEventListener('click', function () {
-          var img = s.querySelector('img');
-          lastTrigger = s;
-          openLB(img.src, img.alt);
-        });
-        s.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
+        var closeLB = function () {
+          if (!lb.classList.contains('open')) return;
+          lb.classList.remove('open');
+          lbImg.removeAttribute('src');
+          if (lastTrigger && lastTrigger.focus) {
+            lastTrigger.focus();
+            lastTrigger = null;
+          }
+        };
+
+        Array.prototype.forEach.call(document.querySelectorAll('.shot'), function (s) {
+          s.addEventListener('click', function () {
             var img = s.querySelector('img');
-            lastTrigger = s;
-            openLB(img.src, img.alt);
+            if (img) openLB(img.getAttribute('src'), img.getAttribute('alt'), s);
+          });
+        });
+
+        lb.addEventListener('click', function (e) {
+          if (e.target === lb || e.target === lbImg) closeLB();
+        });
+        lbClose.addEventListener('click', closeLB);
+
+        window.addEventListener('keydown', function (e) {
+          if (!lb.classList.contains('open')) return;
+          if (e.key === 'Escape') {
+            closeLB();
+            return;
+          }
+          if (e.key === 'Tab') {
+            /* 焦点陷阱：对话框内只有一个可聚焦控件 */
+            e.preventDefault();
+            lbClose.focus();
           }
         });
-      });
+      }
 
-      overlay.addEventListener('click', function (e) {
-        if (e.target === overlay || e.target === big) { closeLB(); }
-      });
-      closeBtn.addEventListener('click', closeLB);
-      window.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && overlay.classList.contains('open')) { closeLB(); }
-      });
+      /* ---------- 5. 关卡诗折叠 ----------
+         无 JS 时 .lv 没有 data-clamp 属性，正文天然全文可见；
+         只有 JS 跑起来才收成 4 行，并显示「展开全文」按钮。 */
+      var lvCards = document.querySelectorAll('.lv');
+      if (lvCards.length) {
+        Array.prototype.forEach.call(lvCards, function (card) {
+          var more = card.querySelector('.lv-more');
+          var poem = card.querySelector('.poem');
+          if (!more || !poem) return;
+
+          card.setAttribute('data-clamp', 'on');
+
+          var sync = function () {
+            var open = card.classList.contains('is-open');
+            more.setAttribute('aria-expanded', open ? 'true' : 'false');
+            var txt = more.querySelector('.lv-more-txt');
+            if (txt) txt.textContent = open ? '收起' : '展开全文';
+          };
+
+          /* 内容不足 4 行时按钮没有意义，直接隐藏（用内联样式，避免被
+             `.lv[data-clamp="on"] .lv-more { display:inline-flex }` 的优先级盖掉） */
+          if (poem.scrollHeight <= poem.clientHeight + 2) {
+            more.style.display = 'none';
+          }
+
+          more.addEventListener('click', function () {
+            card.classList.toggle('is-open');
+            sync();
+          });
+
+          sync();
+        });
+      }
     })();
   </script>
 </body>

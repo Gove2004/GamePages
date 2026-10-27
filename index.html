@@ -399,17 +399,33 @@
       z-index: 90; display: flex; flex-direction: column; gap: 16px;
     }
     .rail a {
+      position: relative;
       display: flex; align-items: center; gap: 10px;
       font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
       color: var(--rc, var(--subtle)); opacity: .55;
       transition: opacity .25s, transform .25s;
     }
-    .rail a:hover, .rail a.cur { opacity: 1; transform: translateX(-4px); }
+    .rail a:hover, .rail a.cur, .rail a:focus-visible { opacity: 1; transform: translateX(-4px); }
     .rail a::before {
-      content: ""; width: 18px; height: 1px; background: currentColor;
+      content: ""; width: 18px; height: 1px; background: currentColor; flex: none;
     }
-    .rail a span { opacity: 0; transition: opacity .25s; }
-    .rail a:hover span, .rail a.cur span { opacity: .9; }
+    /* 游戏名做成悬浮标签：绝对定位、不占布局宽度。
+       这样侧栏宽度只取决于「刻度线 + 编号」，不会因游戏名长短把侧栏撑宽、
+       进而压住 .gate-inner 的右栏并吃掉那块区域的点击。 */
+    .rail a::after {
+      content: attr(data-name);
+      position: absolute; right: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%);
+      padding: 4px 9px;
+      font-size: 10px; letter-spacing: .12em; white-space: nowrap;
+      color: var(--text);
+      background: rgba(6, 7, 12, .94);
+      border: 1px solid var(--line2);
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .rail a:hover::after,
+    .rail a:focus-visible::after { opacity: 1; }
 
     /* ============ 关于区 ============ */
     .about { padding: 120px clamp(20px, 6vw, 84px); background: var(--bg); border-top: 1px solid var(--line); }
@@ -444,6 +460,11 @@
     .d1 { transition-delay: .08s; } .d2 { transition-delay: .18s; } .d3 { transition-delay: .28s; }
 
     /* ============ 响应式 ============ */
+    /* 桌面端给右侧目录栏留一条专用通道：侧栏占右侧约 62px，
+       正文左右各留 78px，两边对称、正文不会钻到侧栏底下被吃掉点击。 */
+    @media (min-width: 981px) {
+      .gate { padding-left: 78px; padding-right: 78px; }
+    }
     @media (max-width: 980px) {
       .rail { display: none; }
     }
@@ -492,7 +513,7 @@
     <div class="nav-links" id="navLinks">
       <a href="#lighting">LightingForYou</a>
       <a href="#unreal">Unreal Objects</a>
-      <a href="#luminary">Archipelago</a>
+      <a href="#luminary">Archipelago Luminary</a>
       <a href="#bug">Bug God</a>
       <a href="#slime">史莱姆牌</a>
       <a href="#six">瑟克斯遗纪</a>
@@ -535,13 +556,13 @@
         <div class="info">
           <p class="kicker reveal d1">01 / 2024.12 · TapTap · 叙事冒险</p>
           <h2 class="reveal d1">LightingForYou</h2>
-          <p class="tagline reveal d2">黑暗中一粒光。14 个关卡，14 个隐藏故事。</p>
-          <p class="desc reveal d2">每个人的生活都缺了一点光。即便通关 14 关、解锁 14 个隐藏故事，你也不会找到那一点光——但你可能会突然想起来，为什么会少了它。微弱视野、光量 5 级。</p>
+          <p class="tagline reveal d2">黑暗中一粒光。14 个关卡，14 段独白。</p>
+          <p class="desc reveal d2">每个人的生活都缺了一点光。从诞生、被窥探、长大，到麻木与终结——14 段隐藏独白散在 14 个关卡里，等你自己走到。光量分五级：冗余、闲置、额定、负荷、超载，越亮的路越难走。</p>
           <div class="tags reveal d3">
             <span class="tag">叙事冒险</span>
-            <span class="tag">微弱视野</span>
-            <span class="tag">光量 5 级</span>
-            <span class="tag">评分 8.8</span>
+            <span class="tag">14 段隐藏独白</span>
+            <span class="tag">光量五级</span>
+            <span class="tag">Godot 4.6</span>
           </div>
           <a class="cta reveal d3" href="games/lightingforyou/index.html">进入详情 <span class="ar">→</span></a>
         </div>
@@ -556,7 +577,7 @@
           <p class="kicker reveal d1">02 / 2025.03 · itch.io · 像素解谜</p>
           <h2 class="reveal d1">UNREAL OBJECTS</h2>
           <p class="tagline reveal d2">不可能物体的像素解谜。二维成立，三维冲突。</p>
-          <p class="desc reveal d2">彭罗斯三角形、不可能立方体、埃舍尔阶梯、恶魔音叉——四种只存在于二维的图形，用欺骗大脑的透视机制，放下习惯性的空间直觉。俯视棋盘 WASD 移动、Space 撤销、N 一次三向位移。</p>
+          <p class="desc reveal d2">彭罗斯三角形、不可能立方体、埃舍尔阶梯、恶魔音叉——四种只存在于二维的图形，用欺骗大脑的透视机制，放下习惯性的空间直觉。五张地图，WASD 走格，空格把走过的路整段倒放回去。</p>
           <div class="tags reveal d3">
             <span class="tag">像素解谜</span>
             <span class="tag">不可能图形</span>
@@ -606,11 +627,12 @@
           <p class="kicker reveal d1">03 / 2025.05 · Steam · ¥11 · 塔防策略</p>
           <h2 class="reveal d1">ARCHIPELAGO LUMINARY<span class="cn">阿奇佩拉戈：北落之光</span></h2>
           <p class="tagline reveal d2">极简 2D 塔防。黑白战场中，颜色是稀世珍宝。</p>
-          <p class="desc reveal d2">一夜，一束光落入北海，无尽怪物从深处涌出。北方王国一步步撤退到最后庇护所，直到人类建造第一座炮塔。14 关反攻，14+ 炮塔，10+ 敌人。</p>
+          <p class="desc reveal d2">一夜，一束光落入北海，无尽怪物从深处涌出。北方王国一步步撤退到最后庇护所，直到人类建造第一座炮塔。14 个关卡从「灵光一闪，诸般皆有」走到「灵光一闪，诸般皆无」，14 座炮塔、14 种敌人，每一座炮塔的升级都是一首诗。</p>
           <div class="tags reveal d3">
             <span class="tag">塔防策略</span>
             <span class="tag">黑白战场</span>
-            <span class="tag">14 关反攻</span>
+            <span class="tag">14 个关卡</span>
+            <span class="tag">14 座炮塔</span>
           </div>
           <a class="cta reveal d3" href="games/archipelago-luminary/index.html">进入详情 <span class="ar">→</span></a>
         </div>
@@ -625,11 +647,12 @@
           <p class="kicker reveal d1">04 / 2025.10 · TapTap · 概念合成</p>
           <h2 class="reveal d1">Bug Universe God</h2>
           <p class="tagline reveal d2">你相信，世界是被创造出来的吗？</p>
-          <p class="desc reveal d2">作为潜在未来的造物者，你的工作不是挥舞刀剑，而是用「原型的雏形」从光与影开始，定义神学、哲学、物理、天文……最终合成整个世界。</p>
+          <p class="desc reveal d2">你受雇于「God Universe Bug」公司，编号 20251016，日薪 5O 起。工作不是挥舞刀剑，而是用「原型的雏形」从光与影开始，把神话、哲学、物理、天文两两合成——174 条配方，8 章造物，一路升到高级造物者，然后去见白先生。</p>
           <div class="tags reveal d3">
             <span class="tag">概念合成</span>
-            <span class="tag">涂鸦实验</span>
-            <span class="tag">评分 9.0</span>
+            <span class="tag">174 条配方</span>
+            <span class="tag">8 章造物</span>
+            <span class="tag">职场黑色幽默</span>
           </div>
           <a class="cta reveal d3" href="games/bug-universe-god/index.html">进入详情 <span class="ar">→</span></a>
         </div>
@@ -660,12 +683,12 @@
           <p class="kicker reveal d1">05 / 2026.02 · TapTap · Roguelike 卡牌</p>
           <h2 class="reveal d1">第九张史莱姆牌</h2>
           <p class="tagline reveal d2">轻量 Roguelike 卡牌。8 大系列，战败归零，重新出发。</p>
-          <p class="desc reveal d2">每局从 Lv.1 开始，用手中卡牌击败层层递进的敌人。胜利扩充卡组，战败一切归零。初始、七罪、血族、坚固、科技、种子、暗影、时序——8 大系列。</p>
+          <p class="desc reveal d2">每局从 Lv.1 开始，用手中卡牌击败层层递进的敌人。胜利扩充卡组，战败一切归零。战技、剑技、炎咒、冰咒、雷咒、光咒、暗咒、秘术——144 张卡牌分作 8 大系列，48 条成就用奖杯解锁。</p>
           <div class="tags reveal d3">
             <span class="tag">Roguelike 卡牌</span>
             <span class="tag">8 大系列</span>
+            <span class="tag">144 张卡牌</span>
             <span class="tag">战败归零</span>
-            <span class="tag">评分 8.5</span>
           </div>
           <a class="cta reveal d3" href="games/ninth-slime-card/index.html">进入详情 <span class="ar">→</span></a>
         </div>
@@ -704,12 +727,12 @@
 
   <!-- 侧栏目录 -->
   <aside class="rail" aria-label="游戏目录">
-    <a href="#lighting" style="--rc:#ffd76b"><i>01</i><span>LightingForYou</span></a>
-    <a href="#unreal" style="--rc:#9b8cff"><i>02</i><span>Unreal Objects</span></a>
-    <a href="#luminary" style="--rc:#f0c674"><i>03</i><span>Archipelago</span></a>
-    <a href="#bug" style="--rc:#fb923c"><i>04</i><span>Bug God</span></a>
-    <a href="#slime" style="--rc:#2ee6ff"><i>05</i><span>史莱姆牌</span></a>
-    <a href="#six" style="--rc:#e2483c"><i>06</i><span>瑟克斯遗纪</span></a>
+    <a href="#lighting" style="--rc:#ffd76b" data-name="LightingForYou" title="LightingForYou" aria-label="LightingForYou"><i>01</i></a>
+    <a href="#unreal" style="--rc:#9b8cff" data-name="Unreal Objects" title="Unreal Objects" aria-label="Unreal Objects"><i>02</i></a>
+    <a href="#luminary" style="--rc:#f0c674" data-name="Archipelago Luminary" title="Archipelago Luminary" aria-label="Archipelago Luminary"><i>03</i></a>
+    <a href="#bug" style="--rc:#fb923c" data-name="Bug God" title="Bug God" aria-label="Bug God"><i>04</i></a>
+    <a href="#slime" style="--rc:#2ee6ff" data-name="史莱姆牌" title="史莱姆牌" aria-label="史莱姆牌"><i>05</i></a>
+    <a href="#six" style="--rc:#e2483c" data-name="瑟克斯遗纪" title="瑟克斯遗纪" aria-label="瑟克斯遗纪"><i>06</i></a>
   </aside>
 
   <!-- 关于 -->
