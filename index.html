@@ -19,6 +19,15 @@
       --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
       --hand: "Segoe Print", "Bradley Hand", "Comic Sans MS", "Marker Felt", cursive;
       --ease: cubic-bezier(.2, .7, .3, 1);
+      /* 渲染模式令牌（ART-DIRECTION 2.1）：首页 = atlas，深空石底材、
+         六门各自的 --accent 轮转，动效气质「影院取景 + chrome 退场」。 */
+      --mode: atlas;
+      --paper: var(--bg);
+      --edge: var(--line2);
+      --grain: 0.3;
+      --ease-stage: cubic-bezier(.62, .02, .28, 1);
+      --ease-overshoot: cubic-bezier(.34, 1.48, .5, 1);
+      --dur-stage: .42s;
       --c-six: #e2483c;
     }
 
