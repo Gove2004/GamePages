@@ -41,6 +41,8 @@ games/
     assets/             # 详情页使用的游戏本体真实素材（精灵图 / 卡面 / 插画，已降采样）
     fonts/              # （部分游戏）内嵌字体，附许可说明
 CNAME                   # gamepages.evog.top
+ART-DIRECTION.md        # 艺术方向设计纲领（7 条手法 + 每页渲染模式 + 实测标定）
+ART-PROGRESS.md         # 升级进度与实测数据
 NEW.md                  # 添加新游戏的指导文件（见此）
 README.md               # 本文件
 ```
@@ -63,6 +65,35 @@ README.md               # 本文件
 - 每页至少一个移动断点；全站零 CDN 外链资源
 - **深色页的质感要往亮里加，不能往暗里压**：接近纯黑的底色上，压暗的扫描线看不出来（基色亮度 5，最多只能压到 0，只有 2 级差），改用叠加暖光可做出 6 级差
 - 视口锚定的辉光用 `position: fixed` 伪元素，**不要**用 `background-attachment: fixed`（iOS Safari 会忽略该属性）
+
+## 艺术方向
+
+从参考项目 [pelican-6000-pure-code](https://github.com/wwh5441/pelican-6000-pure-code)
+（零外部位图的纯代码交互式视听长卷）提炼出一套可迁移手法，完整纲领见
+[ART-DIRECTION.md](./ART-DIRECTION.md)。
+
+**每页 = 一个「时代」**：参考项目给 20 个艺术史时代各配一整套调色板 + 渲染模式，
+本项目同样给每页一套完整令牌，而不只是换一个强调色。
+
+| 页面 | mode | 底材 | 强调色 | 动效气质 |
+|---|---|---|---|---|
+| 首页 | `atlas` | 深空石 | 六色轮转 | 影院取景 + chrome 退场 |
+| lightingforyou | `lumen` | 焦黑纸 | 暖金 | 光晕跟随、光轴呼吸 |
+| unreal-objects | `crt` | 荧光屏 | 紫罗兰 + 扫描线 | 像素量化、扫描线滚动 |
+| archipelago-luminary | `mono` | 黑白棋盘 | 金（极稀缺） | 克制、逐格推进 |
+| ninth-slime-card | `felt` | 绒布 | 冷青 + 暖金 | 翻牌、布料经纬 |
+| bug-universe-god | `dossier` | 档案纸 | 红 + 橙 | 稿纸横线、印章落款 |
+| six-elements | `slate` | 暗石板 | 六元素色 | 反应连锁、像素图标 |
+
+各页 `:root` 统一声明：`--mode`（渲染模式名）、`--paper` / `--accent` / `--edge` /
+`--grain`，以及缓动词汇 `--ease-stage`（两端收敛）、`--ease-overshoot`（过冲回落）、
+`--hz`（时间量化频率，仅像素风页面）。
+
+三个跨页统一手法：**分层光晕**（5 层同心椭圆取代单层渐变）、
+**影院外壳**（静置 2 秒后 chrome 退场）、**缓动词汇**（不再只有一个 `ease-out`）。
+具体实现与踩坑记录见 [NEW.md](./NEW.md) 的「可复用技法」。
+
+> 进度与实测数据记录在 [ART-PROGRESS.md](./ART-PROGRESS.md)。
 
 ## 内容来源（重要）
 
