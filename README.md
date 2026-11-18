@@ -41,8 +41,6 @@ games/
     assets/             # 详情页使用的游戏本体真实素材（精灵图 / 卡面 / 插画，已降采样）
     fonts/              # （部分游戏）内嵌字体，附许可说明
 CNAME                   # gamepages.evog.top
-ART-DIRECTION.md        # 艺术方向设计纲领（7 条手法 + 每页渲染模式 + 实测标定）
-ART-PROGRESS.md         # 升级进度与实测数据
 NEW.md                  # 添加新游戏的指导文件（见此）
 README.md               # 本文件
 ```
@@ -69,8 +67,7 @@ README.md               # 本文件
 ## 艺术方向
 
 从参考项目 [pelican-6000-pure-code](https://github.com/wwh5441/pelican-6000-pure-code)
-（零外部位图的纯代码交互式视听长卷）提炼出一套可迁移手法，完整纲领见
-[ART-DIRECTION.md](./ART-DIRECTION.md)。
+（零外部位图的纯代码交互式视听长卷）提炼出一套可迁移手法，落到本项目中。
 
 **每页 = 一个「时代」**：参考项目给 20 个艺术史时代各配一整套调色板 + 渲染模式，
 本项目同样给每页一套完整令牌，而不只是换一个强调色。
@@ -92,8 +89,6 @@ README.md               # 本文件
 三个跨页统一手法：**分层光晕**（5 层同心椭圆取代单层渐变）、
 **影院外壳**（静置 2 秒后 chrome 退场）、**缓动词汇**（不再只有一个 `ease-out`）。
 具体实现与踩坑记录见 [NEW.md](./NEW.md) 的「可复用技法」。
-
-> 进度与实测数据记录在 [ART-PROGRESS.md](./ART-PROGRESS.md)。
 
 ## 内容来源（重要）
 

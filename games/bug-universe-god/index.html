@@ -37,7 +37,7 @@
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
 
-  /* ---- 渲染模式令牌（ART-DIRECTION 2.1）----
+  /* ---- 渲染模式令牌----
      mode = dossier：档案纸 + 稿纸横线 + 印章落款 */
   --edge:      rgba(255, 90, 90, 0.22);
   --accent:    var(--red);
@@ -45,7 +45,7 @@
   --grain:     0.4;
   --accent-2:  var(--orange);
 
-  /* ---- 缓动词汇（ART-DIRECTION 手法 2 / 5）----
+  /* ---- 缓动词汇（手法 2 / 5）----
      两端收敛、过冲回落，替换单调的 ease-out */
   --ease-stage:   cubic-bezier(.22, .61, .36, 1);
   /* 过冲回落：终点轻微越过再收回，用于卡片的入场与印章落款 */
@@ -97,7 +97,7 @@ body {
    【分层光晕】单层 radial-gradient 是廉价的：边缘一刀切、没有厚度。
    这里每团灯叠 5 层同心椭圆，半径按 k=i/4 递变、alpha 按 (1.3-0.4k) 递减，
    复刻参考项目画墨晕的手法，做出「晕染」的过渡厚度。
-   alpha 标定参照 ART-DIRECTION 2.5：近黑底上低于 ~0.2 等于没画，
+   alpha 标定参照 2.5：近黑底上低于 ~0.2 等于没画，
    故最外层取 .30、最内层取 .12，整体落在看得见又不冲掉层次的区间。 */
 body::before {
   content: "";

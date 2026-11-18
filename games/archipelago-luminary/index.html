@@ -63,7 +63,7 @@
       min-height: 100vh;
       /* 底材：纯黑。氛围辉光改由 body::after 的 position:fixed 层承担
          （原先这里用 background-attachment:fixed，移动端滚动会掉帧，
-         按 ART-DIRECTION 2.3 改为 fixed 伪元素） */
+         按 视口锚定 改为 fixed 伪元素） */
       background: var(--bg);
       color: var(--ink);
       font-family: var(--sans);
@@ -226,7 +226,7 @@
        单层 radial-gradient 是廉价的，叠层才有"晕染"厚度。
 
        ★ 本页是全站最需要克制的一页 ★
-       ART-DIRECTION 标定表：近黑底 screen 叠加，.24~.46 会到亮部 8~13%。
+       实测标定：近黑底 screen 叠加，.24~.46 会到亮部 8~13%。
        本页基线亮部已 4.78%，颜色是"稀世珍宝"，故整体再压一档：
        顶层仅 .16（低于标定表"低于 0.2 等于没画"的阈值是有意的——
        本页要的正是"几乎看不见但确实存在"的金尘感，而不是光晕块）。

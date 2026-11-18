@@ -34,7 +34,7 @@
     --ink-paper: #17131c;
     --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Courier New", monospace;
 
-    /* ---- 渲染模式令牌（ART-DIRECTION 2.1）----
+    /* ---- 渲染模式令牌----
        本页「时代」= crt：底材是通电的荧光屏，强调色只有紫罗兰一种（稀缺），
        动效气质是「像素量化 + 扫描线滚动」。 */
     --mode:      crt;
@@ -45,7 +45,7 @@
     --edge:      #35354f;            /* 边框 / 分割线 */
     --grain:     .055;               /* 噪点强度 */
 
-    /* ---- 缓动词汇（ART-DIRECTION 2.1）----
+    /* ---- 缓动词汇（渲染模式令牌）----
        CRT 页不追求丝滑：主曲线两端收敛（起止速度均为 0），
        配合下面的 --dur-* 时长令牌与 steps() 量化使用。 */
     --ease-stage: cubic-bezier(.62, .02, .28, 1);   /* 两端收敛 */
