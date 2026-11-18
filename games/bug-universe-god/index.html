@@ -36,6 +36,36 @@
   --hand: "Bradley Hand", "Segoe Print", "Comic Sans MS", "Marker Felt", cursive, "Microsoft YaHei", sans-serif;
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+
+  /* ---- 渲染模式令牌（ART-DIRECTION 2.1）----
+     mode = dossier：档案纸 + 稿纸横线 + 印章落款 */
+  --edge:      rgba(255, 90, 90, 0.22);
+  --accent:    var(--red);
+  --mode:      dossier;   /* 渲染模式：档案纸 + 稿纸横线 + 印章落款 */
+  --grain:     0.4;
+  --accent-2:  var(--orange);
+
+  /* ---- 缓动词汇（ART-DIRECTION 手法 2 / 5）----
+     两端收敛、过冲回落，替换单调的 ease-out */
+  --ease-stage:   cubic-bezier(.22, .61, .36, 1);
+  /* 过冲回落：终点轻微越过再收回，用于卡片的入场与印章落款 */
+  --ease-overshoot: cubic-bezier(.34, 1.48, .5, 1);          /* 进慢出缓停 */
+  --ease-settle:  cubic-bezier(.34, 1.42, .64, 1);          /* 过冲回落（印章落下） */
+  --ease-ink:     cubic-bezier(.16, 1, .3, 1);              /* 墨迹晕开：起步快、尾巴极长 */
+  --dur-stage:    .62s;
+  --dur-quick:    .26s;
+
+  /* ---- 分层描边（手法 4）：多层叠加，替代单层 box-shadow ---- */
+  --sh-paper:
+    0 1px 0 rgba(255,255,255,.035),
+    0 3px 8px rgba(0,0,0,.42),
+    0 10px 22px rgba(0,0,0,.34),
+    0 22px 48px rgba(255,90,90,.10);
+  --sh-lift:
+    0 1px 0 rgba(255,255,255,.05),
+    0 4px 10px rgba(0,0,0,.45),
+    0 14px 30px rgba(0,0,0,.38),
+    0 30px 62px rgba(255,90,90,.16);
 }
 
 * { box-sizing: border-box; }
@@ -62,18 +92,34 @@ body {
 /* 三团档案灯：用 position:fixed 伪元素锚定视口。
    刻意不用 background-attachment:fixed —— iOS Safari 会忽略该属性，
    导致灯光跟着页面滚走。伪元素方案在所有浏览器上表现一致。
-   z-index 0 在 .wrap（z-index 2）之下，不会盖住内容。 */
+   z-index 0 在 .wrap（z-index 2）之下，不会盖住内容。
+
+   【分层光晕】单层 radial-gradient 是廉价的：边缘一刀切、没有厚度。
+   这里每团灯叠 5 层同心椭圆，半径按 k=i/4 递变、alpha 按 (1.3-0.4k) 递减，
+   复刻参考项目画墨晕的手法，做出「晕染」的过渡厚度。
+   alpha 标定参照 ART-DIRECTION 2.5：近黑底上低于 ~0.2 等于没画，
+   故最外层取 .30、最内层取 .12，整体落在看得见又不冲掉层次的区间。 */
 body::before {
   content: "";
   position: fixed; inset: 0;
   z-index: 0; pointer-events: none;
   background:
-    /* 左上红主光：档案灯打下来 */
-    radial-gradient(circle at 12% 8%, rgba(255, 90, 90, .20), transparent 34rem),
-    /* 右上橙侧光 */
-    radial-gradient(circle at 88% 18%, rgba(251, 146, 60, .14), transparent 30rem),
-    /* 底部回升的暖光 */
-    radial-gradient(circle at 50% 108%, rgba(255, 90, 90, .12), transparent 34rem);
+    /* ---- 左上红主光：5 层同心晕染 ---- */
+    radial-gradient(ellipse 10rem 9rem at 12% 8%,  rgba(255, 90, 90, .30), transparent 70%),
+    radial-gradient(ellipse 17rem 15rem at 12% 8%, rgba(255, 90, 90, .26), transparent 72%),
+    radial-gradient(ellipse 25rem 22rem at 12% 8%, rgba(255, 90, 90, .22), transparent 74%),
+    radial-gradient(ellipse 34rem 30rem at 12% 8%, rgba(255, 90, 90, .18), transparent 76%),
+    radial-gradient(ellipse 44rem 39rem at 12% 8%, rgba(255, 90, 90, .13), transparent 78%),
+    /* ---- 右上橙侧光：4 层 ---- */
+    radial-gradient(ellipse 9rem 8rem at 88% 18%,   rgba(251, 146, 60, .22), transparent 70%),
+    radial-gradient(ellipse 16rem 14rem at 88% 18%, rgba(251, 146, 60, .19), transparent 72%),
+    radial-gradient(ellipse 24rem 21rem at 88% 18%, rgba(251, 146, 60, .16), transparent 74%),
+    radial-gradient(ellipse 33rem 29rem at 88% 18%, rgba(251, 146, 60, .12), transparent 77%),
+    /* ---- 底部回升暖光：4 层 ---- */
+    radial-gradient(ellipse 12rem 10rem at 50% 108%, rgba(255, 90, 90, .20), transparent 70%),
+    radial-gradient(ellipse 21rem 18rem at 50% 108%, rgba(255, 90, 90, .17), transparent 73%),
+    radial-gradient(ellipse 31rem 27rem at 50% 108%, rgba(255, 90, 90, .14), transparent 76%),
+    radial-gradient(ellipse 42rem 36rem at 50% 108%, rgba(255, 90, 90, .10), transparent 79%);
 }
 
 /* 纸面颗粒：整页极淡的噪点，模拟实验记录本的纸 */
@@ -115,6 +161,24 @@ img { display: block; max-width: 100%; }
   padding: 14px 0;
   background: linear-gradient(180deg, rgba(14, 10, 11, .96) 70%, rgba(14, 10, 11, 0));
   backdrop-filter: blur(3px);
+  /* 影院外壳：静置后退场（仅 JS 就绪时生效，见 .cinema-idle） */
+  transition: opacity .5s var(--ease-stage), transform .5s var(--ease-stage);
+}
+
+/* 静置 2 秒后外壳退场，把画面让给内容本身（参考 bumpActivity）。
+   只在 JS 就绪（html.js-reveal）时生效——无 JS 时顶栏必须始终可见，
+   否则用户会失去唯一的返回入口。 */
+html.js-reveal.cinema-idle .topbar {
+  opacity: .18;
+  transform: translateY(-8px);
+}
+html.js-reveal.cinema-idle .topbar:hover,
+html.js-reveal.cinema-idle .topbar:focus-within {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js-reveal.cinema-idle .topbar { opacity: 1; transform: none; }
 }
 .topbar a { color: var(--dim); font-size: 15px; transition: color .25s ease; }
 .topbar a:hover, .topbar a:focus-visible { color: var(--red); }
@@ -122,6 +186,57 @@ img { display: block; max-width: 100%; }
 .topbar .tag {
   color: var(--faint); font-size: 12.5px; letter-spacing: .06em; font-family: var(--mono);
   border: 1px dashed var(--line); border-radius: 999px; padding: 3px 12px;
+}
+
+/* ---------- 影院外壳：静置 2s 后浮动控件退场（手法 5） ----------
+   只在 JS 能跑时由脚本加 .cinema-idle，无 JS 永远不退场，绝不丢导航。 */
+.cinema-idle .topbar { opacity: 0; transform: translateY(-14px); pointer-events: none; }
+.cinema-idle .to-top { opacity: 0; transform: translateY(14px) scale(.9); pointer-events: none; }
+
+/* ---------- 干笔飞白：不均匀、有断墨感的线条（手法 3） ----------
+   做法：3 层 repeating-linear-gradient 叠加，各自 alpha 与周期不同，
+   相互错位后自然出现「忽粗忽细、时断时续」的落款笔触。
+   纯 CSS，无需图片，也不引入外部字体。 */
+.dryline { position: relative; }
+.dryline::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 3px;
+  pointer-events: none;
+  background:
+    /* 主笔：较长的一段段墨 */
+    repeating-linear-gradient(90deg,
+      rgba(255, 90, 90, .55) 0 13px, transparent 13px 17px,
+      rgba(255, 90, 90, .34) 17px 34px, transparent 34px 41px),
+    /* 副笔：更短的碎点，制造断墨 */
+    repeating-linear-gradient(90deg,
+      rgba(251, 146, 60, .30) 0 5px, transparent 5px 11px),
+    /* 底衬：极淡的连续灰，防止整体断得过于零碎 */
+    linear-gradient(90deg, rgba(255, 90, 90, .10), rgba(251, 146, 60, .06));
+  background-size: 61px 100%, 23px 100%, 100% 100%;
+  mask-image: linear-gradient(90deg, #000 0 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0 88%, transparent 100%);
+}
+
+/* ---------- 印章落款：旋转的方章，过冲回落落下 ---------- */
+.stamp {
+  display: inline-block; padding: 5px 11px; margin-left: 10px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+  color: var(--red); border: 2px solid rgba(255, 90, 90, .55);
+  border-radius: 3px; transform: rotate(-6deg);
+  box-shadow: inset 0 0 0 1px rgba(255, 90, 90, .18);
+  opacity: .9;
+}
+.reveal.in .stamp { animation: stamp-down .7s var(--ease-settle) both; }
+@keyframes stamp-down {
+  0%   { opacity: 0; transform: rotate(-16deg) scale(1.7); }
+  62%  { opacity: 1; transform: rotate(-3deg)  scale(.94); }
+  100% { opacity: .9; transform: rotate(-6deg) scale(1); }
+}
+
+/* ---------- 纸面轻抖：悬停时极轻微的位移，像被手指碰了一下 ---------- */
+@keyframes paper-jitter {
+  0%, 100% { transform: translate(0, 0) rotate(var(--tilt, 0deg)); }
+  25%      { transform: translate(-1px, .5px) rotate(calc(var(--tilt, 0deg) - .18deg)); }
+  75%      { transform: translate(1px, -.5px) rotate(calc(var(--tilt, 0deg) + .18deg)); }
 }
 
 /* ---------- 通用：手绘描边容器 ---------- */
@@ -1678,6 +1793,27 @@ God Universe Bug已然注意到您工作中的优秀​​变现
         Array.prototype.forEach.call(revealEls, function (el) { el.classList.add('in'); });
       }, 2500);
     }
+
+    /* ==================================================================
+       影院外壳：静置 2 秒后顶栏退场（参考 bumpActivity）
+       鼠标 / 键盘 / 触摸 / 滚轮 任一活动立刻唤醒。
+       仅在支持 reduced-motion 检测且用户未要求减弱动效时启用。
+       ================================================================== */
+    (function () {
+      var root = document.documentElement;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;          // 用户要求减弱动效：外壳常驻，不退场
+      var timer = 0;
+      function bump() {
+        root.classList.remove('cinema-idle');
+        clearTimeout(timer);
+        timer = setTimeout(function () { root.classList.add('cinema-idle'); }, 2000);
+      }
+      ['mousemove', 'pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(function (ev) {
+        window.addEventListener(ev, bump, { passive: true });
+      });
+      bump();
+    })();
   })();
   </script>
 </body>

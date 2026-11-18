@@ -237,6 +237,103 @@ var sections = ['lighting', 'unreal', 'luminary', 'bug', 'slime', 'six', '<slug>
 
 几个在现有页面里验证过、成本低但效果强的写法，做新页面时可直接搬。
 
+> **完整设计纲领见 [ART-DIRECTION.md](./ART-DIRECTION.md)** —— 那是从参考项目
+> `pelican-6000-pure-code` 提炼出的 7 条手法、每页的「渲染模式」设定、
+> 以及实测标定数据（光晕透明度表、验证陷阱）。做新页面或升级观感前**先读它**。
+
+### 影院外壳：静置 2 秒后 chrome 退场
+
+参考项目 `player.js` 的 `bumpActivity()`：鼠标一动就移除 idle 类，静置 2 秒后加回，
+把画面让给内容本身。**关键是无 JS 时不能加类**，否则用户会失去导航。
+
+```js
+(function () {
+  var root = document.documentElement;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  root.classList.add('has-chrome');     // 先声明「外壳可用」
+  if (reduce) return;                   // 用户要求减弱动效：不退场
+  var timer = 0;
+  function bump() {
+    root.classList.remove('is-idle');
+    clearTimeout(timer);
+    timer = setTimeout(function () { root.classList.add('is-idle'); }, 2000);
+  }
+  ['mousemove','pointerdown','keydown','wheel','touchstart','scroll']
+    .forEach(function (ev) { addEventListener(ev, bump, { passive: true }); });
+  bump();
+})();
+```
+
+```css
+html.has-chrome .topbar { transition: opacity .5s var(--ease-stage); }
+html.has-chrome.is-idle .topbar { opacity: .18; transform: translateY(-8px); }
+html.has-chrome.is-idle .topbar:hover,
+html.has-chrome.is-idle .topbar:focus-within { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.has-chrome.is-idle .topbar { opacity: 1; transform: none; }
+}
+```
+
+⚠️ **CSS 与 JS 必须成对写**。six-elements 曾只写了 `html.has-chrome.is-idle .topbar`
+规则却没有任何 JS 去加这两个类，结果退场**完全不生效**且不报错（实测 opacity 恒为 1）。
+改完一定要用 CDP 读一次 `getComputedStyle(el).opacity` 确认，别只看代码。
+
+### 分层光晕（取代单层 radial-gradient）
+
+单层渐变的边缘只有一次衰减，看起来像贴上去的色斑。叠 5 层同心椭圆、
+半径按 `k = i/(n-1)` 递变、透明度反向递变，才有「中心实、外圈散」的厚度。
+
+```css
+.halo { position:absolute; left:50%; top:50%; width:132%; height:132%;
+        transform:translate(-50%,-50%); border-radius:50%; mix-blend-mode:screen; }
+.halo i { position:absolute; inset:0; border-radius:50%;
+          background: radial-gradient(circle at 50% 50%,
+            color-mix(in srgb, var(--accent) 92%, transparent) 0%,
+            color-mix(in srgb, var(--accent) 46%, transparent) 34%,
+            transparent 76%); }
+.halo i:nth-child(1) { transform: scale(1.00); opacity:.24 }
+.halo i:nth-child(2) { transform: scale(.86) translate(3%,-4%); opacity:.28 }
+.halo i:nth-child(3) { transform: scale(.68) translate(-4%,3%); opacity:.34 }
+.halo i:nth-child(4) { transform: scale(.48) translate(3%,4%); opacity:.40 }
+.halo i:nth-child(5) { transform: scale(.28) translate(-3%,-3%); opacity:.46 }
+```
+
+三个必踩的坑：
+
+1. **绝对定位元素没有显式尺寸会收缩为 0**，`width`/`height` 必须给。
+2. **近黑底 + screen 混合时，透明度低于 ~0.2 等于没画**。实测 `.16~.40` 逐像素零差异，
+   `.24~.46` 才把亮部从 2.40% 拉到 12.45%。想让光晕"几乎看不见但确实存在"（如
+   archipelago 的金尘），可以刻意低于阈值，但要清楚那是有意为之。
+3. **别被"色阶数下降"误导**。光晕会覆盖背景纹理、局部平滑掉层次，
+   全页色阶下降不一定是过曝。要**分区测量**：本例光晕覆盖区 -61 色阶，
+   而光晕外角落差值为 0，证明影响是局部的、可接受的。
+
+### 缓动词汇：别只有一个 ease-out
+
+参考项目用 `clamp` / `smoothstep` / `smootherstep` / `lerp` **组合**出复杂运动，
+而不是套一条 `ease-out`。两种最实用的手感：
+
+```css
+--ease-stage:     cubic-bezier(.62,.02,.28,1);   /* 两端收敛：起止速度都为 0 */
+--ease-overshoot: cubic-bezier(.34,1.48,.5,1);   /* 过冲回落：终点轻微越过再收回 */
+```
+
+`--ease-stage` 用于区块/卡片的入场位移，`--ease-overshoot` 用于翻牌、印章落款、
+hover 抬升这类需要"手感"的地方。
+
+### 时间量化：给像素风留一点帧率感
+
+参考项目的 `quantizeTime(t, hz) = floor(t*hz + 1e-6) / hz` 把运动吸附到离散网格。
+CSS 里对应 `steps()`：
+
+```css
+.sweep { animation: sweep 8.5s steps(85, end) infinite; }  /* 8.5s × 10Hz = 85 帧 */
+.topbar { transition: opacity .42s steps(3, end); }         /* 退场也走跳变，不丝滑 */
+```
+
+像素风页面（lightingforyou / unreal-objects / six-elements / 瑟克斯遗纪）适合量化；
+绒布、档案纸这类材质页面保持连续更自然。
+
 ### 像素阶梯切角框（无 `border-radius`）
 
 用一个 `.px` 类同时拿到「阶梯切角 + 3px 硬边 + 硬投影」，单个元素即可，不额外加 DOM：

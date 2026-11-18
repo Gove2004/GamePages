@@ -33,6 +33,26 @@
     --paper:     #cfc7b4;
     --ink-paper: #17131c;
     --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Courier New", monospace;
+
+    /* ---- 渲染模式令牌（ART-DIRECTION 2.1）----
+       本页「时代」= crt：底材是通电的荧光屏，强调色只有紫罗兰一种（稀缺），
+       动效气质是「像素量化 + 扫描线滚动」。 */
+    --mode:      crt;
+    --paper-raw: var(--bg);          /* 底材：荧光屏近黑 */
+    --body:      var(--dim);         /* 次级文字 */
+    --accent:    var(--violet);      /* 唯一饱和强调色 */
+    --accent-2:  var(--cyan);        /* 辅助强调色，仅用于扫描带与副辉光 */
+    --edge:      #35354f;            /* 边框 / 分割线 */
+    --grain:     .055;               /* 噪点强度 */
+
+    /* ---- 缓动词汇（ART-DIRECTION 2.1）----
+       CRT 页不追求丝滑：主曲线两端收敛（起止速度均为 0），
+       配合下面的 --dur-* 时长令牌与 steps() 量化使用。 */
+    --ease-stage: cubic-bezier(.62, .02, .28, 1);   /* 两端收敛 */
+    --ease-pop:   cubic-bezier(.34, 1.56, .64, 1);  /* 过冲回落 */
+    --dur-stage:  .42s;                             /* 主时长 */
+    --dur-quick:  .16s;
+    --hz:         10;                               /* 量化网格：10Hz */
     /* 阶梯像素角：两段 3px 台阶，供所有 .px 面板使用 */
     --stair: polygon(
       0 6px, 3px 6px, 3px 3px, 6px 3px, 6px 0,
@@ -171,7 +191,9 @@
       rgba(155, 140, 255, .05) 55%,
       rgba(64, 224, 255, .085) 88%,
       rgba(64, 224, 255, 0) 100%);
-    animation: crt-sweep 8.5s linear infinite;
+    /* 时间量化：8.5s × 10Hz = 85 帧，吸附到离散网格后再跳变，
+       刻意留出「帧率感」，而不是无限丝滑的 linear 平移 */
+    animation: crt-sweep 8.5s steps(85, end) infinite;
   }
   .crt .vig {
     inset: 0;
@@ -355,6 +377,8 @@
     text-transform: uppercase;
     background: linear-gradient(180deg, rgba(6, 6, 12, .97) 62%, rgba(6, 6, 12, 0));
     box-shadow: inset 0 -2px 0 rgba(53, 53, 79, .55);
+    /* 为退场动画与底部余辉提供定位上下文 */
+    will-change: opacity, transform;
   }
   .hud a { color: var(--dim); transition: color .18s linear, text-shadow .18s linear; }
   .hud a:hover, .hud a:focus-visible { color: var(--violet); text-shadow: 0 0 10px rgba(155, 140, 255, .5); }
@@ -369,6 +393,32 @@
     background: currentColor;
     box-shadow: 0 0 6px currentColor;
   }
+
+  /* ---- 影院外壳：静置 2s 后 HUD 退场，把画面让给内容 ----
+     只在能跑 JS 时加 html.has-chrome，无 JS 时 HUD 永远可见（不得回退）。
+     退场用 steps() 量化，保持 CRT 的「跳变」而不是丝滑淡出。 */
+  html.has-chrome .hud {
+    transition: opacity .22s steps(3, end), transform .22s steps(3, end);
+  }
+  html.has-chrome.is-idle .hud {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+  }
+  /* 退场后顶部留一条 2px 的「机台余辉」，避免整块消失显得突兀 */
+  html.has-chrome.is-idle .hud::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+      rgba(155, 140, 255, 0) 0%,
+      rgba(155, 140, 255, .38) 50%,
+      rgba(155, 140, 255, 0) 100%);
+    opacity: 0;
+    transition: opacity .22s steps(3, end);
+  }
+  html.has-chrome.is-idle .hud::after { opacity: 1; }
 
   /* ==================================================================
      5. Hero：标题 + 棋盘舞台
@@ -2108,7 +2158,44 @@
     revealAll();
   }
 
-  /* ---------- 2. 棋盘：生成格子 / 网格读数 / 点击移动主角 ---------- */
+  /* ---------- 2. 时间量化 + 影院外壳（HUD 静置退场） ---------- */
+
+  /* 把时间吸附到离散网格，刻意留一点「帧率感」而不是无限丝滑。
+     参考 quantizeTime(t, hz) = floor(t*hz + 1e-6)/hz */
+  var HZ = 10;
+  function quantizeTime(t, hz) {
+    hz = hz || HZ;
+    return Math.floor(t * hz + 1e-6) / hz;
+  }
+
+  /* 缓动词汇：两端收敛（起止速度均为 0），比 ease-out 更「重」 */
+  function smoothstep(edge0, edge1, x) {
+    var t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+  }
+
+  var hud = document.querySelector('.hud');
+  if (hud && !reduce) {
+    document.documentElement.classList.add('has-chrome');
+    var IDLE_MS = 2000;          /* 静置 2 秒后退场 */
+    var idleTimer = null;
+
+    function bumpActivity() {
+      document.documentElement.classList.remove('is-idle');
+      if (idleTimer) window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(function () {
+        document.documentElement.classList.add('is-idle');
+      }, IDLE_MS);
+    }
+
+    /* 鼠标移动 / 键盘 / 触摸 / 滚动 都立刻恢复外壳 */
+    ['mousemove', 'pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(function (ev) {
+      window.addEventListener(ev, bumpActivity, { passive: true });
+    });
+    bumpActivity();
+  }
+
+  /* ---------- 3. 棋盘：生成格子 / 网格读数 / 点击移动主角 ---------- */
   var board = document.getElementById('board');
   var cellsLayer = document.getElementById('cells');
   var player = document.getElementById('player');

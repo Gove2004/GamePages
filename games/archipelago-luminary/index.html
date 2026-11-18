@@ -31,6 +31,25 @@
       --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
       --wrap: 1120px;
+
+      /* ---- 时代令牌：mode = mono（黑白棋盘 · 金极稀缺）---- */
+      --paper: #05060a;      /* 底材：黑白棋盘的"黑" */
+      --body-c: var(--ink-2);
+      --accent: var(--gold);
+      --accent-2: var(--red);
+      --edge: var(--line);
+      --mode: mono;
+
+      /* 缓动词汇（替代单调 ease-out）：
+         --ease-stage 两端收敛；--ease-overshoot 过冲回落 */
+      --ease-stage: cubic-bezier(.62, .03, .28, 1);
+      --ease-overshoot: cubic-bezier(.34, 1.56, .64, 1);
+      --ease-settle: cubic-bezier(.16, .84, .24, 1);
+      --dur-stage: .62s;
+      --dur-quick: .22s;
+
+      /* 纹理强度：mono 页要求"只加纹理、不发灰"，故极低 */
+      --grain: .035;
     }
 
     /* ==========================================================
@@ -42,14 +61,10 @@
     body {
       margin: 0;
       min-height: 100vh;
-      /* 氛围层：极淡金色辉光 + 冷白纸感，仍是黑白为主 */
-      background:
-        radial-gradient(1180px 620px at 50% -14%, rgba(240, 198, 116, .085), transparent 62%),
-        radial-gradient(860px 520px at 88% 22%, rgba(240, 198, 116, .038), transparent 58%),
-        radial-gradient(720px 480px at 8% 68%, rgba(214, 224, 236, .030), transparent 62%),
-        radial-gradient(900px 560px at 50% 104%, rgba(255, 255, 255, .018), transparent 60%),
-        var(--bg);
-      background-attachment: fixed;
+      /* 底材：纯黑。氛围辉光改由 body::after 的 position:fixed 层承担
+         （原先这里用 background-attachment:fixed，移动端滚动会掉帧，
+         按 ART-DIRECTION 2.3 改为 fixed 伪元素） */
+      background: var(--bg);
       color: var(--ink);
       font-family: var(--sans);
       line-height: 1.72;
@@ -73,14 +88,20 @@
       background-repeat: repeat, repeat, repeat;
     }
 
-    /* 四角压暗，收拢视线 */
+    /* 四角压暗，收拢视线 + 氛围辉光（position:fixed，不用 background-attachment:fixed）
+       辉光透明度刻意压得很低：mono 页底色须保持约 95% 黑，颜色是稀世珍宝。 */
     body::after {
       content: "";
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: radial-gradient(138% 112% at 50% 38%, transparent 40%, rgba(0, 0, 0, .62) 100%);
+      background:
+        radial-gradient(138% 112% at 50% 38%, transparent 40%, rgba(0, 0, 0, .62) 100%),
+        radial-gradient(1180px 620px at 50% -14%, rgba(240, 198, 116, .050), transparent 62%),
+        radial-gradient(860px 520px at 88% 22%, rgba(240, 198, 116, .020), transparent 58%),
+        radial-gradient(720px 480px at 8% 68%, rgba(214, 224, 236, .016), transparent 62%),
+        radial-gradient(900px 560px at 50% 104%, rgba(255, 255, 255, .012), transparent 60%);
     }
 
     a { color: inherit; text-decoration: none; }
@@ -153,7 +174,11 @@
       --px-edge: #2b313b;
       position: relative;
       isolation: isolate;
-      filter: drop-shadow(5px 5px 0 rgba(0, 0, 0, .5));
+      /* 分层投影：远/中/近三层叠加，取代单层 drop-shadow */
+      filter:
+        drop-shadow(2px 2px 0 rgba(0, 0, 0, .55))
+        drop-shadow(6px 7px 0 rgba(0, 0, 0, .30))
+        drop-shadow(14px 20px 26px rgba(0, 0, 0, .55));
     }
     .px::before {
       content: "";
@@ -189,7 +214,65 @@
     }
     .px--gold { --px-edge: var(--gold-a); --px-fill: #0b0d12; }
     .px--red { --px-edge: var(--red-a); }
-    .px--flat { filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, .45)); }
+    .px--flat {
+      filter:
+        drop-shadow(2px 2px 0 rgba(0, 0, 0, .50))
+        drop-shadow(5px 6px 0 rgba(0, 0, 0, .26));
+    }
+
+    /* ==========================================================
+       04b · 分层光晕（5 层同心椭圆）
+       参考项目 drawInkWashBlob()：半径与 alpha 按 k=i/layers 递变，
+       单层 radial-gradient 是廉价的，叠层才有"晕染"厚度。
+
+       ★ 本页是全站最需要克制的一页 ★
+       ART-DIRECTION 标定表：近黑底 screen 叠加，.24~.46 会到亮部 8~13%。
+       本页基线亮部已 4.78%，颜色是"稀世珍宝"，故整体再压一档：
+       顶层仅 .16（低于标定表"低于 0.2 等于没画"的阈值是有意的——
+       本页要的正是"几乎看不见但确实存在"的金尘感，而不是光晕块）。
+       实测亮部增量必须 ≤1.5 个百分点，最终占比落在 2~5%。
+       ========================================================== */
+    .halo {
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+      left: 50%;
+      top: 50%;
+      width: 118%;
+      height: 118%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      mix-blend-mode: screen;
+    }
+    .halo i {
+      position: absolute;
+      inset: 0;
+      display: block;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%,
+        color-mix(in srgb, var(--gold) 88%, transparent) 0%,
+        color-mix(in srgb, var(--gold) 40%, transparent) 32%,
+        color-mix(in srgb, var(--gold) 13%, transparent) 56%,
+        transparent 74%);
+    }
+    /* 递变：越内层越小、越亮（k=i/layers）——但本页封顶在 .16 */
+    .halo i:nth-child(1) { transform: scale(1.00) translate(0, 0);       opacity: .05; }
+    .halo i:nth-child(2) { transform: scale(.87) translate(3%, -4%);     opacity: .07; }
+    .halo i:nth-child(3) { transform: scale(.70) translate(-4%, 3%);     opacity: .09; }
+    .halo i:nth-child(4) { transform: scale(.52) translate(3%, 4%);      opacity: .12; }
+    .halo i:nth-child(5) { transform: scale(.34) translate(-3%, -3%);    opacity: .16; }
+    /* 不支持 color-mix 的老浏览器兜底，至少不空转 */
+    @supports not (background: color-mix(in srgb, red 50%, transparent)) {
+      .halo { color: var(--gold); }
+      .halo i { background: radial-gradient(circle at 50% 50%, currentColor 0%, transparent 72%); }
+    }
+
+    /* 视口锚定辉光由上方 body::after 统一承担（position:fixed 伪元素） */
+
+    /* 分层描边说明：本页卡片用 .px 的 clip-path 阶梯边框，
+       加 box-shadow 会被 clip-path 裁掉，因此分层描边是通过 .px 的
+       三层 drop-shadow 实现的（见上方 .px），此处不再另设工具类。
+       参考项目"画一笔飞白要拆 7 根鬃毛"：单层投影是廉价的。 */
 
     /* ==========================================================
        05 · 顶栏 HUD
@@ -235,6 +318,37 @@
       box-shadow: 0 0 8px var(--gold-a);
     }
     .topbar .steam::after { content: " ↗"; color: var(--gold); }
+
+    /* ==========================================================
+       05b · 影院外壳：静置 2 秒后 chrome 退场
+       参考项目 player.js 的 bumpActivity()：鼠标一动就移除 is-idle，
+       静置后加回，把画面让给内容本身。
+       只在能跑 JS 时加类（html.chrome-idle），无 JS 时 chrome 常显。
+       ========================================================== */
+    .topbar,
+    .stage-bar,
+    .stage-hint {
+      transition:
+        opacity var(--dur-stage) var(--ease-stage),
+        transform var(--dur-stage) var(--ease-stage);
+    }
+    html.chrome-idle .topbar {
+      opacity: .26;
+      transform: translateY(-6px);
+    }
+    html.chrome-idle .stage-bar,
+    html.chrome-idle .stage-hint {
+      opacity: .30;
+    }
+    /* 一旦用户把指针移回或键盘聚焦，立刻完全恢复 */
+    html.chrome-idle .topbar:hover,
+    html.chrome-idle .topbar:focus-within,
+    html.chrome-idle .stage-bar:hover,
+    html.chrome-idle .stage-bar:focus-within,
+    html.chrome-idle .stage-hint:hover {
+      opacity: 1;
+      transform: none;
+    }
 
     /* ==========================================================
        06 · 通用排版
@@ -286,14 +400,35 @@
     .sec-idx b { color: var(--gold); font-weight: 700; }
 
     /* ==========================================================
-       07 · 滚动浮现
+       07 · 滚动浮现（逐格推进 · 强拍/弱拍分级）
+       参考项目 getBeatState()：进入视口是"强拍"（动作大），
+       滚动过程是"弱拍"（动作微）。此处用两档：
+         .rv            弱拍——纯淡入 + 小幅上移
+         .rv.beat-strong 强拍——关卡卡等"格"，带过冲回落
        ========================================================== */
     .rv {
       opacity: 0;
-      transform: translateY(22px);
-      transition: opacity .7s ease, transform .7s ease;
+      transform: translateY(14px);
+      transition:
+        opacity .5s var(--ease-stage),
+        transform .5s var(--ease-stage);
     }
     .rv.in { opacity: 1; transform: none; }
+
+    /* 强拍：过冲回落，动作大但落点稳 */
+    .rv.beat-strong {
+      transform: translateY(26px) scale(.985);
+      transition:
+        opacity .68s var(--ease-stage),
+        transform .78s var(--ease-overshoot);
+    }
+    .rv.beat-strong.in { opacity: 1; transform: none; }
+
+    /* 弱拍错峰：同一容器内的"格"依次推进，强化逐格感 */
+    .lv.rv.beat-strong:nth-child(4n+1) { transition-delay: .00s; }
+    .lv.rv.beat-strong:nth-child(4n+2) { transition-delay: .07s; }
+    .lv.rv.beat-strong:nth-child(4n+3) { transition-delay: .14s; }
+    .lv.rv.beat-strong:nth-child(4n+4) { transition-delay: .21s; }
 
     /* ==========================================================
        08 · Hero
@@ -337,6 +472,8 @@
 
     /* 封面画框 */
     .keyart { position: relative; padding: 10px; background: var(--bg-2); }
+    /* 光晕要抬到封面之上，否则被不透明 img 完全盖住，screen 叠加贡献为 0 */
+    .keyart img { position: relative; z-index: 2; }
     .keyart img {
       width: 100%;
       aspect-ratio: 616 / 353;
@@ -774,7 +911,7 @@
     .lv {
       --px-c: 5px;
       padding: 16px 18px;
-      transition: transform .28s ease;
+      transition: transform var(--dur-quick) var(--ease-overshoot);
     }
     .lv:hover { transform: translateY(-3px); }
 
@@ -920,7 +1057,7 @@
     .tw-card {
       --px-c: 5px;
       padding: 14px 14px 12px;
-      transition: transform .28s ease;
+      transition: transform var(--dur-quick) var(--ease-overshoot);
     }
     .tw-card:hover { transform: translateY(-3px); }
     .tw-card .tc-top {
@@ -1004,7 +1141,7 @@
       gap: 14px;
       padding: 14px;
       align-items: flex-start;
-      transition: transform .28s ease;
+      transition: transform var(--dur-quick) var(--ease-overshoot);
     }
     .th:hover { transform: translateY(-3px); }
     .th-ico {
@@ -1142,7 +1279,7 @@
       border: 0;
       cursor: zoom-in;
       text-align: left;
-      transition: transform .3s ease;
+      transition: transform var(--dur-quick) var(--ease-overshoot);
     }
     .shot:hover, .shot:focus-visible { transform: translateY(-3px); outline: none; }
     .shot img {
@@ -1368,6 +1505,14 @@
         transition: none !important;
       }
       .rv { opacity: 1 !important; transform: none !important; }
+      .rv.beat-strong { opacity: 1 !important; transform: none !important; }
+      /* chrome 退场是纯过渡效果，关闭动效后不再淡化，保证顶栏始终清晰可读 */
+      html.chrome-idle .topbar,
+      html.chrome-idle .stage-bar,
+      html.chrome-idle .stage-hint {
+        opacity: 1 !important;
+        transform: none !important;
+      }
       /* 动效关闭后：敌人与火花这类纯装饰元素不再移动，直接隐藏，避免定格在半途 */
       .enemy-motion,
       .spark,
@@ -1421,6 +1566,7 @@
           </div>
 
           <figure class="keyart px rv">
+            <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
             <img src="cover.jpg" width="616" height="353" alt="Archipelago Luminary 封面：黑白裂纹石纹背景上的白色锚形徽标" />
             <figcaption class="ka-tag">Key Art</figcaption>
           </figure>
@@ -2381,8 +2527,22 @@
     (function () {
       'use strict';
 
-      /* ---------- 1. 滚动浮现 ---------- */
+      /* ---------- 1. 滚动浮现（逐格推进 · 强拍/弱拍分级） ----------
+         参考项目 getBeatState()：进入视口是"强拍"（动作大），
+         滚动过程是"弱拍"（动作微）。关卡卡等"格"标记为强拍。
+         三件套：IO 检测 + 2.5s 兜底 + reduced-motion 强显（CSS 层）。 */
       var rvEls = document.querySelectorAll('.rv');
+
+      /* 强拍对象：关卡卡、炮塔卡、威胁卡、截图 —— 都是"一格" */
+      Array.prototype.forEach.call(rvEls, function (el) {
+        if (el.classList.contains('lv') ||
+            el.classList.contains('tw-card') ||
+            el.classList.contains('th') ||
+            el.classList.contains('shot')) {
+          el.classList.add('beat-strong');
+        }
+      });
+
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (en) {
@@ -2393,13 +2553,32 @@
           });
         }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
         Array.prototype.forEach.call(rvEls, function (el) { io.observe(el); });
-        // 兜底：观察器若因异常或环境限制而未触发，2.4 秒后强制全部可见，避免整页空白
+        // 兜底：观察器若因异常或环境限制而未触发，2.5 秒后强制全部可见，避免整页空白
         window.setTimeout(function () {
           Array.prototype.forEach.call(rvEls, function (el) { el.classList.add('in'); });
-        }, 2400);
+        }, 2500);
       } else {
         Array.prototype.forEach.call(rvEls, function (el) { el.classList.add('in'); });
       }
+
+      /* ---------- 2. 影院外壳：静置 2 秒后 chrome 退场 ----------
+         参考项目 player.js 的 bumpActivity()。只在能跑 JS 时加类，
+         无 JS 时顶栏始终可见（不会出现"没有导航"的死局）。 */
+      var idleTimer = 0;
+      function bumpActivity() {
+        document.documentElement.classList.remove('chrome-idle');
+        clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(function () {
+          /* 灯箱开着时不退场，避免用户正在看图却被淡化 */
+          var lbEl = document.getElementById('lb');
+          if (lbEl && lbEl.classList.contains('open')) return;
+          document.documentElement.classList.add('chrome-idle');
+        }, 2000);
+      }
+      ['mousemove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+        window.addEventListener(ev, bumpActivity, { passive: true });
+      });
+      bumpActivity();
 
       /* ---------- 3. 战场炮塔读数（真实名称 + 真实造价） ---------- */
       var read = document.getElementById('hudRead');

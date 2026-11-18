@@ -75,6 +75,29 @@
 
   --sans: "Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif;
   --pad: clamp(16px, 4vw, 40px);
+
+  /* ---- 渲染模式令牌（ART-DIRECTION §2.1）-----------------------------
+     mode = felt：底材是绒布，强调色是冷青 + 暖金，动效气质是「翻牌、布料经纬」。 */
+  --paper: var(--felt-dark);
+  --edge: var(--line);
+  --accent: var(--cyan);
+  --accent-2: var(--gold);
+  --mode: felt;
+  --grain: 0.55;
+
+  /* ---- 缓动词汇（ART-DIRECTION §2.2 / 手法 2）-------------------------
+     不再到处写 ease-out。四种手感各司其职：
+     stage   舞台级大位移：两端收敛，起止速度都为 0
+     flip    翻牌：过冲后回落，终点有轻微回弹
+     deal    发牌：快速起步、长尾缓停
+     lift    悬停抬起：短促、跟手
+     统一收在这里，改一处就能调全页手感。 */
+  --ease-stage: cubic-bezier(0.62, 0.02, 0.2, 1);
+  --ease-flip: cubic-bezier(0.34, 1.42, 0.52, 1);
+  --ease-deal: cubic-bezier(0.16, 0.84, 0.24, 1);
+  --ease-lift: cubic-bezier(0.2, 0.8, 0.25, 1);
+  --dur-stage: 0.85s;
+  --dur-flip: 0.78s;
 }
 
 * { box-sizing: border-box; }
@@ -97,24 +120,56 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 牌桌上方的三团灯：用 position:fixed 伪元素锚定视口。
+/* 牌桌上方的灯：用 position:fixed 伪元素锚定视口。
    刻意不用 background-attachment:fixed —— iOS Safari 会忽略该属性，
    灯光会跟着页面滚走。伪元素方案在所有浏览器上表现一致。
-   z-index 0 在 .wrap（z-index 2）之下，不会盖住内容。 */
+   z-index 0 在 .wrap（z-index 2）之下，不会盖住内容。
+
+   分层晕染：单层 radial-gradient 是廉价的 —— 边缘只有一次衰减，看起来像
+   一块贴上去的色斑。这里每团灯拆成 5 层同心椭圆，半径按 k=i/(n-1) 递变、
+   透明度反向递变，叠出「中心实、外圈散」的厚度，接近真实灯具的衰减。
+   透明度按 ART-DIRECTION §2.5 标定：近黑底上低于 ~0.2 等于没画，
+   所以峰值取到 0.24 一级。 */
 body::before {
   content: "";
   position: fixed; inset: 0;
   z-index: 0; pointer-events: none;
   background:
-    /* 顶部冷青主光：从牌桌上沿打下来 */
-    radial-gradient(1180px 620px at 50% -12%,
-      rgba(46, 230, 255, 0.115), transparent 62%),
-    /* 右上暖金侧光：让金色稀有感透出来 */
-    radial-gradient(880px 540px at 88% 22%,
-      rgba(246, 196, 83, 0.055), transparent 58%),
-    /* 左下暗紫底光：平衡冷暖 */
-    radial-gradient(1000px 720px at 10% 94%,
-      rgba(139, 123, 255, 0.05), transparent 62%);
+    /* --- 顶部冷青主光：从牌桌上沿打下来，5 层同心 --- */
+    radial-gradient(560px 300px at 50% -6%,  rgba(46, 230, 255, 0.24), transparent 70%),
+    radial-gradient(760px 400px at 50% -7%,  rgba(46, 230, 255, 0.20), transparent 70%),
+    radial-gradient(960px 500px at 50% -8%,  rgba(46, 230, 255, 0.16), transparent 70%),
+    radial-gradient(1180px 620px at 50% -9%, rgba(46, 230, 255, 0.12), transparent 70%),
+    radial-gradient(1420px 760px at 50% -10%, rgba(46, 230, 255, 0.08), transparent 70%),
+    /* --- 右上暖金侧光：让金色稀有感透出来，4 层 --- */
+    radial-gradient(420px 260px at 88% 20%, rgba(246, 196, 83, 0.15), transparent 68%),
+    radial-gradient(600px 370px at 88% 21%, rgba(246, 196, 83, 0.11), transparent 68%),
+    radial-gradient(820px 500px at 88% 22%, rgba(246, 196, 83, 0.08), transparent 68%),
+    radial-gradient(1080px 660px at 88% 23%, rgba(246, 196, 83, 0.05), transparent 68%),
+    /* --- 左下冷紫底光：平衡冷暖，3 层 --- */
+    radial-gradient(500px 360px at 10% 94%, rgba(139, 123, 255, 0.10), transparent 70%),
+    radial-gradient(760px 540px at 10% 95%, rgba(139, 123, 255, 0.075), transparent 70%),
+    radial-gradient(1020px 720px at 10% 96%, rgba(139, 123, 255, 0.05), transparent 70%);
+}
+
+/* 灯罩外的一圈绒布高光：贴着视口上沿，把冷青主光的「灯」坐实。
+   同样用 fixed 伪元素，不参与滚动。 */
+body::after {
+  content: "";
+  position: fixed;
+  left: 50%;
+  top: -180px;
+  width: 1100px;
+  height: 420px;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(46, 230, 255, 0.075) 0%,
+    rgba(46, 230, 255, 0.03) 44%,
+    transparent 72%);
+  filter: blur(26px);
 }
 
 a { color: inherit; text-decoration: none; }
@@ -201,6 +256,27 @@ button { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 
+/* ---------- 影院外壳：静置后顶栏退场 ----------
+   参考 bumpActivity：鼠标一动就恢复，停手 2 秒后淡出，把画面让给牌桌。
+   只在 JS 跑起来时才加 .is-idle（无 JS 时顶栏永远在位，不会「消失」）。
+   退场只降不透明度、保留可点性 —— 淡出时依然能点到返回链接。 */
+.js .topbar {
+  transition: opacity 0.9s var(--ease-stage),
+              transform 0.9s var(--ease-stage),
+              filter 0.9s var(--ease-stage);
+}
+.js .topbar.is-idle {
+  opacity: 0.16;
+  transform: translateY(-6px);
+  filter: blur(0.4px);
+}
+.js .topbar.is-idle:hover,
+.js .topbar.is-idle:focus-within {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
 /* ---------- 通用章节头 ---------- */
 .kicker {
   display: flex;
@@ -251,7 +327,9 @@ button { font: inherit; color: inherit; }
 .js .reveal {
   opacity: 0;
   transform: translateY(28px);
-  transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.2, 0.75, 0.25, 1);
+  /* 两端收敛：起步与收尾速度都为 0，比 ease-out 少了「一顿」的感觉 */
+  transition: opacity var(--dur-stage) var(--ease-stage),
+              transform var(--dur-stage) var(--ease-stage);
 }
 .js .reveal.in { opacity: 1; transform: none; }
 
@@ -364,9 +442,24 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   transform-origin: 50% var(--pivot);
   transform: rotate(var(--rot));
-  transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.25, 1);
+  transition: transform 0.42s var(--ease-lift);
   perspective: 1100px;
   -webkit-tap-highlight-color: transparent;
+  /* 发牌：从桌心方向飞入 + 淡出。用 animation 而非 transition，
+     这样它只播一次，不会和悬停的 transform 打架。
+     delay 由 --i 递推，9 张牌依次落桌。 */
+  animation: deal 0.72s var(--ease-deal) backwards;
+  animation-delay: calc(var(--i) * 90ms + 120ms);
+}
+@keyframes deal {
+  from {
+    opacity: 0;
+    transform: rotate(calc(var(--rot) * 0.25)) translateY(64px) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--rot));
+  }
 }
 /* 悬停：抬起 + 放大 + 站到最前 */
 .card:hover,
@@ -384,9 +477,16 @@ button { font: inherit; color: inherit; }
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.72s cubic-bezier(0.25, 0.75, 0.25, 1), box-shadow 0.4s ease;
+  /* 翻牌用「过冲回落」曲线：终点越过 180° 一点再弹回，收势有实体感，
+     不是硬停在某个角度。 */
+  transition: transform var(--dur-flip) var(--ease-flip), box-shadow 0.4s ease;
   border-radius: 12px;
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(46, 230, 255, 0.10);
+  /* 分层描边：三层影子叠加 —— 贴地的紧影 + 中程扩散 + 一圈青色内描边。
+     单层 box-shadow 会让卡片像贴纸，三层才有厚度。 */
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 16px 34px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(46, 230, 255, 0.10);
 }
 .card.flipped .card-3d { transform: rotateY(180deg); }
 
@@ -482,7 +582,9 @@ button { font: inherit; color: inherit; }
   color: var(--faint);
 }
 
-/* 悬停时卡面泛起的稀有度光 */
+/* 悬停时卡面泛起的稀有度光。
+   分层晕染：5 层同心椭圆由内向外衰减，比单层 radial-gradient 多出
+   「内圈实、外圈散」的过渡带 —— 单层只有一次衰减，看着像贴了块色斑。 */
 .card-glow {
   position: absolute;
   /* 盒子与卡片同尺寸：外扩的那圈交给 blur 的油墨溢出（ink overflow），
@@ -492,12 +594,17 @@ button { font: inherit; color: inherit; }
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s ease;
-  background: radial-gradient(ellipse at center, var(--sc, var(--cyan)) 0%, transparent 66%);
+  background:
+    radial-gradient(ellipse 42% 40% at 50% 50%, var(--sc, var(--cyan)), transparent 70%),
+    radial-gradient(ellipse 58% 54% at 50% 50%, var(--sc, var(--cyan)), transparent 70%),
+    radial-gradient(ellipse 74% 68% at 50% 50%, var(--sc, var(--cyan)), transparent 70%),
+    radial-gradient(ellipse 90% 82% at 50% 50%, var(--sc, var(--cyan)), transparent 70%),
+    radial-gradient(ellipse 108% 98% at 50% 50%, var(--sc, var(--cyan)), transparent 70%);
   filter: blur(14px);
   z-index: -1;
 }
 .card:hover .card-glow,
-.card:focus-visible .card-glow { opacity: 0.4; }
+.card:focus-visible .card-glow { opacity: 0.34; }
 
 /* 扇形下方的提示 */
 .fan-hint {
@@ -630,6 +737,13 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   outline: none;
+  /* 发牌：牌堆从桌面浮起，依次落位 */
+  animation: deal-pile 0.7s var(--ease-deal) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms + 100ms);
+}
+@keyframes deal-pile {
+  from { opacity: 0; transform: translateY(40px) scale(0.92); }
+  to   { opacity: 1; transform: none; }
 }
 /* 底下压着的几张牌 */
 .deck::before,
@@ -640,8 +754,9 @@ button { font: inherit; color: inherit; }
   border-radius: 12px;
   border: 2px solid var(--card-stroke);
   background: linear-gradient(165deg, var(--felt-light), var(--felt-deep));
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.25, 1);
+  transition: transform 0.45s var(--ease-lift);
   z-index: 0;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(46, 230, 255, 0.07);
 }
 .deck::before { transform: translate(9px, 9px) rotate(2.6deg); }
 .deck::after  { transform: translate(4px, 4px) rotate(1.2deg); }
@@ -653,7 +768,8 @@ button { font: inherit; color: inherit; }
   inset: 0;
   z-index: 1;
   transform-style: preserve-3d;
-  transition: transform 0.78s cubic-bezier(0.25, 0.75, 0.25, 1);
+  /* 过冲回落，和手牌翻面同一套手感 */
+  transition: transform var(--dur-flip) var(--ease-flip);
   border-radius: 12px;
 }
 .deck.flipped .deck-3d { transform: rotateY(180deg); }
@@ -666,7 +782,11 @@ button { font: inherit; color: inherit; }
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   border: 3px solid var(--card-stroke);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+  /* 分层描边：紧影 + 中程扩散 + 系列色内描边 */
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    0 14px 30px rgba(0, 0, 0, 0.5),
+    0 0 0 1px color-mix(in srgb, var(--sc, var(--cyan)) 22%, transparent);
 }
 
 /* 正面：真实卡面 + 系列信息 */
@@ -1359,6 +1479,17 @@ button { font: inherit; color: inherit; }
 
   .foe-art img { animation: none !important; }
   .table-area::before { display: none; }
+
+  /* 新增动效同样降级：发牌动画与顶栏退场一律停用。
+     顶栏强制常显 —— 减弱动效的用户不该遇到「界面自己消失」。 */
+  .card,
+  .deck { animation: none !important; opacity: 1 !important; transform: none; }
+  .js .topbar,
+  .js .topbar.is-idle {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
 }
 </style>
 </head>
@@ -2281,6 +2412,39 @@ button { font: inherit; color: inherit; }
 
   var decks = document.querySelectorAll('.deck');
   for (var d = 0; d < decks.length; d++) bindFlip(decks[d], 'flipped');
+
+  /* ------------------------------------------------------------------ *
+   * 2.5 影院外壳：静置后顶栏退场
+   *
+   * 参考 bumpActivity —— 用户一有动作就恢复，停手 2 秒后淡出，
+   * 把画面让给牌桌本身。只降不透明度，不设 display:none，
+   * 所以淡出状态下返回链接依然可点、可 Tab 到。
+   * ------------------------------------------------------------------ */
+  var topbar = document.querySelector('.topbar');
+
+  if (topbar && !reduce) {
+    var idleTimer = null;
+
+    function wake() {
+      topbar.classList.remove('is-idle');
+      if (idleTimer) window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(function () {
+        topbar.classList.add('is-idle');
+      }, 2000);
+    }
+
+    ['mousemove', 'mousedown', 'keydown', 'touchstart', 'wheel', 'focusin']
+      .forEach(function (ev) {
+        window.addEventListener(ev, wake, { passive: true });
+      });
+
+    // 切回标签页时先唤醒，避免用户回来看到一条半透明的栏
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) wake();
+    });
+
+    wake();
+  }
 
   /* ------------------------------------------------------------------ *
    * 3. 截图灯箱

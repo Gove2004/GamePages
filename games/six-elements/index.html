@@ -40,6 +40,26 @@
   --sh:4px 4px 0 rgba(0,0,0,.55);
   --sh2:2px 2px 0 rgba(0,0,0,.5);
   --sh-lg:6px 6px 0 rgba(0,0,0,.6);
+
+  /* ── 渲染模式令牌（ART-DIRECTION 2.1）──
+     本页「时代」= slate：底材暗石板，强调色由六元素色轮流担任，
+     动效气质「反应连锁、像素图标」——所有过渡吸附到离散网格。 */
+  --mode:slate;
+  --paper:#141009;                  /* 底材：暗石板 */
+  --body:var(--dim);                /* 次级文字 */
+  --accent:var(--gold);             /* 主强调（六元素色由局部 --ec 覆盖） */
+  --accent-2:var(--ember);          /* 辅助强调 */
+  --edge:var(--line2);              /* 边框 / 分割线 */
+  --grain:.07;                      /* 纹理强度 */
+
+  /* ── 缓动词汇（ART-DIRECTION 2.1）──
+     两端收敛：起止速度均为 0；过冲回落：用于「点亮」类反馈。
+     像素页不使用长缓动，统一走 steps() 量化。 */
+  --ease-stage:cubic-bezier(.62,.02,.28,1);
+  --ease-pop:cubic-bezier(.34,1.56,.64,1);
+  --dur-stage:.28s;
+  --dur-quick:.12s;
+  --hz:10;                          /* 量化网格：10Hz */
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -47,22 +67,52 @@ body{
   margin:0;min-height:100vh;color:var(--ink);
   font-family:var(--px);font-size:12px;font-weight:400;line-height:2;letter-spacing:.02em;
   overflow-x:hidden;
-  background:
-    radial-gradient(1100px 560px at 50% -12%, rgba(226,72,60,.13), transparent 60%),
-    radial-gradient(900px 500px at 88% 30%, rgba(217,184,63,.06), transparent 55%),
-    var(--bg);
+  background:var(--bg);
 }
-/* 像素字体只有一档字重，伪粗体会糊掉，层级一律用尺寸与颜色拉开 */
-b,strong,h1,h2,h3,h4,th,cite{font-weight:400;font-style:normal}
-
-/* CRT 扫描线 */
+/* 分层光晕（ART-DIRECTION 手法 1 + 2.5 标定表）
+   本页是像素风，所以不用柔和 radial，而是 3 组「带台阶的同心形状」：
+   每一组用两层硬边 stops 造出可见的色阶跳变，而不是渐隐。
+   近黑底 + screen 混合，透明度按标定表取 .24~.46 区间（低于 .2 等于没画）。 */
 body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  mix-blend-mode:screen;
+  background:
+    /* 顶部余烬主光：3 级台阶 */
+    radial-gradient(58% 42% at 50% -6%,
+      rgba(226,72,60,.40) 0 26%,
+      rgba(226,72,60,.24) 26% 46%,
+      rgba(226,72,60,.10) 46% 66%,
+      rgba(226,72,60,0) 66%),
+    /* 右上岩金光：2 级台阶 */
+    radial-gradient(44% 34% at 88% 26%,
+      rgba(217,184,63,.30) 0 30%,
+      rgba(217,184,63,.14) 30% 58%,
+      rgba(217,184,63,0) 58%),
+    /* 左侧水光：2 级台阶 */
+    radial-gradient(40% 38% at 2% 52%,
+      rgba(74,155,232,.26) 0 28%,
+      rgba(74,155,232,.11) 28% 56%,
+      rgba(74,155,232,0) 56%),
+    /* 右下雷光余温：2 级台阶 */
+    radial-gradient(36% 30% at 84% 88%,
+      rgba(180,138,242,.24) 0 30%,
+      rgba(180,138,242,.10) 30% 60%,
+      rgba(180,138,242,0) 60%),
+    /* 页脚回光，避免下半页发死 */
+    radial-gradient(56% 34% at 50% 106%,
+      rgba(231,194,122,.28) 0 28%,
+      rgba(231,194,122,.12) 28% 58%,
+      rgba(231,194,122,0) 58%);
+}
+/* CRT 扫描线（原 body::before 挪到 ::after 的兄弟层 .grain 上，
+   这里保留扫描线职责，位置与观感不变） */
+body::after{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
   background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 2px, transparent 2px 4px);
 }
-/* 棋盘格地面 */
-body::after{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
+/* 棋盘格地面（原本与扫描线同层，拆出来单独一层，保持 z 序不变） */
+.bg-board{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6;
   background-image:
     linear-gradient(45deg, rgba(231,194,122,.07) 25%, transparent 25% 75%, rgba(231,194,122,.07) 75%),
     linear-gradient(45deg, rgba(231,194,122,.07) 25%, transparent 25% 75%, rgba(231,194,122,.07) 75%);
@@ -72,6 +122,8 @@ body::after{
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
 button{font-family:inherit;color:inherit}
+/* 像素字体只有一档字重，伪粗体会糊掉，层级一律用尺寸与颜色拉开 */
+b,strong,h1,h2,h3,h4,th,cite{font-weight:400;font-style:normal}
 .px{image-rendering:pixelated;image-rendering:crisp-edges}
 .wrap{position:relative;z-index:1;width:min(1000px,calc(100% - 32px));margin:0 auto}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -93,6 +145,22 @@ button{font-family:inherit;color:inherit}
 .topbar .back::before{content:"‹ "}
 .topbar .store::after{content:" ↗"}
 .topbar .brand{font-size:12px;letter-spacing:.24em;color:var(--faint)}
+
+/* 影院外壳（ART-DIRECTION 手法 5）：静置 2s 后顶栏退场，把画面让给内容。
+   只在能跑 JS 时加 html.has-chrome，无 JS 时顶栏永远可见（不得回退）。
+   退场走 steps() 量化，保持像素跳变而不是丝滑淡出。 */
+html.has-chrome .topbar{
+  transition:opacity var(--dur-stage) steps(3,end),transform var(--dur-stage) steps(3,end);
+}
+html.has-chrome.is-idle .topbar{
+  opacity:0;transform:translateY(-100%);pointer-events:none;
+}
+/* 退场后留一条金色余辉，避免整块突然消失 */
+html.has-chrome.is-idle .topbar::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,
+    rgba(231,194,122,0) 0%,rgba(231,194,122,.55) 50%,rgba(231,194,122,0) 100%);
+}
 
 /* ===== Hero ===== */
 .hero{position:relative;padding:34px 0 26px;text-align:center}
@@ -486,6 +554,7 @@ h1 .glow{color:var(--gold);text-shadow:3px 3px 0 #5c3111, 0 0 24px rgba(231,194,
 </style>
 </head>
 <body>
+<div class="bg-board" aria-hidden="true"></div>
 <div class="wrap">
 
   <!-- 顶栏 -->
@@ -1332,6 +1401,31 @@ h1 .glow{color:var(--gold);text-shadow:3px 3px 0 #5c3111, 0 0 24px rgba(231,194,
   window.addEventListener('keydown', function(e){
     if(e.key === 'Escape' && lb.classList.contains('open')){ closeLB(); }
   });
+
+  /* ==================================================================
+     影院外壳：静置 2 秒后顶栏退场，把画面让给内容（参考 bumpActivity）
+     只在 JS 就绪时加 has-chrome，无 JS 时顶栏永远可见（不得回退）。
+     灯箱打开期间不退场。
+     ================================================================== */
+  (function(){
+    var root = document.documentElement;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    root.classList.add('has-chrome');          // 先声明"外壳可用"
+    if (reduce) return;                        // 用户要求减弱动效：不退场
+    var timer = 0;
+    function bump(){
+      root.classList.remove('is-idle');
+      clearTimeout(timer);
+      timer = setTimeout(function(){
+        if (lb.classList.contains('open')) return;   // 灯箱开着就别退场
+        root.classList.add('is-idle');
+      }, 2000);
+    }
+    ['mousemove','pointerdown','keydown','wheel','touchstart','scroll'].forEach(function(ev){
+      window.addEventListener(ev, bump, { passive: true });
+    });
+    bump();
+  })();
 })();
 </script>
 </body>
