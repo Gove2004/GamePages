@@ -459,6 +459,65 @@
     .reveal.in { opacity: 1; transform: none; }
     .d1 { transition-delay: .08s; } .d2 { transition-delay: .18s; } .d3 { transition-delay: .28s; }
 
+    /* ============ 影院外壳：静置后退场 ============ */
+    /* 参考项目 player.js 的 bumpActivity()：鼠标一动就移除 is-idle，
+       静置 2 秒后加回，把画面让给内容本身。 */
+    .nav, .rail { transition: opacity .7s var(--ease), transform .7s var(--ease); }
+    html.chrome-idle .nav { opacity: .28; transform: translateY(-6px); }
+    html.chrome-idle .rail { opacity: .22; transform: translateX(6px); }
+    html.chrome-idle .nav:hover,
+    html.chrome-idle .rail:hover,
+    html.chrome-idle .nav:focus-within,
+    html.chrome-idle .rail:focus-within { opacity: 1; transform: none; }
+
+    /* ============ 分层光晕（取代单层 radial-gradient）============ */
+    /* 参考项目 drawInkWashBlob()：5 层同心椭圆，半径与 alpha 按 k=i/layers 递变。
+       单层渐变是廉价的；叠层才有"晕染"的厚度。
+
+       两个必须注意的坑（都踩过）：
+       1. 绝对定位元素没有显式尺寸会收缩为 0 —— 必须给 width/height。
+       2. 光晕若被不透明的 .cover 完全盖住、且 mix-blend-mode 在近黑底上
+          做 screen 运算，实测贡献为 0（A/B 逐像素无差异）。
+          所以光晕要放大到超出封面、并抬到封面之上做柔光叠加。 */
+    .halo {
+      position: absolute; pointer-events: none; z-index: 3;
+      left: 50%; top: 50%; width: 132%; height: 132%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      mix-blend-mode: screen;
+    }
+    .halo i {
+      position: absolute; inset: 0; border-radius: 50%; display: block;
+      background: radial-gradient(circle at 50% 50%,
+        color-mix(in srgb, var(--accent) 92%, transparent) 0%,
+        color-mix(in srgb, var(--accent) 46%, transparent) 34%,
+        color-mix(in srgb, var(--accent) 16%, transparent) 58%,
+        transparent 76%);
+    }
+    /* 透明度必须够大才看得见：近黑底上做 screen 混合时，低透明度等于没画。
+       A/B 实测（隐藏 hero 后测第一个 gate）：
+         opacity .16~.40 → 逐像素零差异（完全看不见）
+         opacity .30~.62 → 亮部 2.40%→13.72%，但色阶 995→472（过曝、层次被冲掉）
+         opacity .24~.46 → 亮部约 8%，色阶保持在 800 以上，是平衡点 */
+    .halo i:nth-child(1) { transform: scale(1.00) translate(0, 0); opacity: .24; }
+    .halo i:nth-child(2) { transform: scale(.86) translate(3%, -4%); opacity: .28; }
+    .halo i:nth-child(3) { transform: scale(.68) translate(-4%, 3%); opacity: .34; }
+    .halo i:nth-child(4) { transform: scale(.48) translate(3%, 4%); opacity: .40; }
+    .halo i:nth-child(5) { transform: scale(.28) translate(-3%, -3%); opacity: .46; }
+    /* 老浏览器兜底：不支持 color-mix 时用 currentColor，至少不空转 */
+    @supports not (background: color-mix(in srgb, red 50%, transparent)) {
+      .halo { color: var(--accent); }
+      .halo i { background: radial-gradient(circle at 50% 50%, currentColor 0%, transparent 72%); }
+    }
+
+    /* ============ 舞台边框：影院取景 ============ */
+    .gate::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent),
+                  inset 0 120px 160px -120px rgba(0,0,0,.85),
+                  inset 0 -120px 160px -120px rgba(0,0,0,.85);
+    }
+
     /* ============ 响应式 ============ */
     /* 桌面端给右侧目录栏留一条专用通道：侧栏占右侧约 62px，
        正文左右各留 78px，两边对称、正文不会钻到侧栏底下被吃掉点击。 */
@@ -546,6 +605,7 @@
       <span class="ghost" aria-hidden="true">01</span>
       <div class="gate-inner">
         <div class="stage reveal">
+          <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           <div class="cover">
             <img src="games/lightingforyou/cover.jpg" alt="LightingForYou 游戏封面" loading="lazy" />
           </div>
@@ -587,6 +647,7 @@
           <a class="cta reveal d3" href="games/unreal-objects/index.html">进入详情 <span class="ar">→</span></a>
         </div>
         <div class="stage reveal">
+          <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           <div class="cover">
             <img src="games/unreal-objects/cover.jpg" alt="UNREAL OBJECTS 游戏封面" loading="lazy" />
           </div>
@@ -608,6 +669,7 @@
       <span class="ghost" aria-hidden="true">03</span>
       <div class="gate-inner">
         <div class="stage reveal">
+          <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           <div class="cover">
             <img src="games/archipelago-luminary/cover.jpg" alt="ARCHIPELAGO LUMINARY 游戏封面" loading="lazy" />
           </div>
@@ -657,6 +719,7 @@
           <a class="cta reveal d3" href="games/bug-universe-god/index.html">进入详情 <span class="ar">→</span></a>
         </div>
         <div class="stage reveal">
+          <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           <div class="cover">
             <img src="games/bug-universe-god/cover.jpg" alt="Bug Universe God 游戏封面" loading="lazy" />
           </div>
@@ -674,6 +737,7 @@
       <span class="ghost" aria-hidden="true">05</span>
       <div class="gate-inner">
         <div class="stage reveal">
+          <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           <div class="cover">
             <img src="games/ninth-slime-card/cover.jpg" alt="第九张史莱姆牌 游戏封面" loading="lazy" />
           </div>
@@ -713,6 +777,7 @@
           <a class="cta reveal d3" href="games/six-elements/index.html">进入详情 <span class="ar">→</span></a>
         </div>
         <div class="stage reveal">
+          <span class="halo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           <div class="cover">
             <img src="games/six-elements/cover.jpg" alt="瑟克斯遗纪 游戏封面：地下图书馆大厅中央的水晶棱柱与六元素" loading="lazy" />
           </div>
@@ -804,6 +869,24 @@
         });
       }, { threshold: 0.4 });
       sections.forEach(function (s) { if (s) sio.observe(s); });
+
+      /* ---------- 影院外壳：静置 2 秒后 chrome 退场 ----------
+         参考项目 player.js 的 bumpActivity()。只在能跑 JS 时加类，
+         无 JS 时 chrome 始终可见（不会出现"没有导航"的死局）。 */
+      var idleTimer = 0;
+      function bumpActivity() {
+        document.documentElement.classList.remove('chrome-idle');
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function () {
+          // 菜单展开时不退场，避免用户正在操作却被淡化
+          if (document.getElementById('navLinks').classList.contains('open')) return;
+          document.documentElement.classList.add('chrome-idle');
+        }, 2000);
+      }
+      ['mousemove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) {
+        window.addEventListener(ev, bumpActivity, { passive: true });
+      });
+      bumpActivity();
     })();
   </script>
 </body>
